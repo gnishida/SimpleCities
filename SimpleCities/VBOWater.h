@@ -7,7 +7,7 @@
 #include <QTime>
 
 
-#define		RESOLUTION 125
+#define		RESOLUTION 500	//125
 
 static int	normals = 0;
 static int	xold = 0;

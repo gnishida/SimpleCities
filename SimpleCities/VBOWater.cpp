@@ -186,9 +186,9 @@
 		const float y2 = y + 1;
 		const float xx = x2 * x2;
 		const float yy = y2 * y2;
-		float tmpZ = ((2 * sinf(20 * sqrtf (xx + yy) - 4 * t) + Noise(10 * x, 10 * y, t, 0)) / 4);
+		float tmpZ = ((0.15 * sinf(2000 * sqrtf (xx + yy) - 4 * t) + Noise(1000 * x, 1000 * y, t, 0)) * 0.1875);
 
-		return tmpZ + 60; //tmpZ - 0.0f;
+		return tmpZ + 60.5; //tmpZ - 0.0f;
 	}
 
 	/*
@@ -207,188 +207,53 @@
 		QTime curTime = QTime::currentTime();
 		const float t = ((float)curTime.second()) + (float(curTime.msec())/1000.0f);
 
-		//const float delta = waterWidth / RESOLUTION;
-		float width=rendManager.maxPos.x()-rendManager.minPos.x();//3000
-		float depth=rendManager.maxPos.y()-rendManager.minPos.y();//3000;
-		float delta = width / RESOLUTION;
-		const unsigned int length = 2 * (RESOLUTION + 1);
-		const float xn = (RESOLUTION + 1) * delta + 1;
-		unsigned int i;
-		unsigned int j;
-		float x;
-		float y;
-		unsigned int indice;
-		unsigned int preindice;
-
-		/* Yes, I know, this is quite ugly... */
-		float v1x;
-		float v1y;
-		float v1z;
-
-		float v2x;
-		float v2y;
-		float v2z;
-
-		float v3x;
-		float v3y;
-		float v3z;
-
-		float vax;
-		float vay;
-		float vaz;
-
-		float vbx;
-		float vby;
-		float vbz;
-
-		float nx;
-		float ny;
-		float nz;
-
-		float l;
-
 		//glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		/* Vertices */
-		for (j = 0; j <= RESOLUTION; ++j) {
-			//y = (j + 1) * delta - 1;
-			y = j * delta - 1;
-			for (i = 0; i <= RESOLUTION; ++i) {
-				indice = 6 * (i + j * (RESOLUTION + 1));
+		int indice = 0;
+		for (int j = 0; j < RESOLUTION - 1; ++j) {
+			float y1 = (rendManager.maxPos.y() - rendManager.minPos.y()) / (RESOLUTION - 1) * j;
+			float y2 = (rendManager.maxPos.y() - rendManager.minPos.y()) / (RESOLUTION - 1) * (j + 1);
 
-				x = i * delta - 1;
-
-				surface[indice + 3] = x - 0.5f * width;//waterWidth;
-				surface[indice + 4] = y - 0.5f * depth;//waterWidth;
-				surface[indice + 5] = z(x, y, t);
-
-				if (j != 0){
-					/* Values were computed during the previous loop */
-					preindice = 6 * (i + (j - 1) * (RESOLUTION + 1));
-					surface[indice] = surface[preindice + 3];
-					surface[indice + 1] = surface[preindice + 4];
-					surface[indice + 2] = surface[preindice + 5];
-				}else{
-					surface[indice] = x - 0.5f * width;//waterWidth;
-					surface[indice + 1] = y - 0.5f * depth;//waterWidth; 
-					surface[indice + 2] = z(x, y, t);
-				}
+			for (int i = 0; i < RESOLUTION; ++i) {
+				float x = (rendManager.maxPos.x() - rendManager.minPos.x()) / (RESOLUTION - 1) * i;
+				surface[indice + 0] = x - (rendManager.maxPos.x() - rendManager.minPos.x()) * 0.5;
+				surface[indice + 1] = y1 - (rendManager.maxPos.y() - rendManager.minPos.y()) * 0.5;
+				surface[indice + 2] = z(x, y1, t);
+				surface[indice + 3] = x - (rendManager.maxPos.x() - rendManager.minPos.x()) * 0.5;
+				surface[indice + 4] = y2 - (rendManager.maxPos.y() - rendManager.minPos.y()) * 0.5;
+				surface[indice + 5] = z(x, y2, t);
+				indice += 6;
 			}
 		}
 
 		/* Normals */
-		for (j = 0; j <= RESOLUTION; ++j) {
-			for (i = 0; i <= RESOLUTION; ++i) {
-				indice = 6 * (i + j * (RESOLUTION + 1));
+		indice = 0;
+		for (int j = 0; j < RESOLUTION - 1; ++j) {
+			for (int i = 0; i < RESOLUTION; ++i) {
+				QVector3D va(surface[indice + 6] - surface[indice], surface[indice + 7] - surface[indice + 1], surface[indice + 8] - surface[indice + 2]);
+				QVector3D vb(surface[indice + 3] - surface[indice], surface[indice + 4] - surface[indice + 1], surface[indice + 5] - surface[indice + 2]);
+				QVector3D n1 = QVector3D::crossProduct(va, vb);
+				normal[indice + 0] = n1.x();
+				normal[indice + 1] = n1.y();
+				normal[indice + 2] = n1.z();
 
-				v1x = surface[indice + 3];
-				v1y = surface[indice + 4];
-				v1z = surface[indice + 5];
-
-				v2x = v1x;
-				v2y = surface[indice + 1];
-				v2z = surface[indice + 2];
-
-				if (i < RESOLUTION) {
-					v3x = surface[indice + 9];
-					v3y = surface[indice + 10];
-					v3z = v1z;
-				} else {
-					v3x = xn;
-					v3y = z(xn, v1z, t);
-					v3z = v1z;
+				if (j == RESOLUTION - 2) {
+					va = QVector3D(surface[indice + 0] - surface[indice + 3], surface[indice + 1] - surface[indice + 4], surface[indice + 2] - surface[indice + 5]);
+					vb = QVector3D(surface[indice + 9] - surface[indice + 3], surface[indice + 10] - surface[indice + 4], surface[indice + 11] - surface[indice + 5]);
 				}
-
-				vax =  v2x - v1x;
-				vay =  v2y - v1y;
-				vaz =  v2z - v1z;
-
-				vbx = v3x - v1x;
-				vby = v3y - v1y;
-				vbz = v3z - v1z;
-
-				nx = (vby * vaz) - (vbz * vay);
-				ny = (vbz * vax) - (vbx * vaz);
-				nz = (vbx * vay) - (vby * vax);
-
-				l = sqrtf (nx * nx + ny * ny + nz * nz);
-				if (l != 0) {
-					l = 1 / l;
-					normal[indice + 3] = nx * l;
-					normal[indice + 4] = ny * l;
-					normal[indice + 5] = nz * l;
-				} else {
-					normal[indice + 3] = 0;
-					normal[indice + 4] = 1;
-					normal[indice + 5] = 0;
+				else {
+					va = QVector3D(surface[indice + 9] - surface[indice + 3], surface[indice + 10] - surface[indice + 4], surface[indice + 11] - surface[indice + 5]);
+					vb = QVector3D(surface[indice + 3 + RESOLUTION * 6] - surface[indice + 3], surface[indice + 4 + RESOLUTION * 6] - surface[indice + 4], surface[indice + 5 + RESOLUTION * 6] - surface[indice + 5]);
 				}
+				QVector3D n2 = QVector3D::crossProduct(va, vb);
+				normal[indice + 3] = n2.x();
+				normal[indice + 4] = n2.y();
+				normal[indice + 5] = n2.z();
 
-				if (j != 0) {
-					/* Values were computed during the previous loop */
-					preindice = 6 * (i + (j - 1) * (RESOLUTION + 1));
-					normal[indice] = normal[preindice + 3];
-					normal[indice + 1] = normal[preindice + 4];
-					normal[indice + 2] = normal[preindice + 5];
-				} else {
-					/* 	    v1x = v1x; */
-					v1y = z(v1x, (j - 1) * delta - 1, t);
-					v1z = (j - 1) * delta - 1;
-
-					/* 	    v3x = v3x; */
-					v3y = z(v3x, v2z, t);
-					v3z = v2z;
-
-					vax = v1x - v2x;
-					vay = v1y - v2y;
-					vaz = v1z - v2z;
-
-					vbx = v3x - v2x;
-					vby = v3y - v2y;
-					vbz = v3z - v2z;
-
-					nx = (vby * vaz) - (vbz * vay);
-					ny = (vbz * vax) - (vbx * vaz);
-					nz = (vbx * vay) - (vby * vax);
-
-					l = sqrtf(nx * nx + ny * ny + nz * nz);
-					if (l != 0) {
-						l = 1 / l;
-						normal[indice] = nx * l;
-						normal[indice + 1] = ny * l;
-						normal[indice + 2] = nz * l;
-					} else {
-						normal[indice] = 0;
-						normal[indice + 1] = 1;
-						normal[indice + 2] = 0;
-					}
-				}
+				indice += 6;
 			}
 		}
-
-		/* The water */
-		/*glEnable(GL_TEXTURE_2D);
-
-		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);			
-		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-
-		glEnable(GL_TEXTURE_GEN_S);
-		glEnable(GL_TEXTURE_GEN_T);
-
-		glBindTexture(GL_TEXTURE_2D, texture->getId());
-
-		glColor3f(1, 1, 1);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, normal);
-		glVertexPointer(3, GL_FLOAT, 0, surface);
-		for (i = 0; i <= RESOLUTION; ++i) {
-			glDrawArrays(GL_TRIANGLE_STRIP, i * length, length);
-		}
-
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_TEXTURE_GEN_S);
-		glDisable(GL_TEXTURE_GEN_T);
-		*/
 
 		//glDisable(GL_CULL_FACE);
 		glEnable(GL_CULL_FACE);
@@ -398,7 +263,7 @@
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, 2*3*sizeof(float)*(RESOLUTION+1)*(RESOLUTION+1), &surface[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 6*sizeof(float)*RESOLUTION*(RESOLUTION-1), &surface[0], GL_DYNAMIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,0);
@@ -407,7 +272,7 @@
 		GLuint nomVBO;
 		glGenBuffers(1, &nomVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, nomVBO);
-		glBufferData(GL_ARRAY_BUFFER, 2*3*sizeof(float)*(RESOLUTION+1)*(RESOLUTION+1), &normal[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 6*sizeof(float)*RESOLUTION*(RESOLUTION-1), &normal[0], GL_DYNAMIC_DRAW);
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,0);
 
@@ -416,8 +281,8 @@
 		glUniform1i (glGetUniformLocation (rendManager.program, "mode"), 4);//MODE: water
 		glUniform1i (glGetUniformLocation (rendManager.program, "tex0"), 0);//tex0: 0
 		
-		for (i = 2; i <= RESOLUTION; ++i) {//magic 2 to avoid wrong strip
-			glDrawArrays(GL_TRIANGLE_STRIP, i * length, length);
+		for (int i = 0; i < RESOLUTION - 1; ++i) {//magic 2 to avoid wrong strip
+			glDrawArrays(GL_TRIANGLE_STRIP, i * RESOLUTION * 2, RESOLUTION * 2);
 		}
 
 		glDeleteBuffers(1, &vbo);
