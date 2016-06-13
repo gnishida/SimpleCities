@@ -46,6 +46,7 @@ public:
     QAction *actionGenerateVegetation;
     QAction *actionGenerateAll;
     QAction *actionLoadParcels;
+    QAction *actionLoadBuildings;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -109,6 +110,8 @@ public:
         actionGenerateAll->setObjectName(QStringLiteral("actionGenerateAll"));
         actionLoadParcels = new QAction(MainWindow);
         actionLoadParcels->setObjectName(QStringLiteral("actionLoadParcels"));
+        actionLoadBuildings = new QAction(MainWindow);
+        actionLoadBuildings->setObjectName(QStringLiteral("actionLoadBuildings"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -137,6 +140,7 @@ public:
         menuFile->addAction(actionSaveTerrain);
         menuFile->addSeparator();
         menuFile->addAction(actionLoadParcels);
+        menuFile->addAction(actionLoadBuildings);
         menuFile->addSeparator();
         menuFile->addAction(actionLoadRoads);
         menuFile->addAction(actionSaveRoads);
@@ -195,6 +199,7 @@ public:
         actionGenerateVegetation->setText(QApplication::translate("MainWindow", "Generate Vegetation", 0));
         actionGenerateAll->setText(QApplication::translate("MainWindow", "Generate All", 0));
         actionLoadParcels->setText(QApplication::translate("MainWindow", "Load Parcels", 0));
+        actionLoadBuildings->setText(QApplication::translate("MainWindow", "Load Buildings", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0));

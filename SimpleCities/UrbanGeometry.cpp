@@ -142,7 +142,8 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
 		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 		BlockMeshGenerator::generateParcelMesh(vboRenderManager, blocks);
-		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+		//VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, buildings);
 		VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	}
 }
@@ -177,7 +178,54 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 		}
 	}
 
-	//mainWin->glWidget->vboRenderManager.changeTerrainDimensions(std::max(maxBound.x - minBound.x, maxBound.y - minBound.y), 100);
+	update(mainWin->glWidget->vboRenderManager);
+}
+
+void UrbanGeometry::loadBuildings(const std::string& filename) {
+	buildings.clear();
+
+	gs::Shape shape;
+	shape.load(filename);
+	minBound = shape.minBound;
+	maxBound = shape.maxBound;
+
+	glm::vec3 offset = (shape.maxBound + shape.minBound) * 0.5f;
+
+	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
+		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
+			Building building;
+
+			if (shape.shapeObjects[i].attributes.find("NbreEtages") != shape.shapeObjects[i].attributes.end()) {
+				building.numStories = shape.shapeObjects[i].attributes["NbreEtages"].intValue();
+			}
+			if (building.numStories <= 0) {
+				building.numStories = 2;
+			}
+
+			building.color = QColor(rand() % 256, rand() % 256, 255);
+
+			if (building.numStories == 1) {	// Low building with flat roof
+				building.bldType = 0;
+			}
+			else if (building.numStories > 6) {	// High tower with flat roof
+				building.bldType = 0;
+			}
+			else {	// residential house with gable roof
+				building.bldType = 0;
+			}
+
+			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 0; --k) {
+				QVector3D pt;
+				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
+				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
+				pt.setZ(shape.shapeObjects[i].parts[j].points[k].z);
+
+				building.buildingFootprint.push_back(pt);
+			}
+
+			buildings.push_back(building);
+		}
+	}
 
 	update(mainWin->glWidget->vboRenderManager);
 }

@@ -2,6 +2,39 @@
 
 namespace gs {
 
+	Variant::Variant(int value) : _intValue(value), type(OFTInteger) {
+		_doubleValue = value;
+		_stringValue = std::to_string(value);
+	}
+
+	Variant::Variant(double value) : _doubleValue(value), type(OFTReal) {
+		_intValue = value;
+		_stringValue = std::to_string(value);
+	}
+
+	Variant::Variant(const std::string& value) : _stringValue(value), type(OFTString) {
+		char* pEnd;
+		_doubleValue = std::strtod(value.c_str(), &pEnd);
+		if (*pEnd == 0) {
+			try {
+				_intValue = std::stoi(value);
+				_doubleValue = std::stod(value);
+			}
+			catch (std::invalid_argument ex) {
+				_intValue = 0;
+				_doubleValue = 0;
+			}
+			catch (std::out_of_range ex) {
+				_intValue = 0;
+				_doubleValue = 0;
+			}
+		}
+		else {
+			_intValue = 0;
+			_doubleValue = 0;
+		}
+	}
+
 	std::ostream& operator<<(std::ostream& os, const Variant& v) {
 		if (v.type == OFTInteger) {
 			os << v._intValue;
@@ -75,6 +108,10 @@ namespace gs {
 					}
 				}
 
+				if (shapeObjects[i].attributes["NbreEtages"].intValue() > 30) {
+					std::cout << "NbreEtages: " << shapeObjects[i].attributes["NbreEtages"].intValue() << "," << shapeObjects[i].attributes["NbreEtages"].stringValue() << std::endl;
+				}
+
 				// このshapeのベクトルデータを読み込む
 				OGRGeometry* poGeometry = poFeature->GetGeometryRef();
 				if (poGeometry != NULL) {
@@ -85,7 +122,6 @@ namespace gs {
 						OGRPoint* poPoint = (OGRPoint*)poGeometry;
 						shapeObjects[i].parts[0].points[0].x = poPoint->getX();
 						shapeObjects[i].parts[0].points[0].y = poPoint->getY();
-						shapeObjects[i].parts[0].points[0].z = 0;
 
 						updateBounds(poPoint);
 					}
@@ -168,7 +204,6 @@ namespace gs {
 
 			shapePart.points[j].x = point.getX();
 			shapePart.points[j].y = point.getY();
-			shapePart.points[j].z = 0;
 			updateBounds(&point);
 		}
 	}

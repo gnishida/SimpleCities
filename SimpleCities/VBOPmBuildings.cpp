@@ -176,7 +176,7 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 	//Set building
 	//inParcel.myBuilding.buildingFootprint=inParcel.myBuilding.buildingFootprint;
 	inParcel.myBuilding.numStories=bldgNumStories;
-	inParcel.myBuilding.bldType=BLDG_WITH_BLDG;
+	inParcel.myBuilding.bldType=0;
 
 	return true;
 }

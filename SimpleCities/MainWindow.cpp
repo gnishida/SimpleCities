@@ -3,9 +3,7 @@
 #include <QShortcut>
 #include "TerrainSizeInputDialog.h"
 #include "GraphUtil.h"
-//#include "CameraSequence.h"
 #include "Util.h"
-//#include "RoadGeneratorHelper.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
@@ -18,13 +16,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.fileToolBar->addAction(ui.actionNewTerrain);
 	ui.fileToolBar->addAction(ui.actionOpenTerrain);
 
-	//ui.actionAreaSelect->setChecked(true);
-
 	// register the menu's action handlers
 	connect(ui.actionNewTerrain, SIGNAL(triggered()), this, SLOT(onNewTerrain()));
 	connect(ui.actionOpenTerrain, SIGNAL(triggered()), this, SLOT(onLoadTerrain()));
 	connect(ui.actionSaveTerrain, SIGNAL(triggered()), this, SLOT(onSaveTerrain()));
 	connect(ui.actionLoadParcels, SIGNAL(triggered()), this, SLOT(onLoadParcels()));
+	connect(ui.actionLoadBuildings, SIGNAL(triggered()), this, SLOT(onLoadBuildings()));
 	connect(ui.actionLoadRoads, SIGNAL(triggered()), this, SLOT(onLoadRoads()));
 	connect(ui.actionSaveRoads, SIGNAL(triggered()), this, SLOT(onSaveRoads()));
 	connect(ui.actionClearRoads, SIGNAL(triggered()), this, SLOT(onClearRoads()));
@@ -86,6 +83,14 @@ void MainWindow::onSaveTerrain() {
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save Terrain file..."), "", tr("Terrain Files (*.png)"));
 	if (filename.isEmpty()) return;
 	glWidget->vboRenderManager.vboTerrain.saveTerrain(filename);
+}
+
+void MainWindow::onLoadBuildings() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Load buildings..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->loadBuildings(filename.toUtf8().constData());
+	glWidget->updateGL();
 }
 
 void MainWindow::onLoadParcels() {

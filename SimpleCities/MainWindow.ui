@@ -38,6 +38,7 @@
     <addaction name="actionSaveTerrain"/>
     <addaction name="separator"/>
     <addaction name="actionLoadParcels"/>
+    <addaction name="actionLoadBuildings"/>
     <addaction name="separator"/>
     <addaction name="actionLoadRoads"/>
     <addaction name="actionSaveRoads"/>
@@ -219,6 +220,11 @@
   <action name="actionLoadParcels">
    <property name="text">
     <string>Load Parcels</string>
+   </property>
+  </action>
+  <action name="actionLoadBuildings">
+   <property name="text">
+    <string>Load Buildings</string>
    </property>
   </action>
  </widget>

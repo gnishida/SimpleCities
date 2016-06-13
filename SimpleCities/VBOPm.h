@@ -10,12 +10,14 @@
 
 #include "VBOBuilding.h"
 #include "BlockSet.h"
+#include <vector>
 
 class VBORenderManager;
 
 class VBOPm {
 public:
 	static bool generateBuildings(VBORenderManager& rendManager, BlockSet& blocks);
+	static bool generateBuildings(VBORenderManager& rendManager, std::vector<Building>& buildings);
 	static bool generateVegetation(VBORenderManager& rendManager, BlockSet& blocks);
 };
 

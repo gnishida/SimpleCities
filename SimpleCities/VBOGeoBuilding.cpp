@@ -17,6 +17,75 @@ static std::vector<QVector3D> facadeScale;
 static std::vector<QString> windowTex;
 static std::vector<QString> roofTex;
 
+
+void addExtrudedGeom(VBORenderManager& rendManager, const QString& name, Loop3D& polygon, const QColor& color, float z, float height) {
+	std::vector<Vertex> vert(polygon.size() * 4);
+
+	for (int i = 0; i < polygon.size(); ++i) {
+		int next = (i + 1) % polygon.size();
+		QVector3D a(polygon[next].x() - polygon[i].x(), polygon[next].y() - polygon[i].y(), 0);
+		QVector3D b(0, 0, 1);
+		QVector3D n = QVector3D::crossProduct(a, b);
+
+		vert[i * 4 + 0] = Vertex(polygon[i].x(), polygon[i].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 4 + 1] = Vertex(polygon[next].x(), polygon[next].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 4 + 2] = Vertex(polygon[next].x(), polygon[next].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 4 + 3] = Vertex(polygon[i].x(), polygon[i].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
+	}
+	rendManager.addStaticGeometry(name, vert, "", GL_QUADS, 1 | mode_Lighting);
+}
+
+void addConvexPoly(VBORenderManager& rendManager, QString geoName, Loop3D& polygon, const QColor& color, float z){
+	if (polygon.size() < 3) return;
+
+	VBORenderManager::PolygonSetP polySet;
+	VBORenderManager::polygonP tempPolyP;
+
+	std::vector<VBORenderManager::pointP> vP;
+	vP.resize(polygon.size());
+	for (int pN = 0; pN<polygon.size(); pN++){
+		vP[pN] = boost::polygon::construct<VBORenderManager::pointP>(polygon[pN].x(), polygon[pN].y());
+	}
+
+
+
+
+	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
+	polySet += tempPolyP;
+	std::vector<VBORenderManager::polygonP> allP;
+	boost::polygon::get_trapezoids(allP, polySet);
+	std::vector<Vertex> vert;
+	for (int pN = 0; pN<allP.size(); pN++){
+		//glColor3ub(qrand()%255,qrand()%255,qrand()%255);
+		boost::polygon::polygon_with_holes_data<double>::iterator_type itPoly = allP[pN].begin();
+		std::vector<QVector3D> points;
+		std::vector<QVector3D> texP;
+		while (itPoly != allP[pN].end()){
+			VBORenderManager::pointP cP = *itPoly;
+			points.push_back(QVector3D(cP.x(), cP.y(), z));
+
+			itPoly++;
+		}
+		if (points.size() >= 3){//last vertex repited
+			for (int i = 0; i<3; i++)
+				vert.push_back(Vertex(points[i], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));
+
+			if (points.size() == 3){
+				vert.push_back(Vertex(points[2], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));//repeat last
+			}
+			else{
+				vert.push_back(Vertex(points[3], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));//fourth
+			}
+		}
+	}
+
+	rendManager.addStaticGeometry(geoName, vert, "", GL_QUADS, 1 | mode_Lighting);
+}//
+
+
+
+
+
 void addTexConvexPoly(VBORenderManager& rendManager,QString geoName,QString textureName,GLenum geometryType,int shaderMode,
 	Loop3D& pos,QColor col,QVector3D norm,float zShift,bool inverseLoop,bool texZeroToOne,QVector3D texScale){
 
@@ -496,13 +565,31 @@ void VBOGeoBuilding::initBuildingsTex(){
 	bldgInitialized=true;
 }
 
-void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& building,int type) {
+void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& building) {
+	// obtain the minimum elevation of the footprint
+	float z = std::numeric_limits<float>::max();
+	for (int k = 0; k < building.buildingFootprint.contour.size(); ++k) {
+		float pt_z = rendManager.getTerrainHeight(building.buildingFootprint.contour[k].x(), building.buildingFootprint.contour[k].y());
+		if (pt_z < z) {
+			z = pt_z;
+		}
+	}
+
 	Polygon3D& footprint=building.buildingFootprint;
 	int numStories=building.numStories;
 
 	///////////////////////////
-	// MORE COMPLEX
-	if(type==1){
+	// Simple box
+	if (building.bldType == 0){
+		for (int i = 0; i < building.buildingFootprint.contour.size(); ++i) {
+			//std::cout << building.buildingFootprint.contour[i].x() << "," << building.buildingFootprint.contour[i].y() << "," << building.buildingFootprint.contour[i].z() << std::endl;
+		}
+		
+		addExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z, building.numStories * 3);
+		addConvexPoly(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z + building.numStories * 3);
+	}
+
+	if(building.bldType==1){
 		if(bldgInitialized==false){
 			initBuildingsTex();
 		}

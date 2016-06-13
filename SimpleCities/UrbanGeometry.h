@@ -6,6 +6,7 @@
 #include "RoadGraph.h"
 #include "BlockSet.h"
 #include <glm/glm.hpp>
+#include "VBOBuilding.h"
 
 class MainWindow;
 
@@ -16,6 +17,7 @@ public:
 	MainWindow* mainWin;
 	RoadGraph roads;
 	BlockSet blocks;
+	std::vector<Building> buildings;
 	glm::vec3 minBound;
 	glm::vec3 maxBound;
 
@@ -41,6 +43,7 @@ public:
 	void update(VBORenderManager& vboRenderManager);
 
 	void loadParcels(const std::string& filename);
+	void loadBuildings(const std::string& filename);
 
 	void loadRoads(const QString &filename);
 	void saveRoads(const QString &filename);

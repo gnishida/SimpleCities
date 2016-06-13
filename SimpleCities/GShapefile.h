@@ -20,9 +20,9 @@ namespace gs {
 
 	public:
 		Variant() : type(-1) {}
-		Variant(int value) : _intValue(value), type(OFTInteger) {}
-		Variant(double value) : _doubleValue(value), type(OFTReal) {}
-		Variant(const std::string& value) : _stringValue(value), type(OFTString) {}
+		Variant(int value);
+		Variant(double value);
+		Variant(const std::string& value);
 
 		int intValue() { return _intValue; }
 		double doubleValue() { return _doubleValue; }
