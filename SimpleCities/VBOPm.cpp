@@ -46,8 +46,13 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, std::vector<Buildin
 	rendManager.removeStaticGeometry("3d_building");
 
 	for (int i = 0; i < buildings.size(); i++) {
+		/*
+		for (int k = 0; k < buildings[i].buildingFootprint.contour.size(); ++k) {
+			std::cout << buildings[i].buildingFootprint.contour[k].x() << "," << buildings[i].buildingFootprint.contour[k].y() << "," << buildings[i].buildingFootprint.contour[k].z() << std::endl;
+		}
+		*/
+
 		VBOGeoBuilding::generateBuilding(rendManager, buildings[i]);
-		//break;
 	}
 	printf("Building generation is done.\n");
 

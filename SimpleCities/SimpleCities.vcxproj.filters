@@ -208,9 +208,6 @@
     <ClCompile Include="GraphUtil.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
-    <ClCompile Include="geomutils.cpp">
-      <Filter>Main Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -390,9 +387,6 @@
       <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphUtil.h">
-      <Filter>Main Files</Filter>
-    </ClInclude>
-    <ClInclude Include="geomutils.h">
       <Filter>Main Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -175,6 +175,9 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 			block.myParcels[pvd] = parcel;
 
 			blocks.blocks.push_back(block);
+
+			// we use only the first part
+			break;
 		}
 	}
 
@@ -224,6 +227,31 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 			}
 
 			buildings.push_back(building);
+			
+			// we use only the first part
+			break;
+		}
+	}
+
+	// remove the building that is within the other buildings
+	for (int i = 0; i < buildings.size(); ) {
+		bool inside = false;
+		for (int k = 0; k < buildings[i].buildingFootprint.contour.size() && !inside; ++k) {
+			for (int j = 0; j < buildings.size(); ++j) {
+				if (i == j) continue;
+
+				if (boost::geometry::within(buildings[i].buildingFootprint.contour[k], buildings[j].buildingFootprint.contour)) {
+					inside = true;
+					break;
+				}
+			}
+		}
+
+		if (inside) {
+			buildings.erase(buildings.begin() + i);
+		}
+		else {
+			i++;
 		}
 	}
 

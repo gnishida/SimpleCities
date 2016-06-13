@@ -136,7 +136,6 @@
     <ClCompile Include="BBox.cpp" />
     <ClCompile Include="BlockMeshGenerator.cpp" />
     <ClCompile Include="BlockSet.cpp" />
-    <ClCompile Include="geomutils.cpp" />
     <ClCompile Include="gisutils.cpp" />
     <ClCompile Include="GShapefile.cpp" />
     <ClCompile Include="nvModel\nvModel.cpp" />
@@ -268,7 +267,6 @@
     <ClInclude Include="BBox.h" />
     <ClInclude Include="BlockMeshGenerator.h" />
     <ClInclude Include="BlockSet.h" />
-    <ClInclude Include="geomutils.h" />
     <ClInclude Include="gisutils.h" />
     <ClInclude Include="GShapefile.h" />
     <ClInclude Include="RoadMeshGenerator.h" />

@@ -19,7 +19,7 @@ static std::vector<QString> roofTex;
 
 
 void addExtrudedGeom(VBORenderManager& rendManager, const QString& name, Loop3D& polygon, const QColor& color, float z, float height) {
-	std::vector<Vertex> vert(polygon.size() * 4);
+	std::vector<Vertex> vert(polygon.size() * 6);
 
 	for (int i = 0; i < polygon.size(); ++i) {
 		int next = (i + 1) % polygon.size();
@@ -27,12 +27,14 @@ void addExtrudedGeom(VBORenderManager& rendManager, const QString& name, Loop3D&
 		QVector3D b(0, 0, 1);
 		QVector3D n = QVector3D::crossProduct(a, b);
 
-		vert[i * 4 + 0] = Vertex(polygon[i].x(), polygon[i].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
-		vert[i * 4 + 1] = Vertex(polygon[next].x(), polygon[next].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
-		vert[i * 4 + 2] = Vertex(polygon[next].x(), polygon[next].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
-		vert[i * 4 + 3] = Vertex(polygon[i].x(), polygon[i].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 0] = Vertex(polygon[i].x(), polygon[i].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 1] = Vertex(polygon[next].x(), polygon[next].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 2] = Vertex(polygon[next].x(), polygon[next].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 3] = Vertex(polygon[i].x(), polygon[i].y(), z, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 4] = Vertex(polygon[next].x(), polygon[next].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
+		vert[i * 6 + 5] = Vertex(polygon[i].x(), polygon[i].y(), z + height, color, n.x(), n.y(), n.z(), 0, 0, 0);
 	}
-	rendManager.addStaticGeometry(name, vert, "", GL_QUADS, 1 | mode_Lighting);
+	rendManager.addStaticGeometry(name, vert, "", GL_TRIANGLES, 1 | mode_Lighting);
 }
 
 void addConvexPoly(VBORenderManager& rendManager, QString geoName, Loop3D& polygon, const QColor& color, float z){
@@ -43,12 +45,9 @@ void addConvexPoly(VBORenderManager& rendManager, QString geoName, Loop3D& polyg
 
 	std::vector<VBORenderManager::pointP> vP;
 	vP.resize(polygon.size());
-	for (int pN = 0; pN<polygon.size(); pN++){
-		vP[pN] = boost::polygon::construct<VBORenderManager::pointP>(polygon[pN].x(), polygon[pN].y());
+	for (int i = 0; i < polygon.size(); ++i) {
+		vP[i] = boost::polygon::construct<VBORenderManager::pointP>(polygon[i].x(), polygon[i].y());
 	}
-
-
-
 
 	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
 	polySet += tempPolyP;
@@ -56,31 +55,29 @@ void addConvexPoly(VBORenderManager& rendManager, QString geoName, Loop3D& polyg
 	boost::polygon::get_trapezoids(allP, polySet);
 	std::vector<Vertex> vert;
 	for (int pN = 0; pN<allP.size(); pN++){
-		//glColor3ub(qrand()%255,qrand()%255,qrand()%255);
 		boost::polygon::polygon_with_holes_data<double>::iterator_type itPoly = allP[pN].begin();
-		std::vector<QVector3D> points;
+		Polygon2D points;
 		std::vector<QVector3D> texP;
 		while (itPoly != allP[pN].end()){
 			VBORenderManager::pointP cP = *itPoly;
-			points.push_back(QVector3D(cP.x(), cP.y(), z));
+			points.push_back(QVector2D(cP.x(), cP.y()));
 
 			itPoly++;
 		}
-		if (points.size() >= 3){//last vertex repited
-			for (int i = 0; i<3; i++)
-				vert.push_back(Vertex(points[i], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));
 
-			if (points.size() == 3){
-				vert.push_back(Vertex(points[2], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));//repeat last
-			}
-			else{
-				vert.push_back(Vertex(points[3], color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));//fourth
+		if (points.size() >= 3) {
+			points.correct();
+			std::reverse(points.begin(), points.end());
+			for (int i = 1; i < points.size() - 1; ++i) {
+				vert.push_back(Vertex(QVector3D(points[0].x(), points[0].y(), z), color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));
+				vert.push_back(Vertex(QVector3D(points[i].x(), points[i].y(), z), color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));
+				vert.push_back(Vertex(QVector3D(points[i+1].x(), points[i+1].y(), z), color, QVector3D(0, 0, 1), QVector3D(0, 0, 0)));
 			}
 		}
 	}
 
-	rendManager.addStaticGeometry(geoName, vert, "", GL_QUADS, 1 | mode_Lighting);
-}//
+	rendManager.addStaticGeometry(geoName, vert, "", GL_TRIANGLES, 1 | mode_Lighting);
+}
 
 
 
