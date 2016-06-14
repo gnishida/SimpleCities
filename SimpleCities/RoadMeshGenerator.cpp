@@ -352,7 +352,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 								
 				if (interPoints.size() > 2) {
-					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
+					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,"../data/textures/roads/road_0lines.jpg",2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
 				}
 			}
 		}

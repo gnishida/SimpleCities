@@ -52,38 +52,10 @@ public:
 		centroid = QVector3D(FLT_MAX, FLT_MAX, FLT_MAX);
 	}
 
-	/**
-	* Destructor.
-	**/
-	~Polygon3D()
-	{
-		contour.clear();
-	}
-
-	/**
-	* Copy constructor.
-	**/
-	Polygon3D(const Polygon3D &ref)
-	{	
-		contour = ref.contour;
-		normalVec = ref.normalVec;
-		centroid = ref.centroid;
-	}
-
 	void clear() { contour.clear(); }
 
+	bool isClockwise();
 	void correct();
-
-	/**
-	* Assignment operator.
-	**/
-	inline Polygon3D &operator=(const Polygon3D &ref)
-	{				
-		contour = ref.contour;
-		normalVec = ref.normalVec;
-		centroid = ref.centroid;
-		return (*this);
-	}
 
 	/**
 	* Acessor to point at index idx
@@ -195,7 +167,7 @@ public:
 
 	static int cleanLoop(Loop3D &pin, Loop3D &pout, float threshold);
 
-	static void transformLoop(Loop3D &pin, Loop3D &pout, QMatrix4x4 &transformMat);
+	static void transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat);
 
 	static float computeLoopArea(Loop3D &pin, bool parallelToXY = false);
 
@@ -203,8 +175,8 @@ public:
 
 	static QVector3D getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &maxCorner);
 
-	static void getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
-	static void getLoopOBB2(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
+	static void getLoopOBB(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
+	static void getLoopOBB2(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
 	static Loop3D getLoopOBB3(Loop3D &pin);
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);

@@ -7,6 +7,26 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/create_offset_polygons_2.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Partition_traits_2.h>
+#include <CGAL/partition_2.h>
+
+bool Polygon3D::isClockwise() {
+	int next;
+	float tmpSum = 0.0f;
+
+	for (int i = 0; i < contour.size(); ++i) {
+		next = (i + 1) % contour.size();
+		tmpSum = tmpSum + (contour[next].x() - contour[i].x()) * (contour[next].y() + contour[i].y());
+	}
+
+	if (tmpSum > 0.0f) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 void Polygon3D::correct() {
 	int next;
@@ -93,6 +113,9 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 	}
 	return true;
 }
+
+
+
 
 float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
 {
@@ -328,10 +351,9 @@ bool Polygon3D::segmentSegmentIntersectXY(QVector2D &a, QVector2D &b, QVector2D 
 	return true;
 }
 
-void Polygon3D::transformLoop(Loop3D &pin, Loop3D &pout, QMatrix4x4 &transformMat)
-{
+void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat) {
 	pout = pin;
-	for(int i=0; i<pin.size(); ++i){
+	for (int i = 0; i < pin.size(); ++i) {
 		pout.at(i) = transformMat*pin.at(i);
 	}
 }
@@ -589,6 +611,51 @@ bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
 * @param[out] pgonInset: The vertices of the polygon inset
 * @return insetArea: Returns the area of the polygon inset		
 **/
+#if 0
+float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
+	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+	typedef CGAL::Partition_traits_2<K> Traits;
+	typedef Traits::Polygon_2 Polygon_2;
+	typedef boost::shared_ptr<Polygon_2> PolygonPtr;
+
+	pgonInset.clear();
+
+	Polygon_2 poly;
+
+	for (int i = 0; i < contour.size(); ++i) {
+		poly.push_back(K::Point_2(contour[i].x(), contour[i].y()));
+	}
+	poly.push_back(K::Point_2(contour[0].x(), contour[0].y()));
+
+	std::vector<PolygonPtr> offset_poly;
+	if (offsetDistance < 0) {
+		K::FT lOffset = -offsetDistance;
+		offset_poly = CGAL::create_exterior_skeleton_and_offset_polygons_2(lOffset, poly);
+
+		for (auto it = offset_poly[1]->vertices_begin(); it != offset_poly[1]->vertices_end(); ++it) {
+			pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+		}
+		std::reverse(pgonInset.begin(), pgonInset.end());
+	}
+	else {
+		K::FT lOffset = offsetDistance;
+		offset_poly = CGAL::create_interior_skeleton_and_offset_polygons_2(lOffset, poly);
+
+		for (auto it = offset_poly[0]->vertices_begin(); it != offset_poly[0]->vertices_end(); ++it) {
+			pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+		}
+	}
+
+	if (computeArea) {
+		// not implemented yet.
+		return 0;
+	}
+	else {
+		return 0;
+	}
+}
+#endif
+#if 1
 float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea)
 {
 	if(contour.size() < 3) return 0.0f;				
@@ -596,6 +663,7 @@ float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool comp
 
 	return computeInset(offsetDistances, pgonInset, computeArea);
 }
+#endif
 
 //Distance from segment ab to point c
 float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c, QVector3D &closestPtInAB)
@@ -743,7 +811,7 @@ int Polygon3D::cleanLoop(Loop3D &pin, Loop3D &pout, float threshold=1.0f)
 /**
 * Get polygon oriented bounding box
 **/
-void Polygon3D::getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
+void Polygon3D::getLoopOBB(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
 	float alpha = 0.0f;			
 	float deltaAlpha = 0.05*3.14159265359f;
 	float bestAlpha;
@@ -791,7 +859,7 @@ void Polygon3D::getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
  * Get polygon oriented bounding box
  * xformMat is a matrix that transform the original polygon to the axis aligned bounding box centered at the origin.
  */
-void Polygon3D::getLoopOBB2(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
+void Polygon3D::getLoopOBB2(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
 	float alpha = 0.0f;			
 	float deltaAlpha = 0.05*3.14159265359f;
 	float bestAlpha;

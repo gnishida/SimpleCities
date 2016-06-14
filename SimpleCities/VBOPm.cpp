@@ -34,7 +34,7 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 			blocks[bN].myParcels[*vi].myBuilding.color = QColor(c, c, c);
 
 			int building_type = 1;//placeTypes.myPlaceTypes[blocks[bN].getMyPlaceTypeIdx()].getInt("building_type");
-			VBOGeoBuilding::generateBuilding(rendManager,blocks[bN].myParcels[*vi].myBuilding);				
+			VBOGeoBuilding::generateBuilding(rendManager,blocks[bN].myParcels[*vi].myBuilding);		
 		}
 	}
 	printf("Building generation is done.\n");
@@ -46,12 +46,6 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, std::vector<Buildin
 	rendManager.removeStaticGeometry("3d_building");
 
 	for (int i = 0; i < buildings.size(); i++) {
-		/*
-		for (int k = 0; k < buildings[i].buildingFootprint.contour.size(); ++k) {
-			std::cout << buildings[i].buildingFootprint.contour[k].x() << "," << buildings[i].buildingFootprint.contour[k].y() << "," << buildings[i].buildingFootprint.contour[k].z() << std::endl;
-		}
-		*/
-
 		VBOGeoBuilding::generateBuilding(rendManager, buildings[i]);
 	}
 	printf("Building generation is done.\n");

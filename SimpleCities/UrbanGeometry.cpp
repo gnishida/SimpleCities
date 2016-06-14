@@ -211,6 +211,19 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 
 	glm::vec3 offset = (maxBound + minBound) * 0.5f;
 
+#if 0
+	Building building;
+	building.numStories = 8;
+	building.color = QColor(rand() % 256, rand() % 256, 255);
+	building.bldType = 0;
+	building.buildingFootprint.push_back(QVector3D(-10, -10, 0));
+	building.buildingFootprint.push_back(QVector3D(10, -10, 0));
+	building.buildingFootprint.push_back(QVector3D(10, 10, 0));
+	building.buildingFootprint.push_back(QVector3D(-10, 10, 0));
+	buildings.push_back(building);
+#endif
+
+#if 1
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
 			Building building;
@@ -224,14 +237,15 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 
 			building.color = QColor(rand() % 256, rand() % 256, 255);
 
+			// For now, only one type of building is implemented.
 			if (building.numStories == 1) {	// Low building with flat roof
-				building.bldType = 0;
+				building.bldType = 1;
 			}
 			else if (building.numStories > 6) {	// High tower with flat roof
-				building.bldType = 0;
+				building.bldType = 1;
 			}
 			else {	// residential house with gable roof
-				building.bldType = 0;
+				building.bldType = 1;
 			}
 
 			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 0; --k) {
@@ -249,6 +263,7 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 			break;
 		}
 	}
+#endif
 
 	// remove the building that is within the other buildings
 	for (int i = 0; i < buildings.size(); ) {

@@ -541,7 +541,7 @@ void VBORoadGraph::updateRoadGraph(VBORenderManager& rendManager,RoadGraph &road
 				}
 				if(interPoints.size()>2)
 					//rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,1.1f,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,9),QVector3D());
-					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,1.1f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2|mode_AdaptTerrain,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());
+					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,1.1f,"../data/textures/roads/road_0lines.jpg",2|mode_AdaptTerrain,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());
 				//////////////
 
 			}
@@ -841,7 +841,7 @@ void VBORoadGraph::updateRoadGraph(VBORenderManager& rendManager,RoadGraph &road
 								printf("interPoints %f %f\n",interPoints[iP].x(),interPoints[iP].y());
 						}*/
 						//rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,1.8f,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,1),QVector3D());
-						rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2|mode_AdaptTerrain,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
+						rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,"../data/textures/roads/road_0lines.jpg",2|mode_AdaptTerrain,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
 					}
 					rendManager.addStaticGeometry("3d_roads_interCom",interPedX,"../data/textures/roads/road_pedX.jpg",GL_QUADS,2|mode_AdaptTerrain);
 					rendManager.addStaticGeometry("3d_roads_interCom",interPedXLineR,"../data/textures/roads/road_pedXLineR.jpg",GL_QUADS,2|mode_AdaptTerrain);

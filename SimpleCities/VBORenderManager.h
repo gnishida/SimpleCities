@@ -111,7 +111,7 @@ public:
 
 	//static
 	bool addStaticGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName,GLenum geometryType,int shaderMode);
-	bool addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QColor color);
+	bool addStaticGeometry2(QString geoName, std::vector<QVector3D>& pos, float zShift, QString textureName, int shaderMode, QVector3D texScale, QColor color);
 	bool removeStaticGeometry(QString geoName);
 	void renderStaticGeometry(QString geoName);
 

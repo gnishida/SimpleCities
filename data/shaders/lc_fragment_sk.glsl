@@ -314,15 +314,13 @@ void main(){
 
 
 	// LIGHTING
-	vec4 ambientIllumination=vec4(0.05,0.05,0.05,0.0);
-	vec4 diffuseIllumination=vec4(0.95,0.95,0.95,1.0);
+	vec4 ambientIllumination = vec4(0.2, 0.2, 0.2, 1.0);
+	vec4 diffuseIllumination = vec4(0.8, 0.8, 0.8, 1);
 	if(((mode&0x0200)==0x0200)||((mode&0xFF)==0x03)){//terran also gets lighting
 		vec3 normal = varyingNormal;
 		if(((mode&0x0FF)==0x05)||((mode&0xFF)==0x06))//seems that it needs it
 			normal=normalize(normal);
-		ambientIllumination = ambientColor*vec4(1.0,1.0,1.0,1.0);
-		diffuseIllumination = (diffuseColor*vec4(1.0,1.0,1.0,1.0)) * max(0.0, dot(-lightDir, normal));
-		//outputF=(ambientIllumination+diffuseIllumination)*outputF;
+		diffuseIllumination = diffuseIllumination * max(0.0, dot(-lightDir, normal));
 	}
 
 	// SHADOW Disable
@@ -333,9 +331,9 @@ void main(){
 
 	// SHADOW Render normal with shadows
 	if(shadowState==1){// 1 SHADOW Render Normal
-		float shadow_coef=0.95;
-		shadow_coef= shadowCoef();
-		outputF=(ambientIllumination+(shadow_coef+0.05)*diffuseIllumination)*outputF;
+		float shadow_coef= shadowCoef();
+
+		outputF = (ambientIllumination + shadow_coef * diffuseIllumination) * outputF;
 		return;
 	}
 

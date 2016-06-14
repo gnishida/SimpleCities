@@ -261,10 +261,9 @@ bool VBORenderManager::addStaticGeometry(QString geoName,std::vector<Vertex>& ve
 	* 指定されたポリゴンに基づいて、ジオメトリを生成する。
 	* 凹型のポリゴンにも対応するよう、ポリゴンは台形にtessellateする。
 	*/
-bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QColor color){
-	if(pos.size()<3){
-		return false;
-	}
+bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos, float zShift, QString textureName, int shaderMode, QVector3D texScale, QColor color){
+	if (pos.size() < 3) return false;
+
 	PolygonSetP polySet;
 	polygonP tempPolyP;
 
@@ -273,77 +272,52 @@ bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>
 	float minX=FLT_MAX,minY=FLT_MAX;
 	float maxX=-FLT_MAX,maxY=-FLT_MAX;
 
-	for(int pN=0;pN<pos.size();pN++){
-		vP[pN]=boost::polygon::construct<pointP>(pos[pN].x(),pos[pN].y());
-		minX=std::min<float>(minX,pos[pN].x());
-		minY=std::min<float>(minY,pos[pN].y());
-		maxX=std::max<float>(maxX,pos[pN].x());
-		maxY=std::max<float>(maxY,pos[pN].y());
+	for (int i = 0; i < pos.size(); ++i) {
+		vP[i] = boost::polygon::construct<pointP>(pos[i].x(),pos[i].y());
+		minX = std::min<float>(minX,pos[i].x());
+		minY = std::min<float>(minY,pos[i].y());
+		maxX = std::max<float>(maxX,pos[i].x());
+		maxY = std::max<float>(maxY,pos[i].y());
 	}
-	if(pos.back().x()!=pos.front().x()&&pos.back().y()!=pos.front().y()){
+
+	// close the polygon
+	if (pos.back().x() != pos.front().x() && pos.back().y() != pos.front().y()) {
 		vP.push_back(vP[0]);
 	}
 
-	boost::polygon::set_points(tempPolyP,vP.begin(),vP.end());
-	polySet+=tempPolyP;
+	// trapezoid the polygon
+	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
+	polySet += tempPolyP;
 	std::vector<polygonP> allP;
 	boost::polygon::get_trapezoids(allP,polySet);
 		
 	std::vector<Vertex> vert;
 
-	for(int pN=0;pN<allP.size();pN++){
-		//glColor3ub(qrand()%255,qrand()%255,qrand()%255);
-		boost::polygon::polygon_with_holes_data<double>::iterator_type itPoly=allP[pN].begin();
-
+	// triangulate each trapezoid
+	for (int i = 0; i < allP.size(); i++) {
 		Polygon3D points;
-		//std::vector<QVector3D> points;
 		std::vector<QVector3D> texP;
-		while(itPoly!=allP[pN].end()){
-			pointP cP=*itPoly;
-			if(inverseLoop==false)
-				points.push_back(QVector3D(cP.x(),cP.y(),pos[0].z()+zShift));
-			else
-				points.contour.insert(points.contour.begin(),QVector3D(cP.x(),cP.y(),pos[0].z()+zShift));
-
-			//if(texZeroToOne==true){
-				//texP.push_back(QVector3D((cP.x()-minX)/(maxX-minX),(cP.y()-minY)/(maxY-minY),0.0f));
-			//}else{
-				texP.push_back(QVector3D((cP.x()-minX)*texScale.x(),(cP.y()-minY)*texScale.y(),0.0f));
-			//}
-			itPoly++;
-		}
-		if(points.contour.size()==0)continue;
-		while(points.contour.size()<4)
-			points.push_back(points.contour.back());
-
-		// GEN 
-		// Sometimes, the polygon is formed in CW order, so we have to reorient it in CCW order.
-		if(inverseLoop==false) {
-			points.correct();
+		for (auto it = allP[i].begin(); it != allP[i].end(); ++it) {
+			pointP cP = *it;
+			points.push_back(QVector3D(cP.x(), cP.y(), pos[0].z() + zShift));
+			texP.push_back(QVector3D((cP.x() - minX) * texScale.x(), (cP.y() - minY) * texScale.y(), 0.0f));
 		}
 
-		/*if(points.size()==4){//last vertex repited
-			addTexTriang(texInd,points,texP,col,norm);
+		if (points.isClockwise()) {
+			std::reverse(points.contour.begin(), points.contour.end());
+			std::reverse(texP.begin(), texP.end());
 		}
-		if(points.size()==5){
-			addTexQuad(texInd,points,texP,col,norm);
 
+		for (int k = 1; k < points.contour.size() - 1; ++k) {
+			vert.push_back(Vertex(points[0], color, QVector3D(0, 0, 1), texP[0]));
+			vert.push_back(Vertex(points[k], color, QVector3D(0, 0, 1), texP[k]));
+			vert.push_back(Vertex(points[k + 1], color, QVector3D(0, 0, 1), texP[k + 1]));
 		}
-		if(points.size()==6){
-			//addTexQuad(texInd,std::vector<QVector3D>(&points[0],&points[3]),std::vector<QVector3D>(&texP[0],&texP[3]),col,norm);
-
-			addTexQuad(texInd,points,texP,col,norm);
-			//addTexTriang(texInd,std::vector<QVector3D>(&points[3],&points[6]),std::vector<QVector3D>(&texP[3],&texP[6]),col,norm);
-			//addTexTriang(texInd,std::vector<QVector3D>(&points[4],&points[6]),std::vector<QVector3D>(&texP[4],&texP[6]),col,norm);
-		}*/
-		vert.push_back(Vertex(points[0],color,QVector3D(0,0,1),texP[0]));//texScale is a hack to define a color when it is not texture
-		vert.push_back(Vertex(points[1],color,QVector3D(0,0,1),texP[1]));
-		vert.push_back(Vertex(points[2],color,QVector3D(0,0,1),texP[2]));
-		vert.push_back(Vertex(points[3],color,QVector3D(0,0,1),texP[3]));
 	}
 
-	return addStaticGeometry(geoName,vert,textureName,geometryType,shaderMode);
-}//
+	return addStaticGeometry(geoName, vert, textureName, GL_TRIANGLES, shaderMode);
+}
+
 
 bool VBORenderManager::removeStaticGeometry(QString geoName){
 	if(geoName2StaticRender.contains(geoName)){
