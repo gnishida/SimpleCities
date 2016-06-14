@@ -148,15 +148,30 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	}
 }
 
+void UrbanGeometry::loadTerrain(const std::string& filename) {
+	mainWin->glWidget->vboRenderManager.vboTerrain.loadTerrain(filename.c_str());
+
+	/*
+	gs::DEM dem;
+	dem.load(filename);
+
+	mainWin->glWidget->vboRenderManager->changeTerrainDimensions(glm::vec2(dem.width, dem.height));
+	mainWin->glWidget->vboRenderManager.vboTerrain.layerData = cv::Mat(dem.height, dem.width, CV_32FC1, dem.data.data()).clone();
+	cv::flip(mainWin->glWidget->vboRenderManager.vboTerrain.layerData, mainWin->glWidget->vboRenderManager.vboTerrain.layerData, 0);
+	*/
+}
+
 void UrbanGeometry::loadParcels(const std::string& filename) {
 	blocks.clear();
 
 	gs::Shape shape;
 	shape.load(filename);
-	minBound = shape.minBound;
-	maxBound = shape.maxBound;
+	if (minBound.x == 0 && minBound.y == 0) {
+		minBound = shape.minBound;
+		maxBound = shape.maxBound;
+	}
 
-	glm::vec3 offset = (shape.maxBound + shape.minBound) * 0.5f;
+	glm::vec3 offset = (maxBound + minBound) * 0.5f;
 
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
@@ -189,10 +204,12 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 
 	gs::Shape shape;
 	shape.load(filename);
-	minBound = shape.minBound;
-	maxBound = shape.maxBound;
+	if (minBound.x == 0 && minBound.y == 0) {
+		minBound = shape.minBound;
+		maxBound = shape.maxBound;
+	}
 
-	glm::vec3 offset = (shape.maxBound + shape.minBound) * 0.5f;
+	glm::vec3 offset = (maxBound + minBound) * 0.5f;
 
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {

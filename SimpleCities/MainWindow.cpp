@@ -74,7 +74,8 @@ void MainWindow::onNewTerrain() {
 void MainWindow::onLoadTerrain() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load DEM file..."), "", tr("DEM Files (*.tif)"));
 	if (filename.isEmpty()) return;
-	glWidget->vboRenderManager.vboTerrain.loadTerrain(filename);
+
+	urbanGeometry->loadTerrain(filename.toUtf8().constData());
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
@@ -106,7 +107,6 @@ void MainWindow::onLoadRoads() {
 	if (filename.isEmpty()) return;
 
 	urbanGeometry->loadRoads(filename);
-
 	glWidget->updateGL();
 }
 

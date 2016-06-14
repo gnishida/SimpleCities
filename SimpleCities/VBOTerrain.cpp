@@ -28,7 +28,7 @@ void VBOTerrain::init(VBORenderManager* rendManager, const glm::vec2& size) {
 	}
 
 	// TERRAIN LAYER
-	layerData = cv::Mat(size.y + 1, size.x + 1, CV_32FC1, cv::Scalar(70.0f));
+	layerData = cv::Mat(size.y, size.x, CV_32FC1, cv::Scalar(70.0f));
 	updateTexture();
 
 	//////////////////
@@ -44,12 +44,10 @@ void VBOTerrain::init(VBORenderManager* rendManager, const glm::vec2& size) {
 	float step = 1;// rendManager->side / resolution;
 		
 	// VERTEX
-	vert.resize((size.y + 1) * (size.x + 1));
+	vert.resize(size.y * size.x);
 	int count = 0;
-	//for (int row = 0; row <= resolution; ++row) {
-	for (int r = 0; r <= size.y; ++r) {
-		//for (int col = 0; col <= resolution; ++col) {
-		for (int c = 0; c <= size.x; ++c) {
+	for (int r = 0; r < size.y; ++r) {
+		for (int c = 0; c < size.x; ++c) {
 			QVector3D pos = QVector3D(c * step, r * step, 0) + rendManager->minPos;
 			vert[count] = Vertex(pos, pos/100.0f);
 			count++;
@@ -64,12 +62,12 @@ void VBOTerrain::init(VBORenderManager* rendManager, const glm::vec2& size) {
 	std::vector<uint> indices;
 	indices.resize(size.x * size.y * 4);
 	count = 0;
-	for (int row = 0; row < size.y; ++row) {
-		for (int col = 0; col < size.x; ++col) {
-			indices[count] = col + row * (size.x + 1);
-			indices[count + 1] = col + 1 + row * (size.x + 1);
-			indices[count + 2] = col + 1 + (row + 1) * (size.x + 1);
-			indices[count + 3] = col + (row + 1) * (size.x + 1);
+	for (int row = 0; row < size.y - 1; ++row) {
+		for (int col = 0; col < size.x - 1; ++col) {
+			indices[count] = col + row * size.x;
+			indices[count + 1] = col + 1 + row * size.x;
+			indices[count + 2] = col + 1 + (row + 1) * size.x;
+			indices[count + 3] = col + (row + 1) * size.x;
 			count += 4;
 		}
 	}

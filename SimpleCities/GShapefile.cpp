@@ -108,10 +108,6 @@ namespace gs {
 					}
 				}
 
-				if (shapeObjects[i].attributes["NbreEtages"].intValue() > 30) {
-					std::cout << "NbreEtages: " << shapeObjects[i].attributes["NbreEtages"].intValue() << "," << shapeObjects[i].attributes["NbreEtages"].stringValue() << std::endl;
-				}
-
 				// このshapeのベクトルデータを読み込む
 				OGRGeometry* poGeometry = poFeature->GetGeometryRef();
 				if (poGeometry != NULL) {

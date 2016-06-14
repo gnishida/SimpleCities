@@ -32,8 +32,8 @@ public slots:
 	void onNewTerrain();
 	void onLoadTerrain();
 	void onSaveTerrain();
-	void onLoadBuildings();
 	void onLoadParcels();
+	void onLoadBuildings();
 	void onLoadRoads();
 	void onSaveRoads();
 	void onClearRoads();

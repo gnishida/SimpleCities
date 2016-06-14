@@ -124,7 +124,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_parcels");
 
-	const float deltaZ = 2.6f;
+	const float deltaZ = 0.2f;// 2.6f;
 
 	for (int i = 0; i < blocks.size(); ++i) {
 		Block::parcelGraphVertexIter vi, viEnd;

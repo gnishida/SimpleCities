@@ -42,6 +42,7 @@ public:
 	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);
 
+	void loadTerrain(const std::string& filename);
 	void loadParcels(const std::string& filename);
 	void loadBuildings(const std::string& filename);
 
