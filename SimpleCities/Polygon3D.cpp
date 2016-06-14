@@ -11,7 +11,7 @@
 #include <CGAL/Partition_traits_2.h>
 #include <CGAL/partition_2.h>
 
-bool Polygon3D::isClockwise() {
+bool Polygon3D::isClockwise() const {
 	int next;
 	float tmpSum = 0.0f;
 
@@ -906,7 +906,7 @@ void Polygon3D::getLoopOBB2(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xfor
 /**
  * Get polygon oriented bounding box
  */
-Loop3D Polygon3D::getLoopOBB3(Loop3D &pin) {
+Loop3D Polygon3D::getLoopOBB3(const Loop3D &pin) {
 	float alpha = 0.0f;			
 	float deltaAlpha = 0.05*3.14159265359f;
 	float bestAlpha;
@@ -1009,14 +1009,14 @@ QVector3D Polygon3D::getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &m
 	return QVector3D(maxCorner - minCorner);
 }//
 
-bool Polygon3D::isSelfIntersecting(void){
+bool Polygon3D::isSelfIntersecting() const {
 	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
 	boost::geometry::assign(bg_pgon, this->contour);
 	boost::geometry::correct(bg_pgon);
 	return boost::geometry::intersects(bg_pgon);
-}//
+}
 
-BBox Polygon3D::envelope() {
+BBox Polygon3D::envelope() const {
 	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
 	boost::geometry::assign(bg_pgon, this->contour);
 	boost::geometry::correct(bg_pgon);
@@ -1026,7 +1026,7 @@ BBox Polygon3D::envelope() {
 	return bbox;
 }
 
-float Polygon3D::area() {
+float Polygon3D::area() const {
 	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
 	boost::geometry::assign(bg_pgon, this->contour);
 	boost::geometry::correct(bg_pgon);

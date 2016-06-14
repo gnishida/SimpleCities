@@ -60,7 +60,7 @@ GLuint VBORenderManager::loadArrayTexture(QString texName,std::vector<QString> f
 // 0 mode
 // 1 tex0
 
-bool VBORenderManager::createVAO(std::vector<Vertex>& vert,GLuint& vbo,GLuint& vao,int& numVertex){
+bool VBORenderManager::createVAO(const std::vector<Vertex>& vert, GLuint& vbo, GLuint& vao, int& numVertex){
 	glGenVertexArrays(1,&vao);
 	glBindVertexArray(vao);
 	// Crete VBO
@@ -88,7 +88,7 @@ bool VBORenderManager::createVAO(std::vector<Vertex>& vert,GLuint& vbo,GLuint& v
 	return true;
 }
 
-void VBORenderManager::renderVAO(RenderSt& renderSt,bool cleanVertex){
+void VBORenderManager::renderVAO(RenderSt& renderSt, bool cleanVertex) {
 	//printf("renderVAO numVert %d texNum %d vao %d numVertVert %d\n",renderSt.numVertex,renderSt.texNum,renderSt.vao,renderSt.vertices.size());
 	// 1. Create if necessary
 	if(renderSt.numVertex!=renderSt.vertices.size()&&renderSt.vertices.size()>0){
@@ -216,7 +216,7 @@ void VBORenderManager::changeTerrainShader(int newMode){
 
 ///////////////////////////////////////////////////////////////////
 // STATIC
-bool VBORenderManager::addStaticGeometry(QString geoName,std::vector<Vertex>& vert,QString texName,GLenum geometryType,int shaderMode){
+bool VBORenderManager::addStaticGeometry(const QString& geoName, const std::vector<Vertex>& vert, const QString& texName, GLenum geometryType, int shaderMode) {
 	if(vert.size() <= 0)
 		return false;
 	GLuint texId;
@@ -237,11 +237,6 @@ bool VBORenderManager::addStaticGeometry(QString geoName,std::vector<Vertex>& ve
 				geoName2StaticRender[geoName][texId]=RenderSt(texId,vert,geometryType,shaderMode);
 			}else{
 				//1.1.1 if also contains texture and the number of vertex!=0--> vao no created--> just append
-				if(geometryType==GL_TRIANGLE_STRIP){
-					//vert.insert(vert.begin(),vert.front());
-					vert.insert(vert.begin(),geoName2StaticRender[geoName][texId].vertices.back());
-					vert.insert(vert.begin(),geoName2StaticRender[geoName][texId].vertices.back());
-				}
 				geoName2StaticRender[geoName][texId].vertices.insert(geoName2StaticRender[geoName][texId].vertices.end(),vert.begin(),vert.end());
 			}
 		}else{
@@ -261,7 +256,7 @@ bool VBORenderManager::addStaticGeometry(QString geoName,std::vector<Vertex>& ve
 	* 指定されたポリゴンに基づいて、ジオメトリを生成する。
 	* 凹型のポリゴンにも対応するよう、ポリゴンは台形にtessellateする。
 	*/
-bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos, float zShift, QString textureName, int shaderMode, QVector3D texScale, QColor color){
+bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
 	if (pos.size() < 3) return false;
 
 	PolygonSetP polySet;
@@ -319,7 +314,7 @@ bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>
 }
 
 
-bool VBORenderManager::removeStaticGeometry(QString geoName){
+bool VBORenderManager::removeStaticGeometry(const QString& geoName){
 	if(geoName2StaticRender.contains(geoName)){
 		// iterate and remove
 		renderGrid::iterator i;
@@ -336,7 +331,7 @@ bool VBORenderManager::removeStaticGeometry(QString geoName){
 	return true;
 }//
 
-void VBORenderManager::renderStaticGeometry(QString geoName){
+void VBORenderManager::renderStaticGeometry(const QString& geoName){
 
 	if(geoName2StaticRender.contains(geoName)){
 		// iterate and remove
@@ -385,30 +380,18 @@ void VBORenderManager::addPolyline(const QString &name, const Polyline3D& polyli
 	addStaticGeometry(name, vertP, "dummy", GL_POINTS, 1);
 }
 
-///////////////////////////////////////////////////////////////////
-// GRID
-bool VBORenderManager::addGridGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName){
-	return false;
-}//
-bool VBORenderManager::removeGridGeometry(QString geoName){
-	return false;
-}//
-	
-void VBORenderManager::renderGridGeometry(QString geoName){
-		
-}//
 ////////////////////////////////////////////////////////////////////
 // MODEL
-void VBORenderManager::addStreetElementModel(QString name,ModelSpec mSpec){
+void VBORenderManager::addStreetElementModel(const QString& name,ModelSpec mSpec){
 	nameToVectorModels[name].push_back(mSpec);
 }//
-void VBORenderManager::renderAllStreetElementName(QString name){
+void VBORenderManager::renderAllStreetElementName(const QString& name){
 	for(int i=0;i<nameToVectorModels[name].size();i++){
 		VBOModel_StreetElements::renderOneStreetElement(program,nameToVectorModels[name][i]);
 	}
 	//printf("name %s --> %d\n",name.toAscii().constData(),nameToVectorModels[name].size());
 }//
-void VBORenderManager::removeAllStreetElementName(QString name){
+void VBORenderManager::removeAllStreetElementName(const QString& name){
 	nameToVectorModels[name].clear();
 }
 	

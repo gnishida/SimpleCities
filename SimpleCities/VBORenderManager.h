@@ -94,7 +94,6 @@ public:
 	void changeTerrainShader(int newMode);
 	QVector3D minPos;
 	QVector3D maxPos;
-	//float side;
 	glm::vec2 size;
 
 	// sky
@@ -110,35 +109,29 @@ public:
 	GLuint loadArrayTexture(QString texName,std::vector<QString> fileNames);
 
 	//static
-	bool addStaticGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName,GLenum geometryType,int shaderMode);
-	bool addStaticGeometry2(QString geoName, std::vector<QVector3D>& pos, float zShift, QString textureName, int shaderMode, QVector3D texScale, QColor color);
-	bool removeStaticGeometry(QString geoName);
-	void renderStaticGeometry(QString geoName);
+	bool addStaticGeometry(const QString& geoName, const std::vector<Vertex>& vert, const QString& textureName, GLenum geometryType, int shaderMode);
+	bool addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
+	bool removeStaticGeometry(const QString& geoName);
+	void renderStaticGeometry(const QString& geoName);
 
 	void addPoint(const QString &name, const QVector2D& pt, const QColor& color, float height);
 	void addPolyline(const QString &linesN, const Polyline3D& polyline, const QColor& color);
 
-	//grid
-	bool addGridGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName);
-	bool removeGridGeometry(QString geoName);
-	void renderGridGeometry(QString geoName);
-
 	//models
 	QHash<QString,std::vector<ModelSpec>> nameToVectorModels;
 	bool initializedStreetElements;
-	void addStreetElementModel(QString name,ModelSpec mSpec);
-	void renderAllStreetElementName(QString name);
-	void removeAllStreetElementName(QString name);
-
-
+	void addStreetElementModel(const QString& name,ModelSpec mSpec);
+	void renderAllStreetElementName(const QString& name);
+	void removeAllStreetElementName(const QString& name);
+	
 	void renderAll(bool cleanVertex);
 private:
 
-	QHash<QString,QHash<int,renderGrid>> geoName2RenderGrids;
-	QHash<QString,renderGrid> geoName2StaticRender;
+	QHash<QString, QHash<int, renderGrid>> geoName2RenderGrids;
+	QHash<QString, renderGrid> geoName2StaticRender;
 
-	void renderVAO(RenderSt& renderSt,bool cleanVertex);
-	bool createVAO(std::vector<Vertex>& vert,GLuint& vbo,GLuint& vao,int& numVertex);
-	void cleanVAO(GLuint vbo,GLuint vao);
+	void renderVAO(RenderSt& renderSt, bool cleanVertex);
+	bool createVAO(const std::vector<Vertex>& vert, GLuint& vbo, GLuint& vao, int& numVertex);
+	void cleanVAO(GLuint vbo, GLuint vao);
 
 };

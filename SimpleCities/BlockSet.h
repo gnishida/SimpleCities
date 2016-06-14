@@ -13,12 +13,9 @@ public:
 	std::vector<Block> blocks;
 	int selectedBlockIndex;
 	int selectedParcelIndex;
-	//bool modified;
 
 public:
 	BlockSet() : selectedBlockIndex(-1), selectedParcelIndex(-1) {}
-
-	//void setModified() { modified = true; }
 
 	int selectBlock(const QVector2D& pos);
 	std::pair<int, int> selectParcel(const QVector2D& pos);

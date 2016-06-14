@@ -54,14 +54,14 @@ public:
 
 	void clear() { contour.clear(); }
 
-	bool isClockwise();
+	bool isClockwise() const ;
 	void correct();
 
-	/**
-	* Acessor to point at index idx
-	**/
-	inline QVector3D &operator[](const int idx)
-	{	
+	QVector3D& operator[](const int idx) {	
+		return contour.at(idx);
+	}
+
+	const QVector3D& operator[](const int idx) const {
 		return contour.at(idx);
 	}
 
@@ -130,10 +130,10 @@ public:
 	}
 
 	//Is self intersecting
-	bool isSelfIntersecting(void);
+	bool isSelfIntersecting() const;
 
-	BBox envelope();
-	float area();
+	BBox envelope() const;
+	float area() const;
 
 	//Only works for polygons with no holes in them
 	bool splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);
@@ -177,7 +177,7 @@ public:
 
 	static void getLoopOBB(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
 	static void getLoopOBB2(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
-	static Loop3D getLoopOBB3(Loop3D &pin);
+	static Loop3D getLoopOBB3(const Loop3D &pin);
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);
 

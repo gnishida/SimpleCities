@@ -37,14 +37,14 @@ void BlockMeshGenerator::init() {
 	initialized = true;
 }
 
-void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, const BlockSet& blocks) {
 	if (!initialized) init();
 
 	// generate 3d model
 	rendManager.removeStaticGeometry("3d_blocks");
 	rendManager.removeStaticGeometry("3d_parks");
 
-	const float deltaZ = 2.3f;
+	const float deltaZ = 0.2f;// 2.3f;
 
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (!blocks[i].valid) continue;
@@ -80,16 +80,21 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_TRIANGLES, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 
 		// parks
 		if (blocks[i].isPark) {
 			// PARK
 			int randPark=qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_parks", blocks[i].blockContour.contour, 0.0f, grassFileNames[randPark], 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
+			if (blocks[i].blockContour.isClockwise()) {
+				std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+			}
+			rendManager.addStaticGeometry2("3d_parks", blocks[i].blockContour.contour, deltaZ, grassFileNames[randPark], 2 | mode_AdaptTerrain, QVector3D(0.05f, 0.05f, 0.05f), QColor());
 
 			// side
 			std::vector<Vertex> vert;
@@ -111,9 +116,11 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_parks", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parks", vert, "", GL_TRIANGLES, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 	}
 }
@@ -121,12 +128,14 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 /**
  * generate parcel mesh
  */
-void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, const BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_parcels");
 
-	const float deltaZ = 0.2f;// 2.6f;
+	const float deltaZ = 0.3f;// 2.6f;
 
 	for (int i = 0; i < blocks.size(); ++i) {
+		if (blocks.blocks[i].isPark) continue;
+
 		Block::parcelGraphVertexIter vi, viEnd;
 			
 		int cnt = 0;
@@ -134,22 +143,26 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 			std::vector<Vertex> vert;
 			QVector3D color;
 
-			if (blocks[i].myParcels[*vi].parcelContour.isSelfIntersecting()) continue;
+			Polygon3D contour = blocks[i].myParcels[*vi].parcelContour;
+			if (contour.isSelfIntersecting()) continue;
+
+			if (contour.isClockwise()) {
+				std::reverse(contour.contour.begin(), contour.contour.end());
+			}
 
 			// top surface
 			int randPark=1;//qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_parcels", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, grassFileNames[randPark], 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
+			rendManager.addStaticGeometry2("3d_parcels", contour.contour, deltaZ, grassFileNames[randPark], 2 | mode_AdaptTerrain, QVector3D(0.05f, 0.05f, 0.05f), QColor());
 
 			// side
-			for(int sN=0;sN<blocks[i].myParcels[*vi].parcelContour.contour.size();sN++){
+			for (int sN = 0; sN<contour.contour.size(); sN++) {
 				int ind1 = sN;
-				int ind2 = (sN+1) % blocks[i].myParcels[*vi].parcelContour.contour.size();
+				int ind2 = (sN + 1) % contour.contour.size();
 				
-				// Note: the polyon of parcel is ordered in clockwise manner!
-				QVector3D p1(blocks[i].myParcels[*vi].parcelContour.contour[ind2].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind2].y(), 0);
-				QVector3D p2(blocks[i].myParcels[*vi].parcelContour.contour[ind1].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind1].y(), 0);
-				QVector3D p3(blocks[i].myParcels[*vi].parcelContour.contour[ind1].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind1].y(), deltaZ);
-				QVector3D p4(blocks[i].myParcels[*vi].parcelContour.contour[ind2].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind2].y(), deltaZ);
+				QVector3D p1(contour.contour[ind2].x(), contour.contour[ind2].y(), 0);
+				QVector3D p2(contour.contour[ind1].x(), contour.contour[ind1].y(), 0);
+				QVector3D p3(contour.contour[ind1].x(), contour.contour[ind1].y(), deltaZ);
+				QVector3D p4(contour.contour[ind2].x(), contour.contour[ind2].y(), deltaZ);
 				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
@@ -164,7 +177,7 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 	}
 }
 
-void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, const BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_blocks");
 	rendManager.removeStaticGeometry("3d_parks");
 
