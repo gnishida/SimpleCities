@@ -84,10 +84,6 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNewTerrain">
-   <property name="icon">
-    <iconset resource="MainWindow.qrc">
-     <normaloff>:/MainWindow/Resources/New_24x24.png</normaloff>:/MainWindow/Resources/New_24x24.png</iconset>
-   </property>
    <property name="text">
     <string>New Terrain</string>
    </property>
@@ -96,10 +92,6 @@
    </property>
   </action>
   <action name="actionOpenTerrain">
-   <property name="icon">
-    <iconset resource="MainWindow.qrc">
-     <normaloff>:/MainWindow/Resources/Open_24x24.png</normaloff>:/MainWindow/Resources/Open_24x24.png</iconset>
-   </property>
    <property name="text">
     <string>Open Terrain</string>
    </property>
@@ -118,10 +110,6 @@
    </property>
   </action>
   <action name="actionSaveTerrain">
-   <property name="icon">
-    <iconset resource="MainWindow.qrc">
-     <normaloff>:/MainWindow/Resources/Save_24x24.png</normaloff>:/MainWindow/Resources/Save_24x24.png</iconset>
-   </property>
    <property name="text">
     <string>Save Terrain</string>
    </property>
