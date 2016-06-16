@@ -29,12 +29,13 @@ int main(int argc, char *argv[]) {
 	//G::global()["roadAngleTolerance"] = 0.8f;
 	//G::global()["roadAngleTolerance"] = 0.52f;
 
-	G::global()["seaLevelForAvenue"] = 0.1f;
-	G::global()["seaLevelForStreet"] = 48.9f;
-	G::global()["seaLevel"] = 70.0f;//48.9f;
+	G::global()["sea_level"] = 55.55f;// 60.5f;
+	G::global()["road_min_level"] = 61.0f;
 
 	G::global()["MAX_Z"] = 1000.0f;
 	G::global()["shader2D"] = true;
+
+	G::global()["2DroadsStroke"] = 3.0f;
 
 	G::global()["sidewalk_width"] = 2.0f;
 	G::global()["parcel_area_mean"] = 2000.0f;

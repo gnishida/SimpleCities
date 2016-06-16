@@ -31,6 +31,7 @@ This file is part of QtUrban.
 #include "VBOPmBuildings.h"
 #include "VBOVegetation.h"
 #include "GShapefile.h"
+#include "GraphUtil.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -290,15 +291,54 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::loadRoads(const QString &filename) {
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly)) {
-		std::cerr << "The file is not accessible: " << filename.toUtf8().constData() << endl;
-		throw "The file is not accessible: " + filename;
+void UrbanGeometry::loadRoads(const std::string& filename) {
+	roads.clear();
+
+	gs::Shape shape;
+	shape.load(filename);
+	if (minBound.x == 0 && minBound.y == 0) {
+		minBound = shape.minBound;
+		maxBound = shape.maxBound;
 	}
 
-	roads.clear();
-	GraphUtil::loadRoads(roads, filename);
+	glm::vec3 offset = (maxBound + minBound) * 0.5f;
+
+	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
+		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
+			QVector2D pt1;
+			RoadVertexDesc desc1;
+			pt1.setX(shape.shapeObjects[i].parts[j].points.front().x - offset.x);
+			pt1.setY(shape.shapeObjects[i].parts[j].points.front().y - offset.y);
+
+			if (!GraphUtil::getVertex(roads, pt1, 0.1f, desc1)) {
+				RoadVertexPtr v(new RoadVertex(pt1));
+				desc1 = GraphUtil::addVertex(roads, v);
+			}
+
+			QVector2D pt2;
+			RoadVertexDesc desc2;
+			pt2.setX(shape.shapeObjects[i].parts[j].points.back().x - offset.x);
+			pt2.setY(shape.shapeObjects[i].parts[j].points.back().y - offset.y);
+
+			if (!GraphUtil::getVertex(roads, pt2, 0.1f, desc2)) {
+				RoadVertexPtr v(new RoadVertex(pt2));
+				desc2 = GraphUtil::addVertex(roads, v);
+			}
+
+			RoadEdgePtr edge(new RoadEdge(RoadEdge::TYPE_STREET, 1, false, false, false));
+			for (int k = 0; k < shape.shapeObjects[i].parts[j].points.size(); ++k) {
+				QVector2D pt;
+				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
+				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
+				edge->addPoint(pt);
+			}
+
+			GraphUtil::addEdge(roads, desc1, desc2, edge);
+
+			// we use only the first part
+			break;
+		}
+	}
 
 	update(mainWin->glWidget->vboRenderManager);
 }

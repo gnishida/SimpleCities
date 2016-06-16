@@ -69,6 +69,7 @@ namespace gs {
 		void updateBounds(OGRPoint* poPoint);
 		void readMultiPolygon(OGRMultiPolygon* poMultiPolygon, ShapeObject& shapeObject);
 		void readPolygon(OGRPolygon* poPolygon, ShapeObject& shapeObject);
+		void readLineString(OGRLineString* lineString, ShapeObject& shapeObject);
 		void readRing(OGRLinearRing* ring, ShapePart& shapePart);
 	};
 

@@ -1,6 +1,6 @@
 #include "VBOWater.h"
 #include "VBORenderManager.h"
-
+#include "global.h"
 
 #define		MOD	0xff
 
@@ -188,7 +188,7 @@
 		const float yy = y2 * y2;
 		float tmpZ = ((0.15 * sinf(2000 * sqrtf (xx + yy) - 4 * t) + Noise(1000 * x, 1000 * y, t, 0)) * 0.1875);
 
-		return tmpZ + 60.5; //tmpZ - 0.0f;
+		return tmpZ + G::g["sea_level"].toFloat();// 60.5;
 	}
 
 	/*

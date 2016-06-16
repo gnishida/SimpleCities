@@ -121,6 +121,7 @@ namespace gs {
 
 						updateBounds(poPoint);
 					}
+					else if (wkbFlatten(poGeometry->getGeometryType()) == wkbLineString) {						OGRLineString* poLineString = (OGRLineString*)poGeometry;						readLineString(poLineString, shapeObjects[i]);					}
 					else if (wkbFlatten(poGeometry->getGeometryType()) == wkbPolygon) {
 						OGRPolygon* poPolygon = (OGRPolygon*)poGeometry;
 						readPolygon(poPolygon, shapeObjects[i]);
@@ -191,6 +192,12 @@ namespace gs {
 			readRing(ring, shapeObject.parts[j + 1]);
 		}
 	}
+
+	void Shape::readLineString(OGRLineString* lineString, ShapeObject& shapeObject) {
+		shapeObject.parts.resize(1);
+		shapeObject.parts[0].points.resize(lineString->getNumPoints());
+
+		for (int i = 0; i < lineString->getNumPoints(); ++i) {			OGRPoint point;			lineString->getPoint(i, &point);			shapeObject.parts[0].points[i].x = point.getX();			shapeObject.parts[0].points[i].y = point.getY();			updateBounds(&point);		}	}
 
 	void Shape::readRing(OGRLinearRing* ring, ShapePart& shapePart) {
 		shapePart.points.resize(ring->getNumPoints());

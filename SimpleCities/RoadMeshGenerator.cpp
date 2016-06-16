@@ -8,7 +8,7 @@ bool compare2ndPartTuple2 (const std::pair<float, RoadEdgeDesc> &i, const std::p
 }
 
 void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGraph& roads) {
-	float deltaZ = 2.0f;//G::global().getFloat("3d_road_deltaZ");
+	float deltaZ = 0.3f;//G::global().getFloat("3d_road_deltaZ");
 	const float deltaL = 1.0f;
 
 	std::vector<Vertex> vertSide;
@@ -110,13 +110,12 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 						b1 = a1;
 						b2 = a2;
 					}
+									
 
 					QVector3D b03 = (b0 + b3) * 0.5f;
 					QVector3D b12 = (b1 + b2) * 0.5f;
 					float z1 = rendManager.getTerrainHeight(b03.x(), b03.y());
-					if (z1 < 70.0f) z1 = 70.0f;
 					float z2 = rendManager.getTerrainHeight(b12.x(), b12.y());
-					if (z2 < 70.0f) z2 = 70.0f;
 
 					b0.setZ(z1 + deltaZ);
 					b3.setZ(z1 + deltaZ);
@@ -126,15 +125,22 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					vertROAD[type].push_back(Vertex(b0,QColor(),QVector3D(0,0,1.0f),QVector3D(1,lengthMovedR / dW,0)));
 					vertROAD[type].push_back(Vertex(b1,QColor(),QVector3D(0,0,1.0f),QVector3D(1,(lengthMovedR + segmentLengR) / dW,0)));
 					vertROAD[type].push_back(Vertex(b2,QColor(),QVector3D(0,0,1.0f),QVector3D(0,(lengthMovedL + segmentLengL) / dW,0)));
-					vertROAD[type].push_back(Vertex(b3,QColor(),QVector3D(0,0,1.0f),QVector3D(0,lengthMovedL / dW,0)));
+					vertROAD[type].push_back(Vertex(b0, QColor(), QVector3D(0, 0, 1.0f), QVector3D(1, lengthMovedR / dW, 0)));
+					vertROAD[type].push_back(Vertex(b2, QColor(), QVector3D(0, 0, 1.0f), QVector3D(0, (lengthMovedL + segmentLengL) / dW, 0)));
+					vertROAD[type].push_back(Vertex(b3, QColor(), QVector3D(0, 0, 1.0f), QVector3D(0, lengthMovedL / dW, 0)));
 
 					// 側面のジオメトリ
 					vertSide.push_back(Vertex(b0 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), -per, QVector3D()));
 					vertSide.push_back(Vertex(b1 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), -per, QVector3D()));
 					vertSide.push_back(Vertex(b1, QColor(64, 64, 64), -per, QVector3D()));
+					vertSide.push_back(Vertex(b0 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), -per, QVector3D()));
+					vertSide.push_back(Vertex(b1, QColor(64, 64, 64), -per, QVector3D()));
 					vertSide.push_back(Vertex(b0, QColor(64, 64, 64), -per, QVector3D()));
+
 					vertSide.push_back(Vertex(b2 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b3 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), per, QVector3D()));
+					vertSide.push_back(Vertex(b3, QColor(64, 64, 64), per, QVector3D()));
+					vertSide.push_back(Vertex(b2 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b3, QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b2, QColor(64, 64, 64), per, QVector3D()));
 
@@ -150,8 +156,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 		}
 		
 		// add all geometry
-		rendManager.addStaticGeometry("3d_roads", vertROAD[0], "../data/textures/roads/road_2lines.jpg", GL_QUADS, 2);
-		rendManager.addStaticGeometry("3d_roads", vertROAD[1], "../data/textures/roads/road_4lines.jpg", GL_QUADS, 2);
+		rendManager.addStaticGeometry("3d_roads", vertROAD[0], "../data/textures/roads/road_2lines.jpg", GL_TRIANGLES, 2);
+		rendManager.addStaticGeometry("3d_roads", vertROAD[1], "../data/textures/roads/road_4lines.jpg", GL_TRIANGLES, 2);
 	}
 
 	//////////////////////////////////////////
@@ -186,7 +192,6 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
-				if (z < 70.0f) z = 70.0f;
 				QVector3D center(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), z + deltaZ);
 
 				const float numSides = 10;
@@ -208,6 +213,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					vertSide.push_back(Vertex(side0_b, QColor(64, 64, 64), cc1, QVector3D()));
 					vertSide.push_back(Vertex(side1_b, QColor(64, 64, 64), cc2, QVector3D()));
 					vertSide.push_back(Vertex(side1_u, QColor(64, 64, 64), cc2, QVector3D()));
+					vertSide.push_back(Vertex(side0_b, QColor(64, 64, 64), cc1, QVector3D()));
+					vertSide.push_back(Vertex(side1_u, QColor(64, 64, 64), cc2, QVector3D()));
 					vertSide.push_back(Vertex(side0_u, QColor(64, 64, 64), cc1, QVector3D()));
 
 					cc1 = cc2;
@@ -216,7 +223,6 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				////////////////////////
 				// 2.2 FOUR OR MORE--> COMPLEX INTERSECTION
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
-				if (z < 70.0f) z = 70.0f;
 				z += deltaZ + 0.1f;
 
 				////////////
@@ -339,7 +345,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 						interPedX.push_back(Vertex(intPoint1,QVector3D(0-0.07f,0,0)));
 						interPedX.push_back(Vertex(intPoint2,QVector3D(ed1W/7.5f+0.07f,0,0)));
 						interPedX.push_back(Vertex(intPoint2-ed1Dir*3.5f,QVector3D(ed1W/7.5f+0.07f,1.0f,0)));
-						interPedX.push_back(Vertex(intPoint1-ed1Dir*3.5f,QVector3D(0.0f-0.07f,1.0f,0)));
+						interPedX.push_back(Vertex(intPoint1, QVector3D(0 - 0.07f, 0, 0)));
+						interPedX.push_back(Vertex(intPoint2 - ed1Dir*3.5f, QVector3D(ed1W / 7.5f + 0.07f, 1.0f, 0)));
+						interPedX.push_back(Vertex(intPoint1 - ed1Dir*3.5f, QVector3D(0.0f - 0.07f, 1.0f, 0)));
 
 						// 停止線
 						QVector3D midPoint=(intPoint2+intPoint1)/2.0f+0.2f*ed1Per;
@@ -347,7 +355,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 						interPedXLineR.push_back(Vertex(intPoint1-ed1Dir*3.5f,QVector3D(0,0.0f,0)));
 						interPedXLineR.push_back(Vertex(midPoint-ed1Dir*3.5f,QVector3D(1.0f,0.0f,0)));
 						interPedXLineR.push_back(Vertex(midPoint-ed1Dir*4.25f,QVector3D(1.0f,1.0f,0)));
-						interPedXLineR.push_back(Vertex(intPoint1-ed1Dir*4.25f,QVector3D(0.0f,1.0f,0)));
+						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir*3.5f, QVector3D(0, 0.0f, 0)));
+						interPedXLineR.push_back(Vertex(midPoint - ed1Dir*4.25f, QVector3D(1.0f, 1.0f, 0)));
+						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir*4.25f, QVector3D(0.0f, 1.0f, 0)));
 					}
 				}
 								
@@ -359,10 +369,10 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 		rendManager.addStaticGeometry("3d_roads_inter",intersectCirclesV,"../data/textures/roads/road_0lines.jpg",GL_TRIANGLES,2);
 		rendManager.addStaticGeometry("3d_roads_inter",interPedX,"../data/textures/roads/road_pedX.jpg",GL_QUADS,2);
-		rendManager.addStaticGeometry("3d_roads_inter",interPedXLineR,"../data/textures/roads/road_pedXLineR.jpg",GL_QUADS,2);
+		rendManager.addStaticGeometry("3d_roads_inter", interPedXLineR, "../data/textures/roads/road_pedXLineR.jpg", GL_TRIANGLES, 2);
 	}
 
-	rendManager.addStaticGeometry("3d_roads", vertSide, "", GL_QUADS, 1|mode_Lighting);
+	rendManager.addStaticGeometry("3d_roads", vertSide, "", GL_TRIANGLES, 1|mode_Lighting);
 }
 
 std::vector<QVector3D> RoadMeshGenerator::generateCurvePoints(const QVector3D& intPoint, const QVector3D& p1, const QVector3D& p2) {
@@ -417,8 +427,8 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 			float halfWidth = roads.graph[*ei]->getWidth()*0.5f;//it should not have /2.0f (but compensated below)
 			
 
-			std::vector<Vertex> vert(4*(num - 1));
-			std::vector<Vertex> vertBg(4*(num - 1));
+			std::vector<Vertex> vert(6*(num - 1));
+			std::vector<Vertex> vertBg(6*(num - 1));
 			
 			// Type
 			QColor color;// = graph[*ei]->color;
@@ -434,12 +444,6 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
 				break;
 			case RoadEdge::TYPE_BOULEVARD:
-				heightOffset = 0.5f;
-				heightOffsetO = 0.2f;
-				color=QColor(0xff,0xe1,0x68);
-				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-				//halfWidth*=1.4f;
-				break;
 			case RoadEdge::TYPE_AVENUE:
 				heightOffset = 0.6f;
 				heightOffsetO = 0.1f;
@@ -454,8 +458,8 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				break;
 			}
 
-			heightOffset+=0.45f;//to have park below
-			heightOffsetO+=0.45f;//to have park below
+			heightOffset += 0.45f;//to have park below
+			heightOffsetO += 0.45f;//to have park below
 
 			float halfWidthBg = halfWidth + G::global().getFloat("2DroadsStroke");//it should not depend on the type 3.5f
 
@@ -490,25 +494,28 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 					Util::getIrregularBisector(pt1, pt2, pt3, -halfWidthBg, -halfWidthBg, p2Bg);
 				}
 
-				vert[i*4+0]=Vertex(p0.x(),p0.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
-				vert[i*4+1]=Vertex(p1.x(),p1.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
-				vert[i*4+2]=Vertex(p2.x(),p2.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
-				vert[i*4+3]=Vertex(p3.x(),p3.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
+				vert[i * 6 + 0] = Vertex(p0.x(), p0.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vert[i * 6 + 1] = Vertex(p1.x(), p1.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vert[i * 6 + 2] = Vertex(p2.x(), p2.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vert[i * 6 + 3] = Vertex(p0.x(), p0.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vert[i * 6 + 4] = Vertex(p2.x(), p2.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vert[i * 6 + 5] = Vertex(p3.x(), p3.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
 					
-				vertBg[i*4+0]=Vertex(p0Bg.x(),p0Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
-				vertBg[i*4+1]=Vertex(p1Bg.x(),p1Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
-				vertBg[i*4+2]=Vertex(p2Bg.x(),p2Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
-				vertBg[i*4+3]=Vertex(p3Bg.x(),p3Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
-					
-
+				vertBg[i * 6 + 0] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 1] = Vertex(p1Bg.x(), p1Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 2] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 3] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 4] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 5] = Vertex(p3Bg.x(), p3Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				
 				p0 = p3;
 				p1 = p2;
 				p0Bg = p3Bg;
 				p1Bg = p2Bg;
 			}
 
-			renderManager.addStaticGeometry("3d_roads", vert, "", GL_QUADS, 1);//MODE=1 color
-			renderManager.addStaticGeometry("3d_roads", vertBg, "", GL_QUADS, 1);//MODE=1 color
+			renderManager.addStaticGeometry("3d_roads", vert, "", GL_TRIANGLES, 1);//MODE=1 color
+			renderManager.addStaticGeometry("3d_roads", vertBg, "", GL_TRIANGLES, 1);//MODE=1 color
 		}
 	}
 
@@ -545,11 +552,6 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
 					continue;
 				case RoadEdge::TYPE_BOULEVARD:
-					heightOffset = 0.5f;
-					heightOffsetO = 0.2f;
-					color=QColor(0xff,0xe1,0x68);
-					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-					continue;
 				case RoadEdge::TYPE_AVENUE:
 					heightOffset = 0.5f;
 					heightOffsetO = 0.2f;

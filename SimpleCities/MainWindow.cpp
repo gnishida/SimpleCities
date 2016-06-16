@@ -103,10 +103,10 @@ void MainWindow::onLoadParcels() {
 }
 
 void MainWindow::onLoadRoads() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Street Map file..."), "", tr("StreetMap Files (*.gsm)"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Load roads..."), "", tr("Shapefiles (*.shp)"));
 	if (filename.isEmpty()) return;
 
-	urbanGeometry->loadRoads(filename);
+	urbanGeometry->loadRoads(filename.toUtf8().constData());
 	glWidget->updateGL();
 }
 

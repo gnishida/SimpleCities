@@ -46,7 +46,7 @@ public:
 	void loadParcels(const std::string& filename);
 	void loadBuildings(const std::string& filename);
 
-	void loadRoads(const QString &filename);
+	void loadRoads(const std::string& filename);
 	void saveRoads(const QString &filename);
 	void clearRoads();
 
