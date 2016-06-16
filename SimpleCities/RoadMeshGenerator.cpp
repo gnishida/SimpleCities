@@ -115,7 +115,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector3D b03 = (b0 + b3) * 0.5f;
 					QVector3D b12 = (b1 + b2) * 0.5f;
 					float z1 = rendManager.getTerrainHeight(b03.x(), b03.y());
+					if (z1 < G::g["road_min_level"].toFloat()) z1 = G::g["road_min_level"].toFloat();
 					float z2 = rendManager.getTerrainHeight(b12.x(), b12.y());
+					if (z2 < G::g["road_min_level"].toFloat()) z2 = G::g["road_min_level"].toFloat();
 
 					b0.setZ(z1 + deltaZ);
 					b3.setZ(z1 + deltaZ);
@@ -192,6 +194,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+				if (z < G::g["road_min_level"].toFloat()) z = G::g["road_min_level"].toFloat();
 				QVector3D center(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), z + deltaZ);
 
 				const float numSides = 10;
@@ -223,6 +226,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				////////////////////////
 				// 2.2 FOUR OR MORE--> COMPLEX INTERSECTION
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+				if (z < G::g["road_min_level"].toFloat()) z = G::g["road_min_level"].toFloat();
 				z += deltaZ + 0.1f;
 
 				////////////
