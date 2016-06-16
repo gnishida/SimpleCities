@@ -371,7 +371,7 @@ void addFirstFloor(VBORenderManager& rendManager, const std::vector<QVector3D>& 
 	for (int sN = 0; sN < columnContour.size(); ++sN) {
 		int ind1 = sN;
 		int ind2 = (sN + 1) % columnContour.size();
-		QVector3D dir = columnContour[ind1] - columnContour[ind2];
+		QVector3D dir = columnContour[ind2] - columnContour[ind1];
 		float sideLength = dir.length();
 		dir /= sideLength;
 		QVector3D norm = QVector3D::crossProduct(dir, QVector3D(0, 0, 1.0f));
@@ -474,7 +474,7 @@ void addColumnGeometry(VBORenderManager& rendManager, const std::vector<QVector3
 	for (int sN = 0; sN < columnContour.size(); ++sN) {
 		int ind1 = sN;
 		int ind2 = (sN + 1) %columnContour.size();
-		QVector3D dir = columnContour[ind1] - columnContour[ind2];
+		QVector3D dir = columnContour[ind2] - columnContour[ind1];
 		float sideLength = dir.length();
 		dir /= sideLength;
 		QVector3D norm = QVector3D::crossProduct(columnContour[ind2] - columnContour[ind1], QVector3D(0, 0, 1.0f));

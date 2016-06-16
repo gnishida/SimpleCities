@@ -94,7 +94,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\opencv\lib\;..\glew\;$(BOOST_LIBRARYDIR);$(CGAL_DIR)\lib;$(CGAL_DIR)\auxiliary\gmp\lib;..\gdal-2-1-0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Testd.lib;opencv_world300d.lib;glew32.lib;libboost_thread-vc120-mt-gd-1_58.lib;CGAL-vc120-mt-gd-4.7.lib;CGAL_Core-vc120-mt-gd-4.7.lib;CGAL_ImageIO-vc120-mt-gd-4.7.lib;libgmp-10.lib;libmpfr-4.lib;gdal_i.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Testd.lib;opencv_world300d.lib;glew32.lib;libboost_thread-vc120-mt-gd-1_58.lib;CGAL-vc120-mt-gd-4.8.1.lib;CGAL_Core-vc120-mt-gd-4.8.1.lib;CGAL_ImageIO-vc120-mt-gd-4.8.1.lib;libgmp-10.lib;libmpfr-4.lib;gdal_i.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +129,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\opencv\lib\;..\glew\;$(BOOST_LIBRARYDIR);$(CGAL_DIR)\lib;$(CGAL_DIR)\auxiliary\gmp\lib;..\gdal-2-1-0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Test.lib;opencv_world300.lib;glew32.lib;libboost_thread-vc120-mt-1_58.lib;CGAL-vc120-mt-4.7.lib;CGAL_Core-vc120-mt-4.7.lib;CGAL_ImageIO-vc120-mt-4.7.lib;libgmp-10.lib;libmpfr-4.lib;gdal_i.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Xml.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Test.lib;opencv_world300.lib;glew32.lib;libboost_thread-vc120-mt-1_58.lib;CGAL-vc120-mt-4.8.1.lib;CGAL_Core-vc120-mt-4.8.1.lib;CGAL_ImageIO-vc120-mt-4.8.1.lib;libgmp-10.lib;libmpfr-4.lib;gdal_i.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

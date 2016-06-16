@@ -31,10 +31,11 @@
 * Classes and functions for geometric data
 **/
 
-struct Loop3D : std::vector<QVector3D>{
+class Loop3D : public std::vector<QVector3D> {
+public:
+	bool isPointWithinLoop(const QVector3D& pt) const;
+	bool isClockwise() const;
 };
-
-bool isPointWithinLoop(std::vector<QVector3D> &loop, QVector3D &pt);
 
 /**
 * Stores a polygon in 3D represented by its
@@ -145,7 +146,9 @@ public:
 
 	float computeArea(bool parallelToXY = false);
 
-	bool isPointWithinLoop(QVector3D &pt){
+	bool isPointWithinLoop(const QVector3D& pt) const {
+		return contour.isPointWithinLoop(pt);
+		/*
 		int i, j, c = 0;
 		for (i = 0, j = contour.size()-1; i < contour.size(); j = i++) {
 			if ( ((contour[i].y()>pt.y()) != (contour[j].y()>pt.y())) &&
@@ -153,8 +156,8 @@ public:
 				c = !c;
 		}
 		return c;
-
-	}//
+		*/
+	}
 
 	/**
 	* Vector containing 3D points of polygon contour

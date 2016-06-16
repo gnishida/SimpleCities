@@ -176,7 +176,7 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
 			Block block;
-			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 0; --k) {
+			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 1; --k) {
 				QVector3D pt;
 				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
 				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
@@ -248,7 +248,7 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 				building.bldType = 1;
 			}
 
-			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 0; --k) {
+			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 1; --k) {
 				QVector3D pt;
 				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
 				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
@@ -272,7 +272,7 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 			for (int j = 0; j < buildings.size(); ++j) {
 				if (i == j) continue;
 
-				if (boost::geometry::within(buildings[i].buildingFootprint.contour[k], buildings[j].buildingFootprint.contour)) {
+				if (buildings[j].buildingFootprint.isPointWithinLoop(buildings[i].buildingFootprint.contour[k])) {
 					inside = true;
 					break;
 				}

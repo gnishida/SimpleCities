@@ -11,13 +11,23 @@
 #include <CGAL/Partition_traits_2.h>
 #include <CGAL/partition_2.h>
 
-bool Polygon3D::isClockwise() const {
-	int next;
+bool Loop3D::isPointWithinLoop(const QVector3D& pt) const {
+	Loop3D closedLoop = *this;
+	if (closedLoop.front().x() != closedLoop.back().x() || closedLoop.front().y() != closedLoop.back().y()) {
+		closedLoop.push_back(closedLoop.front());
+	}
+	if (!closedLoop.isClockwise()) {
+		std::reverse(closedLoop.begin(), closedLoop.end());
+	}
+	return boost::geometry::within(pt, closedLoop);
+}
+
+bool Loop3D::isClockwise() const {
 	float tmpSum = 0.0f;
 
-	for (int i = 0; i < contour.size(); ++i) {
-		next = (i + 1) % contour.size();
-		tmpSum = tmpSum + (contour[next].x() - contour[i].x()) * (contour[next].y() + contour[i].y());
+	for (int i = 0; i < size(); ++i) {
+		int next = (i + 1) % size();
+		tmpSum = tmpSum + (this->at(next).x() - this->at(i).x()) * (this->at(next).y() + this->at(i).y());
 	}
 
 	if (tmpSum > 0.0f) {
@@ -26,6 +36,10 @@ bool Polygon3D::isClockwise() const {
 	else {
 		return false;
 	}
+}
+
+bool Polygon3D::isClockwise() const {
+	return contour.isClockwise();
 }
 
 void Polygon3D::correct() {
