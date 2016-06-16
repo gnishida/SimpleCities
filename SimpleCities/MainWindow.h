@@ -29,6 +29,7 @@ protected:
 	void keyReleaseEvent(QKeyEvent* e);
 
 public slots:
+	void onLoadZone();
 	void onNewTerrain();
 	void onLoadTerrain();
 	void onSaveTerrain();
@@ -44,6 +45,7 @@ public slots:
 	void onSaveCamera();
 	void onResetCamera();
 
+	void onGenerateRoads();
 	void onGenerateBlocks();
 	void onGenerateParcels();
 	void onGenerateBuildings();

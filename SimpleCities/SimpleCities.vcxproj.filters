@@ -208,6 +208,12 @@
     <ClCompile Include="GraphUtil.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
+    <ClCompile Include="PMRoadGenerator.cpp">
+      <Filter>PM Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -387,6 +393,12 @@
       <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphUtil.h">
+      <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PMRoadGenerator.h">
+      <Filter>PM Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
       <Filter>Main Files</Filter>
     </ClInclude>
   </ItemGroup>

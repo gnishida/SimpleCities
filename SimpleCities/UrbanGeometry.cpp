@@ -32,6 +32,7 @@ This file is part of QtUrban.
 #include "VBOVegetation.h"
 #include "GShapefile.h"
 #include "GraphUtil.h"
+#include "PMRoadGenerator.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -42,27 +43,15 @@ void UrbanGeometry::clear() {
 }
 
 void UrbanGeometry::clearGeometry() {
-	//if (&mainWin->glWidget->vboRenderManager != NULL) delete &mainWin->glWidget->vboRenderManager;
-
 	roads.clear();
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-#if 0
-void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-
-	if (G::getBool("useLayer")) {
-		PMRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-	} else {
-		PMRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-	}
+void UrbanGeometry::generateRoads() {
+	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
+	generator.generateRoadNetwork();
 	update(mainWin->glWidget->vboRenderManager);
 }
-#endif
 
 void UrbanGeometry::generateBlocks() {
 	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
@@ -149,17 +138,49 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	}
 }
 
-void UrbanGeometry::loadTerrain(const std::string& filename) {
-	mainWin->glWidget->vboRenderManager.vboTerrain.loadTerrain(filename.c_str());
+void UrbanGeometry::loadZone(const std::string& filename) {
+	zone.clear();
 
-	/*
+	gs::Shape shape;
+	shape.load(filename);
+
+	glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
+	minBound = glm::vec2(shape.minBound) - offset;
+	maxBound = glm::vec2(shape.maxBound) - offset;
+	
+	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
+		//for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
+		for (int k = shape.shapeObjects[i].parts[0].points.size() - 1; k >= 1; --k) {
+			QVector2D pt;
+			pt.setX(shape.shapeObjects[i].parts[0].points[k].x - offset.x);
+			pt.setY(shape.shapeObjects[i].parts[0].points[k].y - offset.y);
+			zone.push_back(pt);
+		}
+	}
+}
+
+void UrbanGeometry::loadTerrain(const std::string& filename) {
+	//mainWin->glWidget->vboRenderManager.vboTerrain.loadTerrain(filename.c_str());
 	gs::DEM dem;
 	dem.load(filename);
 
-	mainWin->glWidget->vboRenderManager->changeTerrainDimensions(glm::vec2(dem.width, dem.height));
-	mainWin->glWidget->vboRenderManager.vboTerrain.layerData = cv::Mat(dem.height, dem.width, CV_32FC1, dem.data.data()).clone();
-	cv::flip(mainWin->glWidget->vboRenderManager.vboTerrain.layerData, mainWin->glWidget->vboRenderManager.vboTerrain.layerData, 0);
-	*/
+	mainWin->glWidget->vboRenderManager.changeTerrainDimensions(glm::vec2(dem.width, dem.height));
+	if (zone.size() == 0) {
+		glm::vec2 offset = dem.origin + glm::vec2(dem.width, dem.height) * 0.5f;
+		minBound = dem.origin - offset;
+		maxBound = dem.origin + glm::vec2(dem.width, dem.height) - offset;
+
+		zone.push_back(QVector2D(minBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x, maxBound.y));
+	}
+
+	cv::Mat layerData = cv::Mat(dem.height, dem.width, CV_32FC1, dem.data.data()).clone();
+	cv::flip(layerData, layerData, 0);
+
+	// update texture
+	mainWin->glWidget->vboRenderManager.vboTerrain.setTerrain(layerData);
 }
 
 void UrbanGeometry::loadParcels(const std::string& filename) {
@@ -167,12 +188,18 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 
 	gs::Shape shape;
 	shape.load(filename);
-	if (minBound.x == 0 && minBound.y == 0) {
-		minBound = shape.minBound;
-		maxBound = shape.maxBound;
+	if (zone.size() == 0) {
+		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
+		minBound = glm::vec2(shape.minBound) - offset;
+		maxBound = glm::vec2(shape.maxBound) - offset;
+
+		zone.push_back(QVector2D(minBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x, maxBound.y));
 	}
 
-	glm::vec3 offset = (maxBound + minBound) * 0.5f;
+	glm::vec2 offset = (maxBound + minBound) * 0.5f;
 
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
@@ -205,12 +232,18 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 
 	gs::Shape shape;
 	shape.load(filename);
-	if (minBound.x == 0 && minBound.y == 0) {
-		minBound = shape.minBound;
-		maxBound = shape.maxBound;
+	if (zone.size() == 0) {
+		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
+		minBound = glm::vec2(shape.minBound) - offset;
+		maxBound = glm::vec2(shape.maxBound) - offset;
+
+		zone.push_back(QVector2D(minBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x, maxBound.y));
 	}
 
-	glm::vec3 offset = (maxBound + minBound) * 0.5f;
+	glm::vec2 offset = (maxBound + minBound) * 0.5f;
 
 #if 0
 	Building building;
@@ -296,12 +329,19 @@ void UrbanGeometry::loadRoads(const std::string& filename) {
 
 	gs::Shape shape;
 	shape.load(filename);
-	if (minBound.x == 0 && minBound.y == 0) {
-		minBound = shape.minBound;
-		maxBound = shape.maxBound;
+
+	if (zone.size() == 0) {
+		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
+		minBound = glm::vec2(shape.minBound) - offset;
+		maxBound = glm::vec2(shape.maxBound) - offset;
+
+		zone.push_back(QVector2D(minBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, minBound.y));
+		zone.push_back(QVector2D(maxBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x, maxBound.y));
 	}
 
-	glm::vec3 offset = (maxBound + minBound) * 0.5f;
+	glm::vec2 offset = (maxBound + minBound) * 0.5f;
 
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {

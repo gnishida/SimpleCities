@@ -33,6 +33,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionLoadZone"/>
     <addaction name="actionNewTerrain"/>
     <addaction name="actionOpenTerrain"/>
     <addaction name="actionSaveTerrain"/>
@@ -64,6 +65,7 @@
     <property name="title">
      <string>PM</string>
     </property>
+    <addaction name="actionGenerateRoads"/>
     <addaction name="actionGenerateBlocks"/>
     <addaction name="actionGenerateParcels"/>
     <addaction name="actionGenerateBuildings"/>
@@ -96,7 +98,7 @@
     <string>Open Terrain</string>
    </property>
    <property name="shortcut">
-    <string/>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionExit">
@@ -130,9 +132,6 @@
   <action name="actionLoadRoads">
    <property name="text">
     <string>Load Roads</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionClearRoads">
@@ -213,6 +212,19 @@
   <action name="actionLoadBuildings">
    <property name="text">
     <string>Load Buildings</string>
+   </property>
+  </action>
+  <action name="actionGenerateRoads">
+   <property name="text">
+    <string>Generate Roads</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionLoadZone">
+   <property name="text">
+    <string>Load Zone</string>
    </property>
   </action>
  </widget>

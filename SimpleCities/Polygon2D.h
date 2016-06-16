@@ -20,7 +20,6 @@ public:
 	float area() const;
 	QVector2D centroid() const;
 	bool contains(const QVector2D &pt) const;
-	bool contains(const QVector2D &pt);
 	bool Polygon2D::contains(const Polygon2D &polygon) const;
 	Polygon2D convexHull() const;
 	BBox envelope() const;

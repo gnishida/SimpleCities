@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.fileToolBar->addAction(ui.actionOpenTerrain);
 
 	// register the menu's action handlers
+	connect(ui.actionLoadZone, SIGNAL(triggered()), this, SLOT(onLoadZone()));
 	connect(ui.actionNewTerrain, SIGNAL(triggered()), this, SLOT(onNewTerrain()));
 	connect(ui.actionOpenTerrain, SIGNAL(triggered()), this, SLOT(onLoadTerrain()));
 	connect(ui.actionSaveTerrain, SIGNAL(triggered()), this, SLOT(onSaveTerrain()));
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionResetCamera, SIGNAL(triggered()), this, SLOT(onResetCamera()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
+	connect(ui.actionGenerateRoads, SIGNAL(triggered()), this, SLOT(onGenerateRoads()));
 	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
 	connect(ui.actionGenerateParcels, SIGNAL(triggered()), this, SLOT(onGenerateParcels()));
 	connect(ui.actionGenerateBuildings, SIGNAL(triggered()), this, SLOT(onGenerateBuildings()));
@@ -60,6 +62,14 @@ void MainWindow::keyPressEvent(QKeyEvent* e) {
 
 void MainWindow::keyReleaseEvent(QKeyEvent* e) {
 	glWidget->keyReleaseEvent(e);
+}
+
+void MainWindow::onLoadZone() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Load zone..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->loadZone(filename.toUtf8().constData());
+	glWidget->updateGL();
 }
 
 void MainWindow::onNewTerrain() {
@@ -170,6 +180,12 @@ void MainWindow::onSaveCamera() {
 void MainWindow::onResetCamera() {
 	glWidget->camera.resetCamera();
 	glWidget->updateCamera();
+	glWidget->updateGL();
+}
+
+void MainWindow::onGenerateRoads() {
+	urbanGeometry->generateRoads();
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 

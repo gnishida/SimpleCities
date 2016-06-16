@@ -37,6 +37,7 @@ public:
 	void smoothTerrain();
 	float getTerrainHeight(float u, float v);
 	void loadTerrain(const QString& fileName);
+	void setTerrain(const cv::Mat& mat);
 	void saveTerrain(const QString& fileName);
 
 private:

@@ -19,11 +19,12 @@ QVector2D Polygon2D::centroid() const {
 }
 
 bool Polygon2D::contains(const QVector2D &pt) const {
-	return boost::geometry::within(pt, *this);
-}
-
-bool Polygon2D::contains(const QVector2D &pt) {
-	return boost::geometry::within(pt, *this);
+	Polygon2D closedPoints = *this;
+	if (this->front().x() != this->back().x() || this->front().y() != this->back().y()) {
+		closedPoints.push_back(closedPoints.front());
+	}
+	closedPoints.correct();
+	return boost::geometry::within(pt, closedPoints);
 }
 
 bool Polygon2D::contains(const Polygon2D &polygon) const {

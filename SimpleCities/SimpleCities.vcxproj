@@ -141,6 +141,7 @@
     <ClCompile Include="nvModel\nvModel.cpp" />
     <ClCompile Include="nvModel\nvModelObj.cpp" />
     <ClCompile Include="nvModel\nvModelQuery.cpp" />
+    <ClCompile Include="PMRoadGenerator.cpp" />
     <ClCompile Include="RoadMeshGenerator.cpp" />
     <ClCompile Include="ControlWidget.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_ControlWidget.cpp">
@@ -202,6 +203,7 @@
     <ClCompile Include="TerrainSizeInputDialog.cpp" />
     <ClCompile Include="UrbanGeometry.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VBOBlock.cpp" />
     <ClCompile Include="VBOGeoBuilding.cpp" />
     <ClCompile Include="VBOModel.cpp" />
@@ -269,6 +271,7 @@
     <ClInclude Include="BlockSet.h" />
     <ClInclude Include="gisutils.h" />
     <ClInclude Include="GShapefile.h" />
+    <ClInclude Include="PMRoadGenerator.h" />
     <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Camera2D.h" />
@@ -308,6 +311,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe" -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED  -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB  "-I$(BOOST_ROOT)\." "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtTest" "-I.\..\opencv\include" "-I.\..\glew\include\GL" "-IC:\cgal4.5\include" "-IC:\cgal4.5\auxiliary\gmp\include"</Command>
     </CustomBuild>
     <ClInclude Include="UrbanGeometry.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="VBOBlock.h" />
     <ClInclude Include="VBOBuilding.h" />
     <ClInclude Include="VBOGeoBuilding.h" />

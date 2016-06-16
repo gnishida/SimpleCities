@@ -315,6 +315,11 @@ void VBOTerrain::loadTerrain(const QString& fileName) {
 	// update texture
 	updateTexture();
 }
+
+void VBOTerrain::setTerrain(const cv::Mat& mat) {
+	layerData = mat;
+	updateTexture();
+}
 	
 void VBOTerrain::saveTerrain(const QString& fileName) {
 	cv::Mat saveImage	= cv::Mat(layerData.rows, layerData.cols, CV_8UC4, layerData.data);

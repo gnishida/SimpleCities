@@ -18,8 +18,9 @@ public:
 	RoadGraph roads;
 	BlockSet blocks;
 	std::vector<Building> buildings;
-	glm::vec3 minBound;
-	glm::vec3 maxBound;
+	glm::vec2 minBound;
+	glm::vec2 maxBound;
+	Polygon2D zone;
 
 public:
 	UrbanGeometry(MainWindow* mainWin);
@@ -33,6 +34,7 @@ public:
 	void clear();
 	void clearGeometry();
 
+	void generateRoads();
 	void generateBlocks();
 	void generateParcels();
 	void generateBuildings();
@@ -42,6 +44,7 @@ public:
 	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);
 
+	void loadZone(const std::string& filename);
 	void loadTerrain(const std::string& filename);
 	void loadParcels(const std::string& filename);
 	void loadBuildings(const std::string& filename);

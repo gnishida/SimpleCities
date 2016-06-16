@@ -47,6 +47,8 @@ public:
     QAction *actionGenerateAll;
     QAction *actionLoadParcels;
     QAction *actionLoadBuildings;
+    QAction *actionGenerateRoads;
+    QAction *actionLoadZone;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -103,6 +105,10 @@ public:
         actionLoadParcels->setObjectName(QStringLiteral("actionLoadParcels"));
         actionLoadBuildings = new QAction(MainWindow);
         actionLoadBuildings->setObjectName(QStringLiteral("actionLoadBuildings"));
+        actionGenerateRoads = new QAction(MainWindow);
+        actionGenerateRoads->setObjectName(QStringLiteral("actionGenerateRoads"));
+        actionLoadZone = new QAction(MainWindow);
+        actionLoadZone->setObjectName(QStringLiteral("actionLoadZone"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -126,6 +132,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuPM->menuAction());
         menuBar->addAction(menuWindow->menuAction());
+        menuFile->addAction(actionLoadZone);
         menuFile->addAction(actionNewTerrain);
         menuFile->addAction(actionOpenTerrain);
         menuFile->addAction(actionSaveTerrain);
@@ -147,6 +154,7 @@ public:
         menuFile->addAction(actionExit);
         menuWindow->addAction(actionControlWidget);
         menuWindow->addAction(actionPropertyWidget);
+        menuPM->addAction(actionGenerateRoads);
         menuPM->addAction(actionGenerateBlocks);
         menuPM->addAction(actionGenerateParcels);
         menuPM->addAction(actionGenerateBuildings);
@@ -164,7 +172,7 @@ public:
         actionNewTerrain->setText(QApplication::translate("MainWindow", "New Terrain", 0));
         actionNewTerrain->setShortcut(QString());
         actionOpenTerrain->setText(QApplication::translate("MainWindow", "Open Terrain", 0));
-        actionOpenTerrain->setShortcut(QString());
+        actionOpenTerrain->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0));
         actionExit->setText(QApplication::translate("MainWindow", "Exit", 0));
         actionControlWidget->setText(QApplication::translate("MainWindow", "Control Widget", 0));
         actionSaveTerrain->setText(QApplication::translate("MainWindow", "Save Terrain", 0));
@@ -172,7 +180,6 @@ public:
         actionSaveRoads->setText(QApplication::translate("MainWindow", "Save Roads", 0));
         actionPropertyWidget->setText(QApplication::translate("MainWindow", "Property Widget", 0));
         actionLoadRoads->setText(QApplication::translate("MainWindow", "Load Roads", 0));
-        actionLoadRoads->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0));
         actionClearRoads->setText(QApplication::translate("MainWindow", "Clear Roads", 0));
         actionClearRoads->setShortcut(QApplication::translate("MainWindow", "Ctrl+N", 0));
         actionSaveImage->setText(QApplication::translate("MainWindow", "Save Image", 0));
@@ -191,6 +198,9 @@ public:
         actionGenerateAll->setText(QApplication::translate("MainWindow", "Generate All", 0));
         actionLoadParcels->setText(QApplication::translate("MainWindow", "Load Parcels", 0));
         actionLoadBuildings->setText(QApplication::translate("MainWindow", "Load Buildings", 0));
+        actionGenerateRoads->setText(QApplication::translate("MainWindow", "Generate Roads", 0));
+        actionGenerateRoads->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0));
+        actionLoadZone->setText(QApplication::translate("MainWindow", "Load Zone", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0));

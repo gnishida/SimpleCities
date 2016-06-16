@@ -24,13 +24,11 @@ int main(int argc, char *argv[]) {
 	G::global()["maxHeightBaseAspectRatio"] = 1.0f;
 	G::global()["minBuildingArea"] = 10.0f;
 
-	//G::global()["roadAngleTolerance"] = 1.2566f;
-	//G::global()["roadAngleTolerance"] = 1.0f;
-	//G::global()["roadAngleTolerance"] = 0.8f;
-	//G::global()["roadAngleTolerance"] = 0.52f;
-
+	G::global()["roadAngleTolerance"] = 0.52f;
+	G::global()["slopeTolerance"] = 0.3f;
 	G::global()["sea_level"] = 55.55f;// 60.5f;
 	G::global()["road_min_level"] = 61.0f;
+	G::global()["acrossRiverTolerance"] = 200.0f;
 
 	G::global()["MAX_Z"] = 1000.0f;
 	G::global()["shader2D"] = true;

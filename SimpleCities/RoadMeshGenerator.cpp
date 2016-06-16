@@ -8,7 +8,7 @@ bool compare2ndPartTuple2 (const std::pair<float, RoadEdgeDesc> &i, const std::p
 }
 
 void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGraph& roads) {
-	float deltaZ = 0.3f;//G::global().getFloat("3d_road_deltaZ");
+	float deltaZ = 1.0f;//G::global().getFloat("3d_road_deltaZ");
 	const float deltaL = 1.0f;
 
 	std::vector<Vertex> vertSide;
@@ -115,9 +115,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector3D b03 = (b0 + b3) * 0.5f;
 					QVector3D b12 = (b1 + b2) * 0.5f;
 					float z1 = rendManager.getTerrainHeight(b03.x(), b03.y());
-					if (z1 < G::g["road_min_level"].toFloat()) z1 = G::g["road_min_level"].toFloat();
+					if (z1 < G::getFloat("road_min_level")) z1 = G::getFloat("road_min_level");
 					float z2 = rendManager.getTerrainHeight(b12.x(), b12.y());
-					if (z2 < G::g["road_min_level"].toFloat()) z2 = G::g["road_min_level"].toFloat();
+					if (z2 < G::getFloat("road_min_level")) z2 = G::getFloat("road_min_level");
 
 					b0.setZ(z1 + deltaZ);
 					b3.setZ(z1 + deltaZ);
@@ -194,7 +194,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
-				if (z < G::g["road_min_level"].toFloat()) z = G::g["road_min_level"].toFloat();
+				if (z < G::getFloat("road_min_level")) z = G::getFloat("road_min_level");
 				QVector3D center(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), z + deltaZ);
 
 				const float numSides = 10;
@@ -226,7 +226,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				////////////////////////
 				// 2.2 FOUR OR MORE--> COMPLEX INTERSECTION
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
-				if (z < G::g["road_min_level"].toFloat()) z = G::g["road_min_level"].toFloat();
+				if (z < G::getFloat("road_min_level")) z = G::getFloat("road_min_level");
 				z += deltaZ + 0.1f;
 
 				////////////
@@ -346,33 +346,33 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 					if (outDegree >= 3 && roads.graph[edgeAngleOut[eN].second]->type == RoadEdge::TYPE_AVENUE && (ed1poly[0] - ed1poly.back()).length() > 10.0f && ed1poly.length() > 50.0f) {
 						// 横断歩道
-						interPedX.push_back(Vertex(intPoint1,QVector3D(0-0.07f,0,0)));
-						interPedX.push_back(Vertex(intPoint2,QVector3D(ed1W/7.5f+0.07f,0,0)));
-						interPedX.push_back(Vertex(intPoint2-ed1Dir*3.5f,QVector3D(ed1W/7.5f+0.07f,1.0f,0)));
+						interPedX.push_back(Vertex(intPoint1, QVector3D(0-0.07f, 0, 0)));
+						interPedX.push_back(Vertex(intPoint2, QVector3D(ed1W / 7.5f + 0.07f, 0, 0)));
+						interPedX.push_back(Vertex(intPoint2 - ed1Dir * 3.5f, QVector3D(ed1W/7.5f + 0.07f, 1.0f, 0)));
 						interPedX.push_back(Vertex(intPoint1, QVector3D(0 - 0.07f, 0, 0)));
-						interPedX.push_back(Vertex(intPoint2 - ed1Dir*3.5f, QVector3D(ed1W / 7.5f + 0.07f, 1.0f, 0)));
-						interPedX.push_back(Vertex(intPoint1 - ed1Dir*3.5f, QVector3D(0.0f - 0.07f, 1.0f, 0)));
+						interPedX.push_back(Vertex(intPoint2 - ed1Dir * 3.5f, QVector3D(ed1W / 7.5f + 0.07f, 1.0f, 0)));
+						interPedX.push_back(Vertex(intPoint1 - ed1Dir * 3.5f, QVector3D(0.0f - 0.07f, 1.0f, 0)));
 
 						// 停止線
 						QVector3D midPoint=(intPoint2+intPoint1)/2.0f+0.2f*ed1Per;
 					
-						interPedXLineR.push_back(Vertex(intPoint1-ed1Dir*3.5f,QVector3D(0,0.0f,0)));
-						interPedXLineR.push_back(Vertex(midPoint-ed1Dir*3.5f,QVector3D(1.0f,0.0f,0)));
-						interPedXLineR.push_back(Vertex(midPoint-ed1Dir*4.25f,QVector3D(1.0f,1.0f,0)));
-						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir*3.5f, QVector3D(0, 0.0f, 0)));
-						interPedXLineR.push_back(Vertex(midPoint - ed1Dir*4.25f, QVector3D(1.0f, 1.0f, 0)));
-						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir*4.25f, QVector3D(0.0f, 1.0f, 0)));
+						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir * 3.5f, QVector3D(0, 0.0f, 0)));
+						interPedXLineR.push_back(Vertex(midPoint - ed1Dir * 3.5f, QVector3D(1.0f, 0.0f, 0)));
+						interPedXLineR.push_back(Vertex(midPoint - ed1Dir * 4.25f, QVector3D(1.0f, 1.0f, 0)));
+						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir * 3.5f, QVector3D(0, 0.0f, 0)));
+						interPedXLineR.push_back(Vertex(midPoint - ed1Dir * 4.25f, QVector3D(1.0f, 1.0f, 0)));
+						interPedXLineR.push_back(Vertex(intPoint1 - ed1Dir * 4.25f, QVector3D(0.0f, 1.0f, 0)));
 					}
 				}
 								
 				if (interPoints.size() > 2) {
-					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,"../data/textures/roads/road_0lines.jpg",2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
+					rendManager.addStaticGeometry2("3d_roads_interCom", interPoints,0.0f, "../data/textures/roads/road_0lines.jpg", 2, QVector3D(1.0f/7.5f, 1.0f/7.5f, 1), QColor());
 				}
 			}
 		}
 
-		rendManager.addStaticGeometry("3d_roads_inter",intersectCirclesV,"../data/textures/roads/road_0lines.jpg",GL_TRIANGLES,2);
-		rendManager.addStaticGeometry("3d_roads_inter",interPedX,"../data/textures/roads/road_pedX.jpg",GL_QUADS,2);
+		rendManager.addStaticGeometry("3d_roads_inter", intersectCirclesV, "../data/textures/roads/road_0lines.jpg", GL_TRIANGLES, 2);
+		rendManager.addStaticGeometry("3d_roads_inter", interPedX, "../data/textures/roads/road_pedX.jpg", GL_TRIANGLES, 2);
 		rendManager.addStaticGeometry("3d_roads_inter", interPedXLineR, "../data/textures/roads/road_pedXLineR.jpg", GL_TRIANGLES, 2);
 	}
 
