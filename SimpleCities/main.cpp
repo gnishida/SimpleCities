@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 	G::global()["MAX_Z"] = 1000.0f;
 	G::global()["shader2D"] = true;
 
-	G::global()["2DroadsStroke"] = 3.0f;
+	G::global()["2DroadsStroke"] = 1.5f;
 
 	G::global()["sidewalk_width"] = 2.0f;
 	G::global()["parcel_area_mean"] = 2000.0f;
@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
 	G::global()["parcel_setback_sides"] = 5.0f;
 	G::global()["building_max_frontage"] = 0.0f;
 	G::global()["building_max_depth"] = 0.0f;
-	G::global()["building_stories_deviation"] = 2.0f;
-	G::global()["building_stories_mean"] = 4;
+	G::global()["building_stories_deviation"] = 0.0f;// 2.0f;
+	G::global()["building_stories_mean"] = 5;
 	G::global()["tree_setback"] = 1.0f;
 
 	QApplication a(argc, argv);

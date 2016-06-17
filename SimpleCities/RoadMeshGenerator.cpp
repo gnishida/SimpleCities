@@ -28,8 +28,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 			numEdges++;
 
 			RoadEdgePtr edge = roads.graph[*ei];
-			float hWidth = roads.graph[*ei]->getWidth() * 0.5f;
-			//printf("roadGraph.graph[*ei]->type %d\n",roadGraph.graph[*ei]->type);
+			float hWidth = roads.graph[*ei]->getHalfWidth();
+			
 			int type;
 			switch (roads.graph[*ei]->type) {
 			case RoadEdge::TYPE_HIGHWAY:
@@ -46,8 +46,6 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				type=0;
 				break;
 			}
-
-			//float lengthMoved=0;//road texture dX
 			
 			float lengthMovedL=0;//road texture dX
 			float lengthMovedR=0;//road texture dX
@@ -186,7 +184,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				for (boost::tie(oei, oeend) = boost::out_edges(*vi, roads.graph); oei != oeend; ++oei) {
 					if (!roads.graph[*oei]->valid) continue;
 
-					rad = roads.graph[*oei]->getWidth() * 0.5;
+					rad = roads.graph[*oei]->getHalfWidth();
 					Polyline2D polyline = GraphUtil::orderPolyLine(roads, *oei, *vi);
 					QVector2D dir = polyline[1] - polyline[0];
 					angle_offset = atan2f(dir.x(), -dir.y());
@@ -428,44 +426,44 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 			int num = roads.graph[*ei]->polyline.size();
 			if (num <= 1) continue;
 
-			float halfWidth = roads.graph[*ei]->getWidth()*0.5f;//it should not have /2.0f (but compensated below)
+			float halfWidth = roads.graph[*ei]->getHalfWidth();
 			
-
 			std::vector<Vertex> vert(6*(num - 1));
 			std::vector<Vertex> vertBg(6*(num - 1));
 			
 			// Type
-			QColor color;// = graph[*ei]->color;
-			QColor colorO;
+			QColor color;
+			QColor colorBg;
 			float heightOffset = 0.0f;
-			float heightOffsetO=0.0f;
+			float heightOffsetBg = 0.0f;
 
 			switch (roads.graph[*ei]->type) {
 			case RoadEdge::TYPE_HIGHWAY:
 				heightOffset = 0.8f;
-				heightOffsetO = 0.3f;
+				heightOffsetBg = 0.3f;
 				color=QColor(0xfa,0x9e,0x25);
-				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
+				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
 				break;
 			case RoadEdge::TYPE_BOULEVARD:
 			case RoadEdge::TYPE_AVENUE:
 				heightOffset = 0.6f;
-				heightOffsetO = 0.1f;
+				heightOffsetBg = 0.1f;
 				color=QColor(0xff,0xe1,0x68);
-				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
 				break;
 			case RoadEdge::TYPE_STREET:
 				heightOffset = 0.4f;
-				heightOffsetO = 0.1f;
+				heightOffsetBg = 0.1f;
 				color=QColor(0xff,0xff,0xff);
-				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
+				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
 				break;
 			}
 
 			heightOffset += 0.45f;//to have park below
-			heightOffsetO += 0.45f;//to have park below
+			heightOffsetBg += 0.45f;//to have park below
 
-			float halfWidthBg = halfWidth + G::global().getFloat("2DroadsStroke");//it should not depend on the type 3.5f
+			float halfWidthBg = halfWidth + G::global().getFloat("2DroadsStroke") * 0.5;
+			halfWidth -= G::global().getFloat("2DroadsStroke") * 0.5;
 
 			QVector2D p0, p1, p2, p3;
 			QVector2D p0Bg, p1Bg, p2Bg, p3Bg;
@@ -487,7 +485,7 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				p3 = pt2 + perp * halfWidth;
 				p2Bg = pt2 - perp * halfWidthBg;
 				p3Bg = pt2 + perp * halfWidthBg;
-				QVector3D normal(0, 0, 1);// = Util::calculateNormal(p0, p1, p2);
+				QVector3D normal(0, 0, 1);
 
 				if (i < num - 2) {
 					QVector2D pt3 = roads.graph[*ei]->polyline[i + 2];
@@ -505,12 +503,12 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				vert[i * 6 + 4] = Vertex(p2.x(), p2.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
 				vert[i * 6 + 5] = Vertex(p3.x(), p3.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
 					
-				vertBg[i * 6 + 0] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
-				vertBg[i * 6 + 1] = Vertex(p1Bg.x(), p1Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
-				vertBg[i * 6 + 2] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
-				vertBg[i * 6 + 3] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
-				vertBg[i * 6 + 4] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
-				vertBg[i * 6 + 5] = Vertex(p3Bg.x(), p3Bg.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 0] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 1] = Vertex(p1Bg.x(), p1Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 2] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 3] = Vertex(p0Bg.x(), p0Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 4] = Vertex(p2Bg.x(), p2Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
+				vertBg[i * 6 + 5] = Vertex(p3Bg.x(), p3Bg.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);// pos color normal texture
 				
 				p0 = p3;
 				p1 = p2;
@@ -532,69 +530,67 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 			if (GraphUtil::getDegree(roads, *vi) == 0) continue;
 
 			// get the largest width of the outing edges
-			QColor color;// = graph[*ei]->color;
-			QColor colorO;
+			QColor color;
+			QColor colorBg;
 			float heightOffset = 0.0f;
-			float heightOffsetO=0.0f;
-			int maxType=-1;
+			float heightOffsetBg = 0.0f;
+			int maxType = -1;
 			float halfWidth;
 
 			RoadOutEdgeIter oei, oeend;
 			for (boost::tie(oei, oeend) = boost::out_edges(*vi, roads.graph); oei != oeend; ++oei) {
 				if (!roads.graph[*oei]->valid) continue;
-				//printf("type %d\n",graph[*oei]->type);
-				if(maxType>roads.graph[*oei]->type)
-					continue;
-				maxType=roads.graph[*oei]->type;
-				halfWidth=roads.graph[*oei]->getWidth()*0.5f;//it should not have /2.0f (but compensated below)
+				
+				maxType = roads.graph[*oei]->type;
+				halfWidth = roads.graph[*oei]->getHalfWidth();
 
 				switch (roads.graph[*oei]->type) {
 				case RoadEdge::TYPE_HIGHWAY:
 					heightOffset = 0.6f;
-					heightOffsetO = 0.3f;
+					heightOffsetBg = 0.3f;
 					color=QColor(0xfa,0x9e,0x25);
-					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
+					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
 					continue;
 				case RoadEdge::TYPE_BOULEVARD:
 				case RoadEdge::TYPE_AVENUE:
 					heightOffset = 0.5f;
-					heightOffsetO = 0.2f;
+					heightOffsetBg = 0.2f;
 					color=QColor(0xff,0xe1,0x68);
-					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
 					continue;
 				case RoadEdge::TYPE_STREET:
 					heightOffset = 0.4f;
-					heightOffsetO = 0.2f;
+					heightOffsetBg = 0.2f;
 					color=QColor(0xff,0xff,0xff);
-					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
+					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
 					continue;
 				}
 			}
 
-			heightOffset+=0.45f;//to have park below
-			heightOffsetO+=0.45f;//to have park below
+			heightOffset += 0.45f;//to have park below
+			heightOffsetBg += 0.45f;//to have park below
 
-			float max_r=halfWidth;
-			float max_rO=halfWidth + G::global().getFloat("2DroadsStroke");//it should not depend on the type 3.5f
+			float rad = halfWidth - G::global().getFloat("2DroadsStroke") * 0.5f;
+			float rad_bg = halfWidth + G::global().getFloat("2DroadsStroke") * 0.5f;
 
-			std::vector<Vertex> vert(3*20);
-			std::vector<Vertex> vertBg(3*20);
+			std::vector<Vertex> vert(3 * 20);
+			std::vector<Vertex> vertBg(3 * 20);
 
 			for (int i = 0; i < 20; ++i) {
 				float angle1 = 2.0 * M_PI * i / 20.0f;
 				float angle2 = 2.0 * M_PI * (i + 1) / 20.0f;
 
-				vert[i*3+0]=Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
-				vert[i*3+1]=Vertex(roads.graph[*vi]->pt.x() + max_r * cosf(angle1), roads.graph[*vi]->pt.y() + max_r * sinf(angle1), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
-				vert[i*3+2]=Vertex(roads.graph[*vi]->pt.x() + max_r * cosf(angle2), roads.graph[*vi]->pt.y() + max_r * sinf(angle2), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+				vert[i * 3 + 0] = Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+				vert[i * 3 + 1] = Vertex(roads.graph[*vi]->pt.x() + rad * cosf(angle1), roads.graph[*vi]->pt.y() + rad * sinf(angle1), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+				vert[i * 3 + 2] = Vertex(roads.graph[*vi]->pt.x() + rad * cosf(angle2), roads.graph[*vi]->pt.y() + rad * sinf(angle2), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
 
-				vertBg[i*3+0]=Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
-				vertBg[i*3+1]=Vertex(roads.graph[*vi]->pt.x() + max_rO * cosf(angle1), roads.graph[*vi]->pt.y() + max_rO * sinf(angle1), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
-				vertBg[i*3+2]=Vertex(roads.graph[*vi]->pt.x() + max_rO * cosf(angle2), roads.graph[*vi]->pt.y() + max_rO * sinf(angle2), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
+				vertBg[i * 3 + 0] = Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);
+				vertBg[i * 3 + 1] = Vertex(roads.graph[*vi]->pt.x() + rad_bg * cosf(angle1), roads.graph[*vi]->pt.y() + rad_bg * sinf(angle1), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);
+				vertBg[i * 3 + 2] = Vertex(roads.graph[*vi]->pt.x() + rad_bg * cosf(angle2), roads.graph[*vi]->pt.y() + rad_bg * sinf(angle2), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);
 			}
 						
-			renderManager.addStaticGeometry("3d_roads_inter", vert, "", GL_TRIANGLES, 1);//MODE=1 color
-			renderManager.addStaticGeometry("3d_roads_inter", vertBg, "", GL_TRIANGLES, 1);//MODE=1 color
+			renderManager.addStaticGeometry("3d_roads_inter", vert, "", GL_TRIANGLES, 1);
+			renderManager.addStaticGeometry("3d_roads_inter", vertBg, "", GL_TRIANGLES, 1);
 		}
 	}
 }

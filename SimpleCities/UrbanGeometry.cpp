@@ -60,7 +60,7 @@ void UrbanGeometry::generateBlocks() {
 
 void UrbanGeometry::generateParcels() {
 	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
-	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	//VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -132,8 +132,8 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
 		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 		BlockMeshGenerator::generateParcelMesh(vboRenderManager, blocks);
-		//VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
-		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, buildings);
+		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+		//VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, buildings);
 		VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	}
 }
@@ -145,8 +145,8 @@ void UrbanGeometry::loadZone(const std::string& filename) {
 	shape.load(filename);
 
 	glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
-	minBound = glm::vec2(shape.minBound) - offset;
-	maxBound = glm::vec2(shape.maxBound) - offset;
+	minBound = glm::vec2(shape.minBound);
+	maxBound = glm::vec2(shape.maxBound);
 	
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		//for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
@@ -167,13 +167,13 @@ void UrbanGeometry::loadTerrain(const std::string& filename) {
 	mainWin->glWidget->vboRenderManager.changeTerrainDimensions(glm::vec2(dem.width, dem.height));
 	if (zone.size() == 0) {
 		glm::vec2 offset = dem.origin + glm::vec2(dem.width, dem.height) * 0.5f;
-		minBound = dem.origin - offset;
-		maxBound = dem.origin + glm::vec2(dem.width, dem.height) - offset;
+		minBound = dem.origin;
+		maxBound = dem.origin + glm::vec2(dem.width, dem.height);
 
-		zone.push_back(QVector2D(minBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, maxBound.y));
-		zone.push_back(QVector2D(minBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
 	}
 
 	cv::Mat layerData = cv::Mat(dem.height, dem.width, CV_32FC1, dem.data.data()).clone();
@@ -190,13 +190,13 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 	shape.load(filename);
 	if (zone.size() == 0) {
 		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
-		minBound = glm::vec2(shape.minBound) - offset;
-		maxBound = glm::vec2(shape.maxBound) - offset;
+		minBound = glm::vec2(shape.minBound);
+		maxBound = glm::vec2(shape.maxBound);
 
-		zone.push_back(QVector2D(minBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, maxBound.y));
-		zone.push_back(QVector2D(minBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
 	}
 
 	glm::vec2 offset = (maxBound + minBound) * 0.5f;
@@ -234,13 +234,13 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 	shape.load(filename);
 	if (zone.size() == 0) {
 		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
-		minBound = glm::vec2(shape.minBound) - offset;
-		maxBound = glm::vec2(shape.maxBound) - offset;
+		minBound = glm::vec2(shape.minBound);
+		maxBound = glm::vec2(shape.maxBound);
 
-		zone.push_back(QVector2D(minBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, maxBound.y));
-		zone.push_back(QVector2D(minBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
 	}
 
 	glm::vec2 offset = (maxBound + minBound) * 0.5f;
@@ -332,13 +332,13 @@ void UrbanGeometry::loadRoads(const std::string& filename) {
 
 	if (zone.size() == 0) {
 		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
-		minBound = glm::vec2(shape.minBound) - offset;
-		maxBound = glm::vec2(shape.maxBound) - offset;
+		minBound = glm::vec2(shape.minBound);
+		maxBound = glm::vec2(shape.maxBound);
 
-		zone.push_back(QVector2D(minBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, minBound.y));
-		zone.push_back(QVector2D(maxBound.x, maxBound.y));
-		zone.push_back(QVector2D(minBound.x, maxBound.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
 	}
 
 	glm::vec2 offset = (maxBound + minBound) * 0.5f;
@@ -364,7 +364,7 @@ void UrbanGeometry::loadRoads(const std::string& filename) {
 				RoadVertexPtr v(new RoadVertex(pt2));
 				desc2 = GraphUtil::addVertex(roads, v);
 			}
-
+			
 			RoadEdgePtr edge(new RoadEdge(RoadEdge::TYPE_STREET, 1, false, false, false));
 			for (int k = 0; k < shape.shapeObjects[i].parts[j].points.size(); ++k) {
 				QVector2D pt;
@@ -373,7 +373,12 @@ void UrbanGeometry::loadRoads(const std::string& filename) {
 				edge->addPoint(pt);
 			}
 
-			GraphUtil::addEdge(roads, desc1, desc2, edge);
+			if (GraphUtil::hasEdge(roads, desc1, desc2)) {
+				// duplicate edge, so ignore this edge
+			}
+			else {
+				GraphUtil::addEdge(roads, desc1, desc2, edge);
+			}
 
 			// we use only the first part
 			break;

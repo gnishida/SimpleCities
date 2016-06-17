@@ -46,14 +46,6 @@ RoadEdge::~RoadEdge() {
 
 float RoadEdge::getLength() {
 	return polyline.length();
-	/*
-	float length = 0.0f;
-	for (int i = 0; i < polyline.size() - 1; i++) {
-		length += (polyline[i + 1] - polyline[i]).length();
-	}
-
-	return length;
-	*/
 }
 
 /**
@@ -66,17 +58,11 @@ void RoadEdge::addPoint(const QVector2D &pt) {
 }
 
 float RoadEdge::getWidth(float widthPerLane) {
-	switch (type) {
-	case TYPE_HIGHWAY:
-		return widthPerLane * 6.0f;// * lanes;
-	case TYPE_BOULEVARD:
-	case TYPE_AVENUE:
-		return widthPerLane * 4.0f;// * lanes;
-	case TYPE_STREET:
-		return widthPerLane * 2.0;// * lanes;
-	default:
-		return 0.0f;
-	}
+	return getHalfWidth(widthPerLane) * 2.0f;
+}
+
+float RoadEdge::getHalfWidth(float widthPerLane) {
+	return lanes * widthPerLane;
 }
 
 /**

@@ -30,11 +30,7 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 			if (blocks[bN].myParcels[*vi].isPark) continue;
 			if (blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour.size() < 3) continue;
 
-			float c = rand() % 192;
-			blocks[bN].myParcels[*vi].myBuilding.color = QColor(c, c, c);
-
-			int building_type = 1;//placeTypes.myPlaceTypes[blocks[bN].getMyPlaceTypeIdx()].getInt("building_type");
-			VBOGeoBuilding::generateBuilding(rendManager,blocks[bN].myParcels[*vi].myBuilding);		
+			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].myParcels[*vi].myBuilding);		
 		}
 	}
 	printf("Building generation is done.\n");

@@ -5,6 +5,7 @@
 
 #include "VBOPmBuildings.h"
 #include "global.h"
+#include "Utils.h"
 
 bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock);
 
@@ -153,30 +154,18 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 	QMatrix4x4 obbMat;
 	inParcel.myBuilding.buildingFootprint.getMyOBB(obbSize, obbMat);
 	if (obbSize.x() < 5 || obbSize.y() < 5) return false;
-	if (obbSize.x() > obbSize.y() * 5 || obbSize.y() > obbSize.x() * 5) return false;
-
-	// stoties
-	float heightDev = G::getFloat("building_stories_deviation") * (((float)qrand()/RAND_MAX)*2.0f-1.0f) * G::getFloat("building_stories_mean");
-	int bldgNumStories = std::max(2.0f, G::getInt("building_stories_mean") + heightDev);
-
-	// find the lowest elevation
-	float minZ = std::numeric_limits<float>::max();
-	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.contour.size(); ++i) {
-		float z = rendManager.getTerrainHeight(inParcel.myBuilding.buildingFootprint[i].x(), inParcel.myBuilding.buildingFootprint[i].y());
-		if (z < minZ) {
-			minZ = z;
-		}
-	}
+	if (obbSize.x() > obbSize.y() * 10 || obbSize.y() > obbSize.x() * 10) return false;
 
 	// set the elevation
 	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.contour.size(); ++i) {
-		inParcel.myBuilding.buildingFootprint[i].setZ(minZ);
+		inParcel.myBuilding.buildingFootprint[i].setZ(0.0f);
 	}
 
-	//Set building
-	//inParcel.myBuilding.buildingFootprint=inParcel.myBuilding.buildingFootprint;
-	inParcel.myBuilding.numStories=bldgNumStories;
-	inParcel.myBuilding.bldType=0;
+	// Set building attributes
+	inParcel.myBuilding.numStories = std::max(1.0, utils::normal_rand(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
+	float c = rand() % 192;
+	inParcel.myBuilding.color = QColor(c, c, c);
+	inParcel.myBuilding.bldType = 1;
 
 	return true;
 }
