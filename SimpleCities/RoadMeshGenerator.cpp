@@ -8,8 +8,7 @@ bool compare2ndPartTuple2 (const std::pair<float, RoadEdgeDesc> &i, const std::p
 }
 
 void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGraph& roads) {
-	float deltaZ = 1.0f;//G::global().getFloat("3d_road_deltaZ");
-	const float deltaL = 1.0f;
+	float deltaZ = 2.0f;
 
 	std::vector<Vertex> vertSide;
 

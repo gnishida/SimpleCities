@@ -35,6 +35,7 @@ class Loop3D : public std::vector<QVector3D> {
 public:
 	bool isPointWithinLoop(const QVector3D& pt) const;
 	bool isClockwise() const;
+	float area() const;
 };
 
 /**
@@ -142,6 +143,7 @@ public:
 
 	//Only works for polygons with no holes in them
 	float computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea = true);
+	float computeInset2(float offsetDistance, Loop3D& pgonInset, bool computeArea = true);
 	float computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea = true);
 
 	float computeArea(bool parallelToXY = false);

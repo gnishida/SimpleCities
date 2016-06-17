@@ -77,8 +77,6 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 		if (vertex_output_visitor_invalid){ 
 			printf("INVALID end face\n");
 
-			BBox3D bbox;
-			sidewalkContourTmp.getBBox3D(bbox.minPt, bbox.maxPt);
 			char filename[255];
 			sprintf(filename, "block_images/block_%d.jpg", face_index);
 			VBOPmBlocks::saveBlockImage(*roadGraphPtr, sidewalkContourTmp, filename);
@@ -265,61 +263,71 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 	int maxVtxCountIdx = -1;
 	std::vector<float> blockAreas;
 
-	Loop3D sidewalkContourInset;
+
+
+	/*
 	for (int i = 0; i < blocks.size(); ++i) {
-		//Reorient faces
-		if (Polygon3D::reorientFace(blocks[i].sidewalkContour.contour)) {
-			std::reverse(blocks[i].sidewalkContourRoadsWidths.begin(), blocks[i].sidewalkContourRoadsWidths.end() - 1);
-		}
+		char filename[255];
+		sprintf(filename, "block_images/block_%d.jpg", i);
+		VBOPmBlocks::saveBlockImage(roadGraph, blocks[i].sidewalkContour, filename);
+	}
+	*/
 
-		if( blocks[i].sidewalkContour.contour.size() != blocks[i].sidewalkContourRoadsWidths.size() ){
-			std::cout << "Error: contour" << blocks[i].sidewalkContour.contour.size() << " widhts " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
-			blocks[i].sidewalkContour.clear();
-			blocks[i].valid = false;
-			blockAreas.push_back(0.0f);
-			continue;
+	// Remove invalid data
+	for (int i = 0; i < blocks.size(); ) {
+		if (blocks[i].sidewalkContour.contour.size() != blocks[i].sidewalkContourRoadsWidths.size()) {
+			std::cout << "!!!!! Error: contour:" << blocks[i].sidewalkContour.contour.size() << ", width: " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
+			blocks.blocks.erase(blocks.blocks.begin() + i);
 		}
-
-		if(blocks[i].sidewalkContour.contour.size() < 3){
-			std::cout << "Error: Contour <3 " << "\n";
-			blocks[i].valid = false;
-			blockAreas.push_back(0.0f);
-			continue;
+		else if (blocks[i].sidewalkContour.contour.size() < 3) {
+			std::cout << "!!!!! Error: Contour <3 " << "\n";
+			blocks.blocks.erase(blocks.blocks.begin() + i);
 		}
-
-		//Compute block offset	
-		float insetArea = blocks[i].sidewalkContour.computeInset(blocks[i].sidewalkContourRoadsWidths,sidewalkContourInset);
-		
-		blocks[i].sidewalkContour.contour = sidewalkContourInset;
-		//blocks[i].sidewalkContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
-		
-		blockAreas.push_back(insetArea);
+		else {
+			i++;
+		}
 	}
 
 	// Remove the largest block
-	float maxArea = -FLT_MAX;
+	float maxArea = -std::numeric_limits<float>::max();
 	int maxAreaIdx = -1;
 	for (int i = 0; i < blocks.size(); ++i) {
-		if (blocks[i].sidewalkContour.contour.size() < 3) {
-			continue;
+		// order the face in counter clockwise
+		if (blocks[i].sidewalkContour.isClockwise()) {
+			std::reverse(blocks[i].sidewalkContour.contour.begin(), blocks[i].sidewalkContour.contour.end());
+			std::reverse(blocks[i].sidewalkContourRoadsWidths.begin(), blocks[i].sidewalkContourRoadsWidths.end());
 		}
-		if (blockAreas[i] > maxArea) {
-			maxArea = blockAreas[i];
+
+		float area = blocks[i].sidewalkContour.area();
+		if (area > maxArea) {
+			maxArea = area;
 			maxAreaIdx = i;
 		}
 	}
 	if (maxAreaIdx != -1) {
-		blocks[maxAreaIdx].valid = false;
-		//blocks.blocks.erase(blocks.blocks.begin()+maxAreaIdx);
+		blocks.blocks.erase(blocks.blocks.begin() + maxAreaIdx);
 	}
+
+
+	for (int i = 0; i < blocks.size(); ++i) {
+		// Compute block offset
+		Loop3D sidewalkContourInset;
+		blocks[i].sidewalkContour.computeInset(blocks[i].sidewalkContourRoadsWidths, sidewalkContourInset);
+
+		blocks[i].sidewalkContour.contour = sidewalkContourInset;
+	}
+
+
 
 	// GEN: remove the blocks whose edges are less than 3
 	// This problem is caused by the computeInset() function.
 	// ToDo: fix the computeInset function.
-	for (int i = 0; i < blocks.size(); ++i) {
+	for (int i = 0; i < blocks.size(); ) {
 		if (blocks[i].sidewalkContour.contour.size() < 3) {
-			blocks[i].valid = false;
-			//blocks.blocks.erase(blocks.blocks.begin() + i);
+			blocks.blocks.erase(blocks.blocks.begin() + i);
+		}
+		else {
+			i++;
 		}
 	}
 
@@ -365,9 +373,10 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		BBox3D bbox;
 		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
 
-		// If the block is too narrow, make it invalid.
+		// If the block is too narrow, make it park.
 		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
-			blocks[i].valid = false;
+			blocks[i].isPark = true;
+			//blocks[i].valid = false;
 			continue;
 		}
 
@@ -386,7 +395,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 			//min_z = std::min(min_z, z);
 			//max_z = std::max(max_z, z);
 		}
-		if (min_z < 40.0f) {
+		if (min_z < G::getFloat("sea_level")) {
 			blocks[i].valid = false;
 			continue;
 		} else if (max_z - min_z > 20.0f) {

@@ -38,20 +38,20 @@ bool Loop3D::isClockwise() const {
 	}
 }
 
+float Loop3D::area() const {
+	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
+	boost::geometry::assign(bg_pgon, *this);
+	boost::geometry::correct(bg_pgon);
+
+	return boost::geometry::area(bg_pgon);
+}
+
 bool Polygon3D::isClockwise() const {
 	return contour.isClockwise();
 }
 
 void Polygon3D::correct() {
-	int next;
-	float tmpSum = 0.0f;
-
-	for (int i = 0; i < contour.size(); ++i) {
-		next = (i + 1) % contour.size();
-		tmpSum = tmpSum + (contour[next].x() - contour[i].x()) * (contour[next].y() + contour[i].y());
-	}			
-
-	if (tmpSum > 0.0f) {
+	if (isClockwise()) {
 		std::reverse(contour.begin(), contour.end());
 	}
 }
@@ -128,11 +128,7 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 	return true;
 }
 
-
-
-
-float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
-{
+float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea) {
 	Loop3D cleanPgon; 
 	double tol = 0.01f;
 
@@ -141,11 +137,9 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	int prev, next;
 	int cSz = cleanPgon.size();
 
-	if(cSz < 3){
-		return 0.0f;
-	}
+	if (cSz < 3) return 0.0f;
 
-	if(reorientFace(cleanPgon)){				
+	if (reorientFace(cleanPgon)){				
 		std::reverse(offsetDistances.begin(), offsetDistances.end() - 1);
 	}
 
@@ -156,12 +150,9 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		}
 	}
 
-	//pgonInset.resize(cSz);
-
 	QVector3D intPt;
-
-
-	// GEN CODE--> It leads to self-intersection very often with non-convex polygons
+	
+	// ToDo: We should improve this logic to make it more stable.
 	pgonInset.clear();
 	for(int cur=0; cur<cSz; ++cur){
 		//Some geometry and trigonometry
@@ -195,99 +186,26 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 			pgonInset.push_back(intPt);
 		}
 	}
-
-	// Old Code
-	/*
-	pgonInset.resize(cSz);
-	for(int cur=0; cur<cSz; ++cur){
-		//Some geometry and trigonometry
-
-		//point p1 is the point with index cur
-		prev = (cur-1+cSz)%cSz; //point p0
-		next = (cur+1)%cSz;	  //point p2
-
-		Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-
-		pgonInset[cur] = intPt;
-	}
-	*/
-
-	//temp
 	
-
-	//Compute inset area
-	if(computeArea){
-
+	if (pgonInset.size() > 0) {
 		boost::geometry::ring_type<Polygon3D>::type bg_contour;
 		boost::geometry::ring_type<Polygon3D>::type bg_contour_inset;
-		float contArea;
-		float contInsetArea;
 
-		if(pgonInset.size()>0){
-			boost::geometry::assign(bg_contour_inset, pgonInset);
-			boost::geometry::correct(bg_contour_inset);
+		boost::geometry::assign(bg_contour_inset, pgonInset);
+		boost::geometry::correct(bg_contour_inset);
 
-			if(boost::geometry::intersects(bg_contour_inset)){
-				//printf("INSET: intersects\n");
-				pgonInset.clear();
-				//return 0.0f;
-			} else {
-
-				boost::geometry::assign(bg_contour, cleanPgon);
-				boost::geometry::correct(bg_contour);
-				//if inset is not within polygon
-				if( !is2DRingWithin2DRing(bg_contour_inset, bg_contour) ){
-					pgonInset.clear();
-					//printf("INSET: ringWithRing\n");
-					//return 0.0f;
-				} else {
-					contArea = fabs(boost::geometry::area(bg_contour));
-					contInsetArea = fabs(boost::geometry::area(bg_contour_inset));
-
-					if(contInsetArea < contArea){// OK EXIT
-						//return boost::geometry::area(bg_contour_inset);
-						return contInsetArea;
-					} else {
-						//printf("INSET: contInsetArea < contArea\n");
-						pgonInset.clear();
-						//return 0.0f;
-					}
-				}
-			}
-		} else {
-			//printf("INSET: sides <0\n");
-			pgonInset.clear();
-			//return 0.0f;
+		if (boost::geometry::intersects(bg_contour_inset)) {
+			return computeInset2(offsetDistances[0], pgonInset, computeArea);
 		}
-#if 0
-		// IT FAILED TRY SECOND METHOD
-		{
-			Path subj;
-			Paths solution;
-			for(int cur=0; cur<cSz; ++cur){
-				subj << IntPoint(cleanPgon[cur].x()*1000,cleanPgon[cur].y()*1000);
-			}
-			/*subj << 
-				ClipperLib::IntPoint(348,257) << IntPoint(364,148) << IntPoint(362,148) << 
-				IntPoint(326,241) << IntPoint(295,219) << IntPoint(258,88) << 
-				IntPoint(440,129) << IntPoint(370,196) << IntPoint(372,275);*/
-			ClipperOffset co;
-			co.AddPath(subj, jtSquare, etClosedPolygon);
-			co.Execute(solution, -1000*7.5);
-			if (solution.size() > 0) { // GEN: we have to check whether the solution exists.
-				pgonInset.resize(solution[0].size());
-				for(int sN=0;sN<solution[0].size();sN++){
-					pgonInset[sN]=QVector3D(solution[0][sN].X/1000.0f,solution[0][sN].Y/1000.0f,0);
-				}
-				//printf("Solutions %d\n",solution.size());
-				return Area(solution[0]);
-			}
-		}
-#endif
-
 	}
-	return 0.0f;
-
+	
+	// Compute inset area
+	if (computeArea) {
+		return pgonInset.area();
+	}
+	else {
+		return 0.0f;
+	}
 }
 
 QVector3D calculateNormal(QVector3D& p0,QVector3D& p1,QVector3D& p2)
@@ -625,8 +543,7 @@ bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
 * @param[out] pgonInset: The vertices of the polygon inset
 * @return insetArea: Returns the area of the polygon inset		
 **/
-#if 0
-float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
+float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
 	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 	typedef CGAL::Partition_traits_2<K> Traits;
 	typedef Traits::Polygon_2 Polygon_2;
@@ -661,23 +578,20 @@ float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool comp
 	}
 
 	if (computeArea) {
-		// not implemented yet.
-		return 0;
+		return pgonInset.area();
 	}
 	else {
 		return 0;
 	}
 }
-#endif
-#if 1
-float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea)
-{
+
+
+float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
 	if(contour.size() < 3) return 0.0f;				
 	std::vector<float> offsetDistances(contour.size(), offsetDistance);
 
 	return computeInset(offsetDistances, pgonInset, computeArea);
 }
-#endif
 
 //Distance from segment ab to point c
 float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c, QVector3D &closestPtInAB)
@@ -1041,11 +955,7 @@ BBox Polygon3D::envelope() const {
 }
 
 float Polygon3D::area() const {
-	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
-	boost::geometry::assign(bg_pgon, this->contour);
-	boost::geometry::correct(bg_pgon);
-
-	return boost::geometry::area(bg_pgon);
+	return contour.area();
 }
 
 /**
