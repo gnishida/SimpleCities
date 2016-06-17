@@ -36,23 +36,19 @@ public:
 	bool isPointWithinLoop(const QVector3D& pt) const;
 	bool isClockwise() const;
 	float area() const;
+	bool isSelfIntersecting() const;
 };
 
 /**
 * Stores a polygon in 3D represented by its
 *     exterior contour.
 **/
-class Polygon3D
-{
+class Polygon3D {
 public:
-	/**
-	* Constructor.
-	**/
-	Polygon3D()
-	{
-		normalVec = QVector3D(0.0f, 0.0f, 0.0f);
-		centroid = QVector3D(FLT_MAX, FLT_MAX, FLT_MAX);
-	}
+	Loop3D contour;
+
+public:
+	Polygon3D() {}
 
 	void clear() { contour.clear(); }
 
@@ -71,33 +67,6 @@ public:
 		contour.push_back(pt);
 	}
 
-	/**
-	* Get normal vector
-	**/
-	QVector3D getNormalVector(void);
-
-	/**
-	* Get center of vertices
-	**/
-	QVector3D getCentroid(void)
-	{
-		if(centroid.x() != FLT_MAX){
-			return centroid;
-		} else {
-			QVector3D newCentroid(0.0f, 0.0f, 0.0f);
-			int cSz = contour.size();
-			for(int i=0; i<cSz; ++i)
-			{
-				newCentroid = newCentroid + contour[i];
-			}
-			if(cSz>0){
-				centroid = (newCentroid/cSz);						
-			}					
-			return centroid;
-		}
-	}
-
-
 	inline void getBBox3D(QVector3D &ptMin, QVector3D &ptMax)
 	{
 		ptMin.setX(FLT_MAX);
@@ -115,19 +84,6 @@ public:
 			if(contour[i].x() > ptMax.x()){ ptMax.setX(contour[i].x()); }
 			if(contour[i].y() > ptMax.y()){ ptMax.setY(contour[i].y()); }
 			if(contour[i].z() > ptMax.z()){ ptMax.setZ(contour[i].z()); }
-		}
-	}
-
-	inline float getMeanZValue(void)
-	{
-		float zVal = 0.0f;
-		if(this->contour.size() > 0){
-			for(size_t i=0; i<contour.size(); ++i){
-				zVal += (contour[i].z());
-			}
-			return (zVal/((float)contour.size()));
-		} else {
-			return zVal;
 		}
 	}
 
@@ -150,33 +106,13 @@ public:
 
 	bool isPointWithinLoop(const QVector3D& pt) const {
 		return contour.isPointWithinLoop(pt);
-		/*
-		int i, j, c = 0;
-		for (i = 0, j = contour.size()-1; i < contour.size(); j = i++) {
-			if ( ((contour[i].y()>pt.y()) != (contour[j].y()>pt.y())) &&
-				(pt.x() < (contour[j].x()-contour[i].x()) * (pt.y()-contour[i].y()) / (contour[j].y()-contour[i].y()) + contour[i].x()) )
-				c = !c;
-		}
-		return c;
-		*/
 	}
-
-	/**
-	* Vector containing 3D points of polygon contour
-	**/
-	Loop3D contour;
-
-	static QVector3D getLoopNormalVector(Loop3D &pin);
 
 	static bool reorientFace(Loop3D &pface, bool onlyCheck = false);
 
 	static int cleanLoop(Loop3D &pin, Loop3D &pout, float threshold);
 
 	static void transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat);
-
-	static float computeLoopArea(Loop3D &pin, bool parallelToXY = false);
-
-	static void sampleTriangularLoopInterior(Loop3D &pin, std::vector<QVector3D> &pts, float density);
 
 	static QVector3D getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &maxCorner);
 
@@ -189,45 +125,25 @@ public:
 	static bool segmentSegmentIntersectXY(QVector2D &a, QVector2D &b, QVector2D &c, QVector2D &d,
 		float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint);
 
-	static void extrudePolygon(Polygon3D &basePgon, float height,
-		std::vector<Polygon3D> &pgonExtrusion);
-
 	//Shortest distance from a point to a polygon
 	static float distanceXYToPoint(Loop3D &pin, QVector3D &pt);
 
 	static bool getIrregularBisector(QVector3D &p0, QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt);
 
-	//minimum distance from a loop to another loop (this considers the contour only)
-	static float distanceXYfromContourAVerticesToContourB(Loop3D &pA, Loop3D &pB);
 	bool isTooNarrow(float ratio, float min_side);
-
-private:			
-	QVector3D normalVec;
-	QVector3D centroid;
 };	
 
-class BBox3D{
+class BBox3D {
 public:
+	QVector3D minPt;
+	QVector3D maxPt;
 
+public:
 	BBox3D(){
 		this->resetMe();	
 	}
 
-	~BBox3D(){
-	}
-
-	BBox3D(const BBox3D &ref){	
-		minPt = ref.minPt;
-		maxPt = ref.maxPt;
-	}
-
-	inline BBox3D &operator=(const BBox3D &ref){				
-		minPt = ref.minPt;
-		maxPt = ref.maxPt;				
-		return (*this);
-	}
-
-	inline void resetMe(void){
+	inline void resetMe(void) {
 		minPt.setX(FLT_MAX);
 		minPt.setY(FLT_MAX);
 		minPt.setZ(FLT_MAX);
@@ -271,12 +187,9 @@ public:
 			( (this->minPt.y() <= other.maxPt.y()) && (this->maxPt.y() >= other.minPt.y()) );					
 	}
 
-	inline QVector3D midPt(void){
+	inline QVector3D midPt(void) {
 		return (0.5*(minPt + maxPt));
 	}
-
-	QVector3D minPt;
-	QVector3D maxPt;
 };
 
 

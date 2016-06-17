@@ -46,6 +46,13 @@ float Loop3D::area() const {
 	return boost::geometry::area(bg_pgon);
 }
 
+bool Loop3D::isSelfIntersecting() const {
+	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
+	boost::geometry::assign(bg_pgon, *this);
+	boost::geometry::correct(bg_pgon);
+	return boost::geometry::intersects(bg_pgon);
+}
+
 bool Polygon3D::isClockwise() const {
 	return contour.isClockwise();
 }
@@ -118,7 +125,7 @@ bool Polygon3D::getIrregularBisector(QVector3D &p0,	QVector3D &p1, QVector3D &p2
 /**
 * Checks if contour A is within contour B
 **/
-bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA, boost::geometry::ring_type<Polygon3D>::type &contourB)
+/*bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA, boost::geometry::ring_type<Polygon3D>::type &contourB)
 {
 	for(int i=0; i<contourA.size(); ++i){
 		if( !boost::geometry::within( contourA[i], contourB) ){
@@ -126,7 +133,7 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 		}
 	}
 	return true;
-}
+}*/
 
 float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea) {
 	Loop3D cleanPgon; 
@@ -206,28 +213,6 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	else {
 		return 0.0f;
 	}
-}
-
-QVector3D calculateNormal(QVector3D& p0,QVector3D& p1,QVector3D& p2)
-{
-	return (QVector3D::normal((p1-p0),(p2-p1)));
-}
-
-QVector3D Polygon3D::getLoopNormalVector(Loop3D &pin)
-{
-	if(pin.size() >= 3){
-		return (calculateNormal(pin[0], pin[1], pin[2]));
-	}
-	return ( QVector3D(0, 0, 0) );
-}
-
-QVector3D Polygon3D::getNormalVector()
-{	
-	if(this->normalVec.isNull())
-	{
-		normalVec = getLoopNormalVector(this->contour);
-	}
-	return normalVec;
 }
 
 const float MTC_FLOAT_TOL = 1e-6f;
@@ -661,23 +646,6 @@ float Polygon3D::distanceXYToPoint(Loop3D &pin, QVector3D &pt)
 	return minDist;
 }
 
-//this function measures the minimum distance from the vertices of a contour A
-//	to the edges of a contour B, i.e., it measures the distances from each vertex of A
-//  to all the edges in B, and returns the minimum of such distances
-float Polygon3D::distanceXYfromContourAVerticesToContourB(Loop3D &pA, Loop3D &pB)
-{
-	float minDist = FLT_MAX;
-	float dist;
-
-	for(size_t i=0; i<pA.size(); ++i){
-		dist = Polygon3D::distanceXYToPoint(pB, pA.at(i));
-		if(dist < minDist){
-			minDist = dist;
-		}
-	}
-	return minDist;
-}
-
 /**
 * @brief: Merge consecutive vertices that are within a distance threshold to each other
 **/
@@ -938,10 +906,7 @@ QVector3D Polygon3D::getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &m
 }//
 
 bool Polygon3D::isSelfIntersecting() const {
-	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
-	boost::geometry::assign(bg_pgon, this->contour);
-	boost::geometry::correct(bg_pgon);
-	return boost::geometry::intersects(bg_pgon);
+	return contour.isSelfIntersecting();
 }
 
 BBox Polygon3D::envelope() const {
