@@ -7,15 +7,19 @@
 #include "global.h"
 #include "Utils.h"
 
-bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock);
-
 bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks) {
-	//For each block
 	for (int i = 0; i < blocks.size(); ++i) {
-		generateBlockBuildings(rendManager, blocks[i]);
+		Block::parcelGraphVertexIter vi, viEnd;
+
+		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
+			if (!generateParcelBuildings(rendManager, blocks[i], blocks[i].myParcels[*vi])) {
+				blocks[i].myParcels[*vi].isPark = true;
+			}
+		}
 	}
+
 	return true;
-}//
+}
 
 /**
 * Compute Building Footprint Polygon
@@ -108,7 +112,7 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,	std::vec
 /**
  * 指定されたParcelの中に、ビルを建てる。
  */
-bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel) {
+bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel) {
 	float probEmptyParcel = 0.0f;
 	Loop3D pContourCpy;
 
@@ -125,28 +129,20 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 	pContourCpy.clear();
 	pContourCpy = inParcel.parcelContour.contour;
 	inParcel.parcelContour.contour.clear();
-
-
+	
 	Polygon3D::cleanLoop(pContourCpy, inParcel.parcelContour.contour, 1.0f);
 	Polygon3D::reorientFace(inParcel.parcelContour.contour);
 
 	inBlock.findParcelFrontAndBackEdges(inBlock, inParcel, frontEdges, rearEdges, sideEdges);
 
-	//Compute buildable area polygon
+	// Compute buildable area polygon
 	float bldgFootprintArea = inParcel.computeBuildableArea(G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges,	inParcel.parcelBuildableAreaContour.contour);
-	if(inParcel.parcelBuildableAreaContour.isSelfIntersecting()){
+	if (inParcel.parcelBuildableAreaContour.contour.size() == 0) return false;
+	if (inParcel.parcelBuildableAreaContour.isSelfIntersecting()) {
 		inParcel.parcelBuildableAreaContour.contour.clear();
 		return false;
 	}
 
-	//compute building footprint polygon
-	/*
-	if(!computeBuildingFootprintPolygon(G::getFloat("building_max_frontage"), G::getFloat("building_max_depth"), frontEdges, rearEdges, sideEdges, inParcel.parcelBuildableAreaContour.contour, inParcel.myBuilding.buildingFootprint.contour))	{
-		printf("!computeBuildingFootprintPolygon\n");
-		inParcel.myBuilding.buildingFootprint.clear();
-		return false;
-	}
-	*/
 	inParcel.myBuilding.buildingFootprint.contour = inParcel.parcelBuildableAreaContour.contour;
 
 	// もしfootprintの一辺の長さが短すぎたら、または、短い辺と長い辺の比が大きすぎたら、ビルの建設を中止する
@@ -169,19 +165,3 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 
 	return true;
 }
-
-/**
- * 指定されたブロック内に、ビルを建てる
- */
-bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock) {
-	Block::parcelGraphVertexIter vi, viEnd;	
-
-	//For each parcel
-	for (boost::tie(vi, viEnd) = boost::vertices(inBlock.myParcels); vi != viEnd; ++vi) {
-		if (!generateParcelBuildings(rendManager, inBlock, inBlock.myParcels[*vi])) {
-			inBlock.myParcels[*vi].isPark = true;
-		}
-	}
-	return true;
-}
-

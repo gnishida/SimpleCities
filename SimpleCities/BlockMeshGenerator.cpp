@@ -164,14 +164,15 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, const
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
 
-			rendManager.addStaticGeometry("3d_parcels", vert, "", GL_TRIANGLES, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parcels", vert, "", GL_TRIANGLES, 1 | mode_Lighting | mode_AdaptTerrain);
 		}
 	}
 }
 
 void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, const BlockSet& blocks) {
-	rendManager.removeStaticGeometry("3d_blocks");
-	rendManager.removeStaticGeometry("3d_parks");
+	rendManager.removeStaticGeometry("2d_blocks");
+	rendManager.removeStaticGeometry("2d_blocks_contour");
+	rendManager.removeStaticGeometry("2d_parks");
 
 	const float deltaZ = 3.0f;
 
@@ -182,7 +183,7 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 			Loop3D parkC = blocks[bN].blockContour.contour;
 			if (parkC.size() > 2) {
 				parkC.push_back(parkC.front());
-				rendManager.addStaticGeometry2("3d_parks", parkC, deltaZ, "", 1, QVector3D(), parkColor);
+				rendManager.addStaticGeometry2("2d_parks", parkC, deltaZ, "", 1, QVector3D(), parkColor);
 			}
 		}
 	}
@@ -199,15 +200,29 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 			for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {
 				if (blocks[bN].myParcels[*vi].parcelContour.isSelfIntersecting()) continue;
 
-				//Polygon3D pol = blocks[bN].myParcels[*vi].parcelBuildableAreaContour;
 				Polygon3D pol = blocks[bN].myParcels[*vi].parcelContour;
 				for (int i = 0; i < pol.contour.size(); ++i) {
-					int next = (i+1) % pol.contour.size();
-					vert.push_back(Vertex(pol.contour[i]+QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
-					vert.push_back(Vertex(pol.contour[next]+QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
+					int next = (i + 1) % pol.contour.size();
+					vert.push_back(Vertex(pol.contour[i] + QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
+					vert.push_back(Vertex(pol.contour[next] + QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
+				}
+				
+
+				if (blocks[bN].myParcels[*vi].isPark) {
+					rendManager.addStaticGeometry2("2d_parks", blocks[bN].myParcels[*vi].parcelContour.contour, deltaZ, "", 1, QVector3D(), parkColor);
+				}
+				else {
+					// ビルのfootprintを描画
+					for (int i = 0; i < blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour.size(); ++i) {
+						int next = (i + 1) % blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour.size();
+						vert.push_back(Vertex(blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour[i] + QVector3D(0, 0, deltaZ), QColor(156, 143, 186), QVector3D(0, 0, 1), QVector3D()));
+						vert.push_back(Vertex(blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour[next] + QVector3D(0, 0, deltaZ), QColor(156, 143, 186), QVector3D(0, 0, 1), QVector3D()));
+					}
+
+					rendManager.addStaticGeometry2("2d_blocks", blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour, deltaZ, "", 1, QVector3D(), QColor(205, 191, 242));
 				}
 			}
 		}
-		rendManager.addStaticGeometry("3d_blocks", vert, "", GL_LINES, 1);
+		rendManager.addStaticGeometry("2d_blocks_contour", vert, "", GL_LINES, 1);
 	}
 }

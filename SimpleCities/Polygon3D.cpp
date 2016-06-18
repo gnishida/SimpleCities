@@ -548,17 +548,21 @@ float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool com
 		K::FT lOffset = -offsetDistance;
 		offset_poly = CGAL::create_exterior_skeleton_and_offset_polygons_2(lOffset, poly);
 
-		for (auto it = offset_poly[1]->vertices_begin(); it != offset_poly[1]->vertices_end(); ++it) {
-			pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+		if (offset_poly.size() >= 2) {
+			for (auto it = offset_poly[1]->vertices_begin(); it != offset_poly[1]->vertices_end(); ++it) {
+				pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+			}
+			std::reverse(pgonInset.begin(), pgonInset.end());
 		}
-		std::reverse(pgonInset.begin(), pgonInset.end());
 	}
 	else {
 		K::FT lOffset = offsetDistance;
 		offset_poly = CGAL::create_interior_skeleton_and_offset_polygons_2(lOffset, poly);
 
-		for (auto it = offset_poly[0]->vertices_begin(); it != offset_poly[0]->vertices_end(); ++it) {
-			pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+		if (offset_poly.size() > 0) {
+			for (auto it = offset_poly[0]->vertices_begin(); it != offset_poly[0]->vertices_end(); ++it) {
+				pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
+			}
 		}
 	}
 

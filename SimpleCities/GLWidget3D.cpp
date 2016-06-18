@@ -197,9 +197,9 @@ void GLWidget3D::drawScene(int drawMode) {
 		
 		vboRenderManager.vboTerrain.render(true);
 		glLineWidth(1);// G::global().getFloat("2d_parcelLine"));
-		vboRenderManager.renderStaticGeometry("3d_blocks");
-		vboRenderManager.renderStaticGeometry("3d_parks");
-		vboRenderManager.renderStaticGeometry("3d_parcels");
+		vboRenderManager.renderStaticGeometry("2d_blocks_contour");
+		vboRenderManager.renderStaticGeometry("2d_blocks");
+		vboRenderManager.renderStaticGeometry("2d_parks");
 		vboRenderManager.renderStaticGeometry("3d_roads");
 		vboRenderManager.renderStaticGeometry("3d_roads_inter");
 		vboRenderManager.renderStaticGeometry("3d_roads_interCom");
