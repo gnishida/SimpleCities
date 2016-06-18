@@ -133,9 +133,6 @@
     <ClCompile Include="VBOParcel.cpp">
       <Filter>PM Blocks\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="VBOPlaceType.cpp">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="GLWidget3D_Shadows.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
@@ -204,9 +201,6 @@
     </ClCompile>
     <ClCompile Include="PMRoadGenerator.cpp">
       <Filter>PM Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="Polyline2D.cpp">
       <Filter>common</Filter>
@@ -308,9 +302,6 @@
     <ClInclude Include="VBOSkyBox.h">
       <Filter>VBO</Filter>
     </ClInclude>
-    <ClInclude Include="VBOPlaceType.h">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="VBOBlock.h">
       <Filter>PM Blocks\Geometry</Filter>
     </ClInclude>
@@ -388,9 +379,6 @@
     </ClInclude>
     <ClInclude Include="PMRoadGenerator.h">
       <Filter>PM Blocks</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="Polyline2D.h">
       <Filter>common</Filter>

@@ -38,6 +38,7 @@ public:
 	float area() const;
 	bool isSelfIntersecting() const;
 	float distanceXYToPoint(const QVector3D& pt) const;
+	void simplify(float threshold);
 };
 
 /**
@@ -52,7 +53,6 @@ public:
 	Polygon3D() {}
 
 	void clear() { contour.clear(); }
-
 	bool isClockwise() const ;
 	void correct();
 
@@ -77,7 +77,6 @@ public:
 	bool splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);
 	bool split(const std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons);
 
-	//Only works for polygons with no holes in them
 	void computeInset(float offsetDistance, Loop3D &pgonInset) const;
 	void computeInset2(float offsetDistance, Loop3D& pgonInset) const;
 	void computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const;
@@ -86,22 +85,14 @@ public:
 		return contour.isPointWithinLoop(pt);
 	}
 
-	static int cleanLoop(Loop3D &pin, Loop3D &pout, float threshold);
-
 	static void transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat);
-
 	static QVector3D getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &maxCorner);
-
 	static void getLoopOBB(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
 	static void getLoopOBB2(const Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
 	static Loop3D getLoopOBB3(const Loop3D &pin);
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);
-
 	float distanceXYToPoint(const QVector3D &pt) const;
-
-	static bool getIrregularBisector(QVector3D &p0, QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt);
-
 	bool isTooNarrow(float ratio, float min_side) const;
 };	
 

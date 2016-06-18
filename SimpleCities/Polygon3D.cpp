@@ -68,6 +68,50 @@ float Loop3D::distanceXYToPoint(const QVector3D &pt) const {
 	return minDist;
 }
 
+void Loop3D::simplify(float threshold = 1.0f) {
+	float thresholdSq = threshold * threshold;
+
+	if (size() < 3) {
+		return;
+	}
+
+	boost::geometry::ring_type<Polygon3D>::type bg_pin;
+	boost::geometry::ring_type<Polygon3D>::type bg_pout;
+	boost::geometry::assign(bg_pin, *this);
+	boost::geometry::correct(bg_pin);
+	boost::geometry::simplify(bg_pin, bg_pout, threshold);
+
+	// copy points back
+	clear();
+	for (size_t i = 0; i < bg_pout.size(); ++i) {
+		push_back(QVector3D(bg_pout[i].x(), bg_pout[i].y(), 0));
+	}
+
+	// remove last point
+	if ((front() - back()).lengthSquared() < thresholdSq) {
+		pop_back();
+	}
+
+	// clean angles
+	float angleThreshold = 0.01f;
+	for (size_t i = 0; i < size(); ++i) {
+		int next = (i + 1) % size();
+		int prev = (i - 1 + size()) % size();
+		QVector3D cur_prev = at(prev) - at(i);
+		QVector3D cur_next = at(next) - at(i);
+
+		float ang = Util::angleBetweenVectors(cur_prev, cur_next);
+		if ((fabs(ang) < angleThreshold) || (fabs(ang - 3.14159265f) < angleThreshold) || (!(ang == ang))) {
+			erase(begin() + i);
+			--i;
+		}
+	}
+
+	if (isClockwise()) {
+		std::reverse(begin(), end());
+	}
+}
+
 bool Polygon3D::isClockwise() const {
 	return contour.isClockwise();
 }
@@ -78,76 +122,8 @@ void Polygon3D::correct() {
 	}
 }
 
-double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2){	
+/*double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2){	
 	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
-}
-
-/**
-* Given three non colinear points p0, p1, p2, this function computes
-* the intersection between the lines A and B. Line A is the line parallel to the segment p0-p1
-* and at a distance d01 from that segment. Line B is the line parallel to the segment
-* p1-p2 at a distance d12 from that segment.
-* Returns true if point is successfully computed
-**/
-
-bool Polygon3D::getIrregularBisector(QVector3D &p0,	QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt) {
-	double alpha;
-	double theta;
-	double L;
-
-	QVector3D p1_p0;
-	QVector3D p1_p2;
-	QVector3D p1_p2_perp;
-	QVector3D crossP;
-
-	p1_p0 = p0 - p1;
-	p1_p0.setZ(0.0f);
-
-	p1_p2 = p2 - p1;
-	p1_p2.setZ(0.0f);
-
-	p1_p2_perp.setX( -p1_p2.y() );
-	p1_p2_perp.setY(  p1_p2.x() );
-	p1_p2_perp.setZ( 0.0f );
-
-	alpha = angleBetweenVectors(p1_p0, p1_p2);				
-
-	if( !(alpha == alpha) ){
-		return false;
-	}				
-
-	theta = atan2( sin(alpha), (d01 / d12) + cos(alpha) );				
-	L = d12 / sin(theta);
-
-	//This is done to handle convex vs. concave angles in polygon
-	crossP = QVector3D::crossProduct(p1_p2, p1_p0);
-
-	if(crossP.z() > 0){
-		//CCW polygon (A + B + C)
-		//CW  polygon (A - B - C)
-		intPt = p1 + (p1_p2.normalized())*L*cos(theta) +
-			(p1_p2_perp.normalized())*d12;
-	}
-	else {
-		//CCW polygon (A - B + C)
-		//CW  polygon (A + B - C)
-		intPt = p1 - (p1_p2.normalized())*L*cos(theta) +
-			(p1_p2_perp.normalized())*d12;
-	}
-	return true;
-}
-
-/**
-* Checks if contour A is within contour B
-**/
-/*bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA, boost::geometry::ring_type<Polygon3D>::type &contourB)
-{
-	for(int i=0; i<contourA.size(); ++i){
-		if( !boost::geometry::within( contourA[i], contourB) ){
-			return false;
-		}
-	}
-	return true;
 }*/
 
 void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const {
@@ -236,8 +212,7 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 			}
 			else {
 				Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-
-
+				
 				// For acute angle
 				if (pgonInset.size() >= 2) {
 					if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
@@ -574,63 +549,6 @@ void Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset) const {
 float Polygon3D::distanceXYToPoint(const QVector3D &pt) const {
 	return contour.distanceXYToPoint(pt);
 }
-
-/**
-* @brief: Merge consecutive vertices that are within a distance threshold to each other
-**/
-int Polygon3D::cleanLoop(Loop3D &pin, Loop3D &pout, float threshold=1.0f) {	
-	float thresholdSq = threshold*threshold;
-
-	if(pin.size()<3){
-		return 1;
-	}
-
-	boost::geometry::ring_type<Polygon3D>::type bg_pin;
-	boost::geometry::ring_type<Polygon3D>::type bg_pout;
-	boost::geometry::assign(bg_pin, pin);
-	boost::geometry::correct(bg_pin);
-	boost::geometry::simplify(bg_pin, bg_pout, threshold);
-
-	//strategy::simplify::douglas_peucker
-
-	//copy points back
-	QVector3D tmpPt;
-	for(size_t i=0; i< bg_pout.size(); ++i){						
-		tmpPt.setX( bg_pout[i].x() );
-		tmpPt.setY( bg_pout[i].y() );
-		pout.push_back(tmpPt);						
-	}
-
-	//remove last point
-	if( (pout[0] - pout[pout.size()-1]).lengthSquared() < thresholdSq ){
-		pout.pop_back();				
-	}
-
-	//clean angles
-	int next, prev;
-	QVector3D cur_prev, cur_next;
-	float ang;
-	float angleThreshold = 0.01f;
-	for(size_t i=0; i<pout.size(); ++i){
-		next = (i+1)%pout.size();
-		prev = (i-1+pout.size())%pout.size();
-		cur_prev = pout[prev]-pout[i];
-		cur_next = pout[next]-pout[i];
-
-		ang = angleBetweenVectors(cur_prev, cur_next);
-		if( (fabs(ang) < angleThreshold) 
-			|| (fabs(ang - 3.14159265f ) < angleThreshold)
-			|| (!(ang==ang) ) )
-		{
-			//std::cout << ang << " ";
-			pout.erase(pout.begin() + i);
-			--i;
-		}
-	}
-
-
-	return 0;
-}//
 
 /**
 * Get polygon oriented bounding box

@@ -5,9 +5,8 @@
 #include "global.h"
 #include "Util.h"
 #include "GraphUtil.h"
-//#include "RoadGeneratorHelper.h"
 #include <assert.h>
-#include "Utils.h"
+#include "Util.h"
 
 void PMRoadGenerator::generateRoadNetwork() {
 	srand(12345);
@@ -160,8 +159,8 @@ void PMRoadGenerator::generateAvenueSeeds(std::list<RoadVertexDesc>& seeds) {
 	for (int iter = 0; iter < numSeeds; ++iter) {
 		float x, y;
 		while (true) {
-			x = utils::uniform_rand(bbox.minPt.x(), bbox.maxPt.x());
-			y = utils::uniform_rand(bbox.minPt.y(), bbox.maxPt.y());
+			x = Util::genRand(bbox.minPt.x(), bbox.maxPt.x());
+			y = Util::genRand(bbox.minPt.y(), bbox.maxPt.y());
 			bool hoge = targetArea.contains(QVector2D(x, y));
 			float z = vboRenderManager->getMinTerrainHeight(x, y);
 			if (targetArea.contains(QVector2D(x, y)) && vboRenderManager->getMinTerrainHeight(x, y) > G::getFloat("sea_level")) break;

@@ -5,7 +5,7 @@
 
 #include "VBOPmBuildings.h"
 #include "global.h"
-#include "Utils.h"
+#include "Util.h"
 
 bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
@@ -60,7 +60,7 @@ bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Bloc
 	}
 
 	// Set building attributes
-	inParcel.myBuilding.numStories = std::max(1.0, utils::normal_rand(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
+	inParcel.myBuilding.numStories = std::max(1.0f, Util::genRand(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
 	float c = rand() % 192;
 	inParcel.myBuilding.color = QColor(c, c, c);
 	inParcel.myBuilding.bldType = 1;

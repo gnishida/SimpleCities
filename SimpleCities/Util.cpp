@@ -1,12 +1,11 @@
 ﻿#include "Util.h"
 #include <random>
 
+//const float M_PI = 3.1415926535;
+
+static std::default_random_engine generator;
 
 const float Util::MTC_FLOAT_TOL = 1e-6f;
-
-QVector3D Util::calculateNormal(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2) {
-	return QVector3D::normal((p1-p0),(p2-p1));
-}
 
 /**
  * Return the distance from segment ab to point c.
@@ -187,15 +186,6 @@ float Util::pointSegmentDistanceXY(const QVector2D& a, const QVector2D& b, const
 	return abs(dist);
 }
 
-bool Util::leftTurn(const QVector2D& a, const QVector2D& b, const QVector2D& c) {
-	return leftTurn(b - a, c - b);
-}
-
-bool Util::leftTurn(const QVector2D& v1, const QVector2D& v2) {
-	if (v1.x() * v2.y() - v1.y() * v2.x() >= 0) return true;
-	else return false;
-}
-
 float Util::deg2rad(float deg) {
 	return M_PI * deg / 180.0f;
 }
@@ -290,6 +280,10 @@ float Util::angleThreePoints(const QVector3D& pa, const QVector3D& pb, const QVe
 	return acos(0.999f * (a*a + c*c - b*b) / (2.0f*a*c));
 }
 
+double Util::angleBetweenVectors(const QVector3D& vec1, const QVector3D& vec2) {
+	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
+}
+
 /**
  * 指定された点を、反時計回りにrad回転させた位置を返却する。
  */
@@ -344,22 +338,6 @@ float Util::curvature(const Polyline2D &polyline) {
 
 	if (length == 0.0f) return 0.0f;
 	else return curvature / length;
-
-	/*
-	float total_diff = 0.0f;
-	int num = 0;
-	for (int i = 0; i < polyline.size() - 2; ++i) {
-		QVector2D vec1 = (polyline[i + 1] - polyline[i]).normalized();
-		QVector2D vec2 = (polyline[i + 2] - polyline[i + 1]).normalized();
-
-		float diff = diffAngle(vec1, vec2);
-		total_diff += diff;
-		num++;
-	}
-
-	if (num == 0) return 0.0f;
-	else return total_diff / (float)num;
-	*/
 }
 
 /**
@@ -379,41 +357,12 @@ float Util::genRand(float a, float b) {
 /**
  * Normal distributionを使用して乱数を生成する。
  */
-float Util::genRandNormal(float mean, float variance) {
-	/*
-	static std::default_random_engine generator;
-
-	std::normal_distribution<float> distribution(mean, sqrtf(variance));
-	return distribution(generator);
-	*/
-
-#if 1
-	float m = mean;
-	float s = sqrt(variance);
-
-	/* mean m, standard deviation s */
-	float x1, x2, w, y1;
-	static float y2;
-	static int use_last = 0;
-
-	if (use_last) {	/* use value from previous call */
-		y1 = y2;
-		use_last = 0;
-	} else {
-		do {
-			x1 = 2.0 * genRand(0.0f, 1.0f) - 1.0;
-			x2 = 2.0 * genRand(0.0f, 1.0f) - 1.0;
-			w = x1 * x1 + x2 * x2;
-		} while ( w >= 1.0 );
-
-		w = sqrt( (-2.0 * log( w ) ) / w );
-		y1 = x1 * w;
-		y2 = x2 * w;
-		use_last = 1;
+float Util::genRandNormal(float mean, float sigma) {
+	if (sigma == 0.0) return mean;
+	else {
+		std::normal_distribution<double> distribution(mean, sigma);
+		return distribution(generator);
 	}
-
-	return m + y1 * s;
-#endif
 }
 
 int Util::sampleFromCdf(std::vector<float> &cdf) {
@@ -460,10 +409,6 @@ float Util::barycentricInterpolation(const QVector3D& p0, const QVector3D& p1, c
 	}
 
 	return 0.0f;
-}
-
-QVector2D Util::projectTo2D(const QVector3D &pt) {
-	return QVector2D(pt.x(), pt.y());
 }
 
 /**
