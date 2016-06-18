@@ -10,7 +10,7 @@
 class VBOPmBuildings{
 public:
 
-	static bool generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks);
-	static bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel);
+	static bool generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks);
+	static bool generateParcelBuildings(VBORenderManager& rendManager, Block& inBlock, Parcel& inParcel);
 };
 

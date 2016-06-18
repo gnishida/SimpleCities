@@ -16,11 +16,7 @@ int main(int argc, char *argv[]) {
 	G::global()["parkPercentage"] = 0.2f;
 	G::global()["parksRatio"] = 0.05f;
 
-	G::global()["buildingHeightMean"] = 12;
-	G::global()["buildingHeightDeviation"] = 90;
-	G::global()["buildingBaseAboveGround"] = 3.0f;
 	G::global()["meanBuildingFloorHeight"] = 3.0f;
-	G::global()["buildingHeightFactor"] = 0.067f;
 	G::global()["maxHeightBaseAspectRatio"] = 1.0f;
 	G::global()["minBuildingArea"] = 10.0f;
 
@@ -36,8 +32,8 @@ int main(int argc, char *argv[]) {
 	G::global()["2DroadsStroke"] = 1.5f;
 
 	G::global()["sidewalk_width"] = 2.0f;
-	G::global()["parcel_area_mean"] = 2000.0f;
-	G::global()["parcel_area_min"] = 1000.0f;
+	G::global()["parcel_area_mean"] = 1000.0f;
+	G::global()["parcel_area_min"] = 200.0f;
 	G::global()["parcel_area_deviation"] = 1.0f;
 	G::global()["parcel_split_deviation"] = 0.2f;
 	G::global()["parcel_setback_front"] = 5.0f;

@@ -649,8 +649,8 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 /**
  * 一軒家の3Dモデルを生成する。
  */
-void VBOGeoBuilding::generateHouse(VBORenderManager& rendManager,Building& building) {
-	Polygon3D& footprint=building.buildingFootprint;
+void VBOGeoBuilding::generateHouse(VBORenderManager& rendManager, Building& building) {
+	Polygon3D& footprint = building.buildingFootprint;
 	int numStories=building.numStories;
 	//printf("numSt %d numSides %d\n",numStories,footprint.contour.size());
 

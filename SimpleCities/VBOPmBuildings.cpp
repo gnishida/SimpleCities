@@ -7,7 +7,7 @@
 #include "global.h"
 #include "Utils.h"
 
-bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks) {
+bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
 		Block::parcelGraphVertexIter vi, viEnd;
 
@@ -25,7 +25,7 @@ bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vecto
  * 指定されたParcelの中に、ビルを建てる。
  * ビルを建てられない場合は、falseを返却する。
  */
-bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel) {
+bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Block& inBlock, Parcel& inParcel) {
 	Loop3D pContourCpy;
 	
 	if (inParcel.isPark) return false;

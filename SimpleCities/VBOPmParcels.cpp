@@ -61,7 +61,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 * @splitIrregularity: A normalized value 0-1 indicating how far
 *					from the middle point the split line should be
 **/
-bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
+bool VBOPmParcels::subdivideParcel(const Block &block, Parcel& parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
 	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
 	
 	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {

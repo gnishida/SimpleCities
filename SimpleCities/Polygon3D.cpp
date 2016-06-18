@@ -135,7 +135,7 @@ bool Polygon3D::getIrregularBisector(QVector3D &p0,	QVector3D &p1, QVector3D &p2
 	return true;
 }*/
 
-float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea) {
+float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea) const {
 	Loop3D cleanPgon; 
 	double tol = 0.01f;
 
@@ -596,7 +596,7 @@ bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
 * @param[out] pgonInset: The vertices of the polygon inset
 * @return insetArea: Returns the area of the polygon inset		
 **/
-float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
+float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool computeArea) const {
 	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 	typedef CGAL::Partition_traits_2<K> Traits;
 	typedef Traits::Polygon_2 Polygon_2;
@@ -643,7 +643,7 @@ float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool com
 }
 
 
-float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) {
+float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) const {
 	if(contour.size() < 3) return 0.0f;				
 	std::vector<float> offsetDistances(contour.size(), offsetDistance);
 
@@ -651,8 +651,7 @@ float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool comp
 }
 
 //Distance from segment ab to point c
-float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c, QVector3D &closestPtInAB)
-{
+float pointSegmentDistanceXY(QVector3D& a, QVector3D& b, QVector3D& c, QVector3D& closestPtInAB) {
 	float dist;		
 
 	float r_numerator = (c.x()-a.x())*(b.x()-a.x()) + (c.y()-a.y())*(b.y()-a.y());

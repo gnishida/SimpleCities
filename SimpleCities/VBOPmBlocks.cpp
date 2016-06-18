@@ -31,10 +31,8 @@ std::vector<RoadVertexDesc> visitedVs;
 int face_index = 0;
 bool vertex_output_visitor_invalid = false;
 
-struct output_visitor : public boost::planar_face_traversal_visitor
-{
-	void begin_face()
-	{
+struct output_visitor : public boost::planar_face_traversal_visitor {
+	void begin_face() {
 		face_index++;
 		sidewalkContourTmp.clear();
 		sidewalkContourWidths.clear();
@@ -46,8 +44,7 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 		visitedVs.clear();
 	}
 
-	void end_face()
-	{
+	void end_face() {
 		if (vertex_output_visitor_invalid) {
 			printf("INVALID end face\n");
 			return;
@@ -102,11 +99,9 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 };
 
 //Vertex visitor
-struct vertex_output_visitor : public output_visitor
-{
+struct vertex_output_visitor : public output_visitor {
 	template <typename Vertex> 
-	void next_vertex(Vertex v) 
-	{
+	void next_vertex(Vertex v) {
 		if (v >= boost::num_vertices(roadGraphPtr->graph)) {
 			vertex_output_visitor_invalid = true;
 			return;
@@ -157,7 +152,7 @@ struct vertex_output_visitor : public output_visitor
 /**
 * Remove intersecting edges.
 */
-bool removeIntersectingEdges(RoadGraph &roadGraph) {
+bool removeIntersectingEdges(RoadGraph& roadGraph) {
 	std::vector<RoadEdgeIter> edgesToRemove;
 
 	RoadEdgeIter ei, eend;
@@ -194,7 +189,7 @@ bool removeIntersectingEdges(RoadGraph &roadGraph) {
 /**
  * Generate blocks from the road network
  */
-bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roadGraph, BlockSet &blocks) {
+bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGraph, BlockSet& blocks) {
 	GraphUtil::normalizeLoop(roadGraph);
 
 	roadGraphPtr = &roadGraph;
@@ -331,13 +326,13 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 		}
 	}
 
-	// assign a zone to each block
+	checkValidness(renderManager, blocks);
 	generateSideWalk(renderManager, blocks);
 
 	return true;
 }
 
-void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
+void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc>>& embedding) {
 	embedding.clear();
 
 	RoadVertexIter vi, vend;
@@ -363,10 +358,8 @@ void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadE
 	}
 }
 
-/**
- * Generate side walks
- */
-void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
+
+void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (!blocks[i].valid) continue;
 
@@ -376,11 +369,10 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		// If the block is too narrow, make it park.
 		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
 			blocks[i].isPark = true;
-			//blocks[i].valid = false;
 			continue;
 		}
 
-		// If the block is close or under waterlevel, or on a steep terain, make it invalid.
+		// If the block is below sea level, or on a steep terain, make it invalid or park.
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
 		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
@@ -391,29 +383,31 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 				min_z = std::min(min_z, z);
 				max_z = std::max(max_z, z);
 			}
-			//float z = renderManager->getTerrainHeight(blocks[i].sidewalkContour.contour[pi].x(), blocks[i].sidewalkContour.contour[pi].y());
-			//min_z = std::min(min_z, z);
-			//max_z = std::max(max_z, z);
 		}
+
 		if (min_z < G::getFloat("sea_level")) {
 			blocks[i].valid = false;
 			continue;
-		} else if (max_z - min_z > 20.0f) {
+		}
+		else if (max_z - min_z > 20.0f) {
 			blocks[i].isPark = true;
 			continue;
 		}
 	}
+}
 
+/**
+ * Generate side walks
+ */
+void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
 	// Compute the block contour (the outer part becomes sidewalks)
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (!blocks[i].valid) continue;
-		//if (blocks[i].isPark) continue;
 
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");
 		blocks[i].sidewalkContour.computeInset(sidewalk_width, blockContourInset, false);
 		blocks[i].blockContour.contour = blockContourInset;
-		//blocks[i].blockContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
 	}
 }
 
