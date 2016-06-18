@@ -9,7 +9,6 @@ Parcel::Parcel() {
 **/
 float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &pgonInset) {
 	pgonInset.clear();
-	float buildableArea = 0.0f;
 
 	int contourSz = this->parcelContour.contour.size();
 
@@ -38,10 +37,7 @@ float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float 
 	}
 
 	// compute irregular offset and the inset area
-	buildableArea = parcelContour.computeInset(offsetValues, pgonInset);
+	parcelContour.computeInset(offsetValues, pgonInset);
 		
-	if(buildableArea < 0)
-		buildableArea = 0;
-
-	return buildableArea;
+	return pgonInset.area();
 }

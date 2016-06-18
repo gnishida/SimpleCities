@@ -74,19 +74,17 @@ public:
 	float area() const;
 
 	//Only works for polygons with no holes in them
-	bool splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);
-	bool split(std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons);
+	bool splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);
+	bool split(const std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons);
 
 	//Only works for polygons with no holes in them
-	float computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea = true) const;
-	float computeInset2(float offsetDistance, Loop3D& pgonInset, bool computeArea = true) const;
-	float computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea = true) const;
+	void computeInset(float offsetDistance, Loop3D &pgonInset) const;
+	void computeInset2(float offsetDistance, Loop3D& pgonInset) const;
+	void computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const;
 
 	bool isPointWithinLoop(const QVector3D& pt) const {
 		return contour.isPointWithinLoop(pt);
 	}
-
-	static bool reorientFace(Loop3D &pface, bool onlyCheck = false);
 
 	static int cleanLoop(Loop3D &pin, Loop3D &pout, float threshold);
 
@@ -100,11 +98,11 @@ public:
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);
 
-	float distanceXYToPoint(const QVector3D &pt);
+	float distanceXYToPoint(const QVector3D &pt) const;
 
 	static bool getIrregularBisector(QVector3D &p0, QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt);
 
-	bool isTooNarrow(float ratio, float min_side);
+	bool isTooNarrow(float ratio, float min_side) const;
 };	
 
 class BBox3D {

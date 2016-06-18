@@ -150,7 +150,9 @@ bool Polygon3D::getIrregularBisector(QVector3D &p0,	QVector3D &p1, QVector3D &p2
 	return true;
 }*/
 
-float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea) const {
+void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const {
+	pgonInset.clear();
+
 	Loop3D cleanPgon; 
 	double tol = 0.01f;
 
@@ -159,7 +161,7 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	int prev, next;
 	int cSz = cleanPgon.size();
 
-	if (cSz < 3) return 0.0f;
+	if (cSz < 3) return;
 
 	/*if (reorientFace(cleanPgon)){				
 		std::reverse(offsetDistances.begin(), offsetDistances.end() - 1);
@@ -256,13 +258,15 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		boost::geometry::correct(bg_contour_inset);
 
 		if (boost::geometry::intersects(bg_contour_inset)) {
-			return computeInset2(offsetDistances[0], pgonInset, computeArea);
+			computeInset2(offsetDistances[0], pgonInset);
+			return;
 		}
 		else {
 			// 内側へのinsetなのに、areaが大きくなった場合は、CGALを利用する。
 			if (offsetDistances[0] > 0) {
 				if (pgonInset.area() > contour.area()) {
-					return computeInset2(offsetDistances[0], pgonInset, computeArea);
+					computeInset2(offsetDistances[0], pgonInset);
+					return;
 				}
 			}
 
@@ -284,17 +288,10 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 			}
 
 			if (intersected) {
-				return computeInset2(offsetDistances[0], pgonInset, computeArea);
+				computeInset2(offsetDistances[0], pgonInset);
+				return;
 			}
 		}
-	}
-	
-	// Compute inset area
-	if (computeArea) {
-		return pgonInset.area();
-	}
-	else {
-		return 0.0f;
 	}
 }
 
@@ -306,7 +303,7 @@ void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4&
 }
 
 //Only works for polygons with no holes in them
-bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2) {
+bool Polygon3D::splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2) {
 	bool polylineIntersectsPolygon = false;
 
 	int plineSz = pline.size();
@@ -335,7 +332,6 @@ bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1
 			QVector2D tmpIntPt;
 			float tPline, tPgon;
 			if (Util::segmentSegmentIntersectXY(QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(contour[j]), QVector2D(contour[jNext]), &tPline, &tPgon, true, tmpIntPt)) {
-			//if (segmentSegmentIntersectXY( QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(contour[j]), QVector2D(contour[jNext]), &tPline, &tPgon, true, tmpIntPt)) {
 				polylineIntersectsPolygon = true;
 
 				//first intersection
@@ -426,7 +422,7 @@ typedef std::list<Polygon_with_holes_2> Pwh_list_2;
  * Split the polygon by a line.
  * uses CGAL library and supports concave polygons.
  */
-bool Polygon3D::split(std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons) {
+bool Polygon3D::split(const std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons) {
 	bool polylineIntersectsPolygon = false;
 
 	int plineSz = pline.size();
@@ -518,33 +514,6 @@ bool Polygon3D::split(std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgo
 }
 
 /**
-* @brief: Reorient polygon faces so that they are CCW
-* @in: If only check is true, the polygon is not modified
-* @out: True if polygon had to be reoriented
-**/
-bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
-{
-	int pfaceSz = pface.size();
-	int next;
-	float tmpSum = 0.0f;
-
-	for(int i=0; i<pfaceSz; ++i){
-		next = (i+1)%pfaceSz;
-		tmpSum = tmpSum + ( pface[next].x() - pface[i].x() )*( pface[next].y() + pface[i].y() );
-	}			
-
-	if(tmpSum > 0.0f)
-	{				
-		if(!onlyCheck){
-			std::reverse(pface.begin(), pface.end());
-		}
-		return true;
-	}
-	return false;
-}
-
-
-/**
 * @brief: Given a polygon, this function computes the polygon's inwards offset. The offset distance
 * is not assumed to be constant and must be specified in the vector offsetDistances. The size of this
 * vector must be equal to the number of vertices of the polygon.
@@ -554,7 +523,7 @@ bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
 * @param[out] pgonInset: The vertices of the polygon inset
 * @return insetArea: Returns the area of the polygon inset		
 **/
-float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool computeArea) const {
+void Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset) const {
 	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 	typedef CGAL::Partition_traits_2<K> Traits;
 	typedef Traits::Polygon_2 Polygon_2;
@@ -591,24 +560,18 @@ float Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset, bool com
 			}
 		}
 	}
-
-	if (computeArea) {
-		return pgonInset.area();
-	}
-	else {
-		return 0;
-	}
 }
 
 
-float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea) const {
-	if(contour.size() < 3) return 0.0f;				
+void Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset) const {
+	pgonInset.clear();
+	if (contour.size() < 3) return;				
+
 	std::vector<float> offsetDistances(contour.size(), offsetDistance);
-
-	return computeInset(offsetDistances, pgonInset, computeArea);
+	computeInset(offsetDistances, pgonInset);
 }
 
-float Polygon3D::distanceXYToPoint(const QVector3D &pt) {
+float Polygon3D::distanceXYToPoint(const QVector3D &pt) const {
 	return contour.distanceXYToPoint(pt);
 }
 
@@ -912,7 +875,7 @@ float Polygon3D::area() const {
  * このポリゴンが細すぎるかどうかチェックする。
  * OBBを計算し、縦横比がratioより大きく、且つ、最小エッジがmin_side未満なら、細すぎると判定する。
  */
-bool Polygon3D::isTooNarrow(float ratio, float min_side) {
+bool Polygon3D::isTooNarrow(float ratio, float min_side) const {
 	QVector3D size;
 	QMatrix4x4 xformMat;
 	getLoopOBB(contour, size, xformMat);

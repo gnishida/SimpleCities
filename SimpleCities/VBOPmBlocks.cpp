@@ -406,7 +406,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");
-		blocks[i].sidewalkContour.computeInset(sidewalk_width, blockContourInset, false);
+		blocks[i].sidewalkContour.computeInset(sidewalk_width, blockContourInset);
 		blocks[i].blockContour.contour = blockContourInset;
 	}
 }

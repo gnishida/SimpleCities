@@ -608,7 +608,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 		float buildingHeight = (building.numStories - 1) * storyHeight + firstFloorHeight;
 
 		Loop3D roofOffCont;
-		building.buildingFootprint.computeInset(-0.1, roofOffCont, false);
+		building.buildingFootprint.computeInset(-0.1, roofOffCont);
 
 		////////////////////////////
 		// FLOORS
