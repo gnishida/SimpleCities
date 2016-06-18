@@ -213,7 +213,7 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 			}
 			
 			Parcel parcel;
-			parcel.setContour(block.blockContour);
+			parcel.parcelContour = block.blockContour;
 			Block::parcelGraphVertexDesc pvd = boost::add_vertex(block.myParcels);
 			block.myParcels[pvd] = parcel;
 

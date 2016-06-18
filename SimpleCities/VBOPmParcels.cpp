@@ -23,12 +23,11 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 	//srand(block.randSeed);
 	std::vector<Parcel> tmpParcels;
 
-	//Empty parcels in block
 	block.myParcels.clear();
 
-	//Make the initial parcel of the block be the block itself
+	// set the initial parcel be the block itself
 	Parcel tmpParcel;
-	tmpParcel.setContour(block.blockContour);
+	tmpParcel.parcelContour = block.blockContour;
 
 	if (block.isPark) {
 		tmpParcel.isPark = true;
@@ -38,7 +37,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 	}
 
 	Block::parcelGraphVertexDesc tmpPGVD;
-	for(int i=0; i<tmpParcels.size(); ++i){
+	for (int i = 0; i < tmpParcels.size(); ++i) {
 		//add parcel to block parcels graph
 		tmpPGVD = boost::add_vertex(block.myParcels);
 		block.myParcels[tmpPGVD] = tmpParcels[i];
@@ -70,12 +69,12 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		return true;
 	}
 
-	//compute OBB
+	// compute OBB
 	QVector3D obbSize;
 	QMatrix4x4 obbMat;
 	parcel.parcelContour.getMyOBB(obbSize, obbMat);
 
-	//compute split line passing through center of OBB TODO (+/- irregularity)
+	// compute split line passing through center of OBB TODO (+/- irregularity)
 	//		and with direction parallel/perpendicular to OBB main axis
 	QVector3D slEndPoint;
 	QVector3D dirVectorInit, dirVector, dirVectorOrthogonal;
@@ -104,7 +103,7 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 	slEndPoint = midPt - 10000.0f*dirVector;
 	splitLine.push_back(slEndPoint);
 
-	//split parcel with line and obtain two new parcels
+	// split parcel with line and obtain two new parcels
 	Polygon3D pgon1, pgon2;
 
 	float kDistTol = 0.01f;
@@ -116,10 +115,10 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		Parcel parcel1;
 		Parcel parcel2;
 
-		parcel1.setContour(pgon1);
-		parcel2.setContour(pgon2);
+		parcel1.parcelContour = pgon1;
+		parcel2.parcelContour = pgon2;
 
-		//call recursive function for both parcels
+		// call recursive function for both parcels
 		subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 		subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 	} else {
@@ -127,7 +126,7 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		if (parcel.parcelContour.split(splitLine, pgons)) {
 			for (int i = 0; i < pgons.size(); ++i) {
 				Parcel parcel;
-				parcel.setContour(pgons[i]);
+				parcel.parcelContour = pgons[i];
 
 				subdivideParcel(block, parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 			}

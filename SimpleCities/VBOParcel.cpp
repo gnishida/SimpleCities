@@ -1,23 +1,19 @@
 #include "VBOParcel.h"
 
-Parcel::Parcel(){
+Parcel::Parcel() {
 	isPark = false;
 }
 
 /**
 * Compute Parcel Buildable Area
 **/
-float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float sideSetback, std::vector<int> &frontEdges, std::vector<int> &rearEdges, std::vector<int> &sideEdges, Loop3D &pgonInset) {
+float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &pgonInset) {
 	pgonInset.clear();
 	float buildableArea = 0.0f;
 
 	int contourSz = this->parcelContour.contour.size();
 
 	if(contourSz < 3) return 0.0f;
-
-	//get parcel back edge(s)
-
-	//put together offset values to pass to irregular offset function
 
 	//--- first, initialize values to side setback (most edges are sides)
 	std::vector<float> offsetValues(contourSz, sideSetback);
@@ -41,12 +37,7 @@ float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float 
 		}
 	}
 
-	if (parcelContour.contour.isClockwise()) {
-		int xxx = 0;
-	}
-
-
-	//compute irregular offset and the inset area
+	// compute irregular offset and the inset area
 	buildableArea = parcelContour.computeInset(offsetValues, pgonInset);
 		
 	if(buildableArea < 0)
