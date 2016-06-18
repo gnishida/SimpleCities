@@ -60,7 +60,10 @@ bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Bloc
 	}
 
 	// Set building attributes
-	inParcel.myBuilding.numStories = std::max(1.0f, Util::genRand(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
+	inParcel.myBuilding.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
+	if (inParcel.myBuilding.numStories != 5) {
+		int xxx = 0;
+	}
 	float c = rand() % 192;
 	inParcel.myBuilding.color = QColor(c, c, c);
 	inParcel.myBuilding.bldType = 1;
