@@ -585,27 +585,29 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 	}
 
 	// obtain the minimum elevation of the footprint
-	float z = std::numeric_limits<float>::max();
+	float min_elev = std::numeric_limits<float>::max();
+	float max_elev = -std::numeric_limits<float>::max();
+
 	for (int k = 0; k < building.buildingFootprint.contour.size(); ++k) {
-		float pt_z = rendManager.getTerrainHeight(building.buildingFootprint.contour[k].x(), building.buildingFootprint.contour[k].y());
-		if (pt_z < z) {
-			z = pt_z;
-		}
+		float z = rendManager.getTerrainHeight(building.buildingFootprint.contour[k].x(), building.buildingFootprint.contour[k].y());
+		min_elev = std::min(min_elev, z);
+		max_elev = std::max(max_elev, z);
 	}
 
 	///////////////////////////
 	// Simple box
 	if (building.bldType == 0) {
 		//addExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z, building.numStories * storyHeight);
-		addTexExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z, building.numStories * storyHeight);
+		addTexExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, min_elev, building.numStories * storyHeight);
 		//addConvexPoly(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z + building.numStories * storyHeight);
-		addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, building.buildingFootprint.contour, building.color, QVector3D(0, 0, 1), z + building.numStories * storyHeight, QVector3D(0, 0, 0));
+		addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, building.buildingFootprint.contour, building.color, QVector3D(0, 0, 1), min_elev + building.numStories * storyHeight, QVector3D(0, 0, 0));
 	}
 
 	if (building.bldType == 1) {
 		//float boxSize=1.0f;
+		float baseHeight = max_elev - min_elev + 2.8f;
 		float firstFloorHeight = 4.0f;
-		float buildingHeight = (building.numStories - 1) * storyHeight + firstFloorHeight;
+		float buildingHeight = baseHeight + firstFloorHeight + (building.numStories - 1) * storyHeight;
 
 		Loop3D roofOffCont;
 		building.buildingFootprint.computeInset(-0.1, roofOffCont);
@@ -617,9 +619,8 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 
 
 		///////////////////////////
-		// First floor
-		//addFirstFloor(rendManager, building.buildingFootprint.contour, bldgColor, z, firstFloorHeight);
-		//addBox(rendManager, roofOffCont, bldgColor, z + firstFloorHeight, boxSize);
+		// Add Base
+		addExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, bldgColor, min_elev, baseHeight);
 
 		/// Add columns
 		std::vector<QVector3D> columnContour;
@@ -635,14 +636,14 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 		QVector3D randN(qrand(),qrand(),qrand());
 
 		// First floor
-		addFirstFloor(rendManager, columnContour, windows, randomFacade, randN, uS, vS, z, firstFloorHeight, windowRandSize);
+		addFirstFloor(rendManager, columnContour, windows, randomFacade, randN, uS, vS, min_elev + baseHeight, firstFloorHeight, windowRandSize);
 
 		// Upper floors
-		addColumnGeometry(rendManager, columnContour, windows, randomFacade, randN, uS, vS, z + firstFloorHeight, building.numStories - 1, storyHeight, windowRandSize);
+		addColumnGeometry(rendManager, columnContour, windows, randomFacade, randN, uS, vS, min_elev + baseHeight + firstFloorHeight, building.numStories - 1, storyHeight, windowRandSize);
 
 		////////////////////////////
 		// ROOF	
-		addRoof(rendManager, roofOffCont, bldgColor, z + buildingHeight, 1.0f);
+		addRoof(rendManager, roofOffCont, bldgColor, min_elev + buildingHeight, 1.0f);
 	}
 }
 

@@ -88,9 +88,6 @@
     <ClCompile Include="UrbanGeometry.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
-    <ClCompile Include="VBORoadGraph.cpp">
-      <Filter>VBO</Filter>
-    </ClCompile>
     <ClCompile Include="BBox.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -274,9 +271,6 @@
     </ClInclude>
     <ClInclude Include="UrbanGeometry.h">
       <Filter>Main Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VBORoadGraph.h">
-      <Filter>VBO</Filter>
     </ClInclude>
     <ClInclude Include="BBox.h">
       <Filter>common</Filter>

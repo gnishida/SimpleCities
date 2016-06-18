@@ -19,7 +19,6 @@ This file is part of QtUrban.
 #include "GraphUtil.h"
 #include "MainWindow.h"
 #include <gl/GLU.h>
-#include "VBORoadGraph.h"
 #include "VBOPm.h"
 #include "BlockMeshGenerator.h"
 
@@ -201,8 +200,6 @@ void GLWidget3D::drawScene(int drawMode) {
 		vboRenderManager.renderStaticGeometry("2d_blocks");
 		vboRenderManager.renderStaticGeometry("2d_parks");
 		vboRenderManager.renderStaticGeometry("3d_roads");
-		vboRenderManager.renderStaticGeometry("3d_roads_inter");
-		vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 	} else {
 		// NORMAL
 		if (drawMode == 0) {
@@ -217,8 +214,6 @@ void GLWidget3D::drawScene(int drawMode) {
 			vboRenderManager.renderStaticGeometry("3d_parks");
 			vboRenderManager.renderStaticGeometry("3d_parcels");
 			vboRenderManager.renderStaticGeometry("3d_roads");
-			vboRenderManager.renderStaticGeometry("3d_roads_inter");
-			vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
@@ -235,8 +230,6 @@ void GLWidget3D::drawScene(int drawMode) {
 			//vboRenderManager.renderStaticGeometry("3d_parks");
 			//vboRenderManager.renderStaticGeometry("3d_parcels");
 			//vboRenderManager.renderStaticGeometry("3d_roads");
-			//vboRenderManager.renderStaticGeometry("3d_roads_inter");
-			//vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 

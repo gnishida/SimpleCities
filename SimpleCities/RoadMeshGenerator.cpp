@@ -363,14 +363,14 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 								
 				if (interPoints.size() > 2) {
-					rendManager.addStaticGeometry2("3d_roads_interCom", interPoints,0.0f, "../data/textures/roads/road_0lines.jpg", 2, QVector3D(1.0f/7.5f, 1.0f/7.5f, 1), QColor());
+					rendManager.addStaticGeometry2("3d_roads", interPoints,0.0f, "../data/textures/roads/road_0lines.jpg", 2, QVector3D(1.0f/7.5f, 1.0f/7.5f, 1), QColor());
 				}
 			}
 		}
 
-		rendManager.addStaticGeometry("3d_roads_inter", intersectCirclesV, "../data/textures/roads/road_0lines.jpg", GL_TRIANGLES, 2);
-		rendManager.addStaticGeometry("3d_roads_inter", interPedX, "../data/textures/roads/road_pedX.jpg", GL_TRIANGLES, 2);
-		rendManager.addStaticGeometry("3d_roads_inter", interPedXLineR, "../data/textures/roads/road_pedXLineR.jpg", GL_TRIANGLES, 2);
+		rendManager.addStaticGeometry("3d_roads", intersectCirclesV, "../data/textures/roads/road_0lines.jpg", GL_TRIANGLES, 2);
+		rendManager.addStaticGeometry("3d_roads", interPedX, "../data/textures/roads/road_pedX.jpg", GL_TRIANGLES, 2);
+		rendManager.addStaticGeometry("3d_roads", interPedXLineR, "../data/textures/roads/road_pedXLineR.jpg", GL_TRIANGLES, 2);
 	}
 
 	rendManager.addStaticGeometry("3d_roads", vertSide, "", GL_TRIANGLES, 1|mode_Lighting);
@@ -588,8 +588,8 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				vertBg[i * 3 + 2] = Vertex(roads.graph[*vi]->pt.x() + rad_bg * cosf(angle2), roads.graph[*vi]->pt.y() + rad_bg * sinf(angle2), deltaZ + heightOffsetBg, colorBg, 0, 0, 1.0f, 0, 0, 0);
 			}
 						
-			renderManager.addStaticGeometry("3d_roads_inter", vert, "", GL_TRIANGLES, 1);
-			renderManager.addStaticGeometry("3d_roads_inter", vertBg, "", GL_TRIANGLES, 1);
+			renderManager.addStaticGeometry("3d_roads", vert, "", GL_TRIANGLES, 1);
+			renderManager.addStaticGeometry("3d_roads", vertBg, "", GL_TRIANGLES, 1);
 		}
 	}
 }
