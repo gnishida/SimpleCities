@@ -6,7 +6,7 @@
 #include "RoadGraph.h"
 #include "BlockSet.h"
 #include <glm/glm.hpp>
-#include "VBOBuilding.h"
+#include "Building.h"
 
 class MainWindow;
 

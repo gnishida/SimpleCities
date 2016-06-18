@@ -3,10 +3,9 @@
 #include "VBORenderManager.h"
 #include <vector>
 #include <QString>
-#include <QDomNode>
 #include <QVector2D>
-#include "VBOBlock.h"
-#include "VBOParcel.h"
+#include "Block.h"
+#include "Parcel.h"
 
 class BlockSet {
 public:

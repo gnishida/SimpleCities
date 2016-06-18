@@ -8,7 +8,7 @@
 #include <boost/graph/planar_face_traversal.hpp>
 #include <boost/graph/boyer_myrvold_planar_test.hpp>
 
-#include "VBOBuilding.h"
+#include "Building.h"
 #include "BlockSet.h"
 #include <vector>
 

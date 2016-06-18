@@ -2,21 +2,19 @@
 
 #include <vector>
 
-#include "VBOBlock.h"
+#include "Block.h"
 #include "VBOModel.h"
 
+class VBOModel_StreetElements{
 
+public:
 
-		class VBOModel_StreetElements{
+	static void clearVBOModel_StreetElements();
+	static void initStreetElements();
 
-		public:
+	static void renderOneStreetElement(int programId,ModelSpec& strEleStr);
 
-			static void clearVBOModel_StreetElements();
-			static void initStreetElements();
-
-			static void renderOneStreetElement(int programId,ModelSpec& strEleStr);
-
-			static std::vector<VBOModel> streetElementsModels;
-			static bool streetElements_wasInitialized;
-		};
+	static std::vector<VBOModel> streetElementsModels;
+	static bool streetElements_wasInitialized;
+};
 		

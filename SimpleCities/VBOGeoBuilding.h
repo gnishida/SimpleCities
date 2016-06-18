@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "VBOBuilding.h"
+#include "Building.h"
 
 class VBORenderManager;
 

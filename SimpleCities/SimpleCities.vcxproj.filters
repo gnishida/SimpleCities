@@ -32,17 +32,14 @@
     <Filter Include="common">
       <UniqueIdentifier>{fb349a01-a1fa-43e3-8d24-f3a2615eeefd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PM Blocks">
-      <UniqueIdentifier>{0c679474-b313-45cf-8352-882a78a96147}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PM Blocks\Geometry">
-      <UniqueIdentifier>{30f3fad5-3177-40bf-af01-67c0a442da73}</UniqueIdentifier>
-    </Filter>
     <Filter Include="VBO">
       <UniqueIdentifier>{aebcea57-bebf-40c6-ad5d-faf9d8a21739}</UniqueIdentifier>
     </Filter>
     <Filter Include="VBO\nvModels">
       <UniqueIdentifier>{aea19619-d12d-45e1-a8fc-9c4a9a84a93d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PM">
+      <UniqueIdentifier>{0c679474-b313-45cf-8352-882a78a96147}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -127,29 +124,23 @@
     <ClCompile Include="VBORenderManager.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
-    <ClCompile Include="VBOBlock.cpp">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOParcel.cpp">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="GLWidget3D_Shadows.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="VBOGeoBuilding.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="VBOPm.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="VBOPmBlocks.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="VBOPmBuildings.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="VBOPmParcels.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="PropertyWidget.cpp">
       <Filter>Form Files</Filter>
@@ -200,10 +191,16 @@
       <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="PMRoadGenerator.cpp">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClCompile>
     <ClCompile Include="Polyline2D.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Parcel.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>Main Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,32 +299,23 @@
     <ClInclude Include="VBOSkyBox.h">
       <Filter>VBO</Filter>
     </ClInclude>
-    <ClInclude Include="VBOBlock.h">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOBuilding.h">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOParcel.h">
-      <Filter>PM Blocks\Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="GLWidget3D_Shadows.h">
       <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="VBOPmParcels.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="VBOGeoBuilding.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="VBOPm.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="VBOPmBlocks.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="VBOPmBuildings.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="VBOModel.h">
       <Filter>VBO\nvModels</Filter>
@@ -378,10 +366,19 @@
       <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="PMRoadGenerator.h">
-      <Filter>PM Blocks</Filter>
+      <Filter>PM</Filter>
     </ClInclude>
     <ClInclude Include="Polyline2D.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Parcel.h">
+      <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Building.h">
+      <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Main Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

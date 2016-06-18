@@ -8,9 +8,9 @@
 #include <boost/graph/planar_face_traversal.hpp>
 #include <boost/graph/boyer_myrvold_planar_test.hpp>
 
-#include "VBOBlock.h"
-#include "VBOParcel.h"
-#include "VBOBuilding.h"
+#include "Block.h"
+#include "Parcel.h"
+#include "Building.h"
 #include "RoadGraph.h"
 #include "BlockSet.h"
 
@@ -23,10 +23,11 @@ public:
 	//Generate Blocks
 	static bool generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGraph, BlockSet& blocks);
 
-	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc>>& embedding);
+	static bool removeIntersectingEdges(RoadGraph& roadGraph);
+	static void buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadEdgeDesc>>& embedding);
 	static void checkValidness(VBORenderManager* renderManager, BlockSet& blocks);
 	static void generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks);
-	static void saveBlockImage(RoadGraph& roads, Polygon3D& contour, const char* filename);
+	static void saveBlockImage(const RoadGraph& roads, const Polygon3D& contour, const char* filename);
 };
 
 

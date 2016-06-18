@@ -152,7 +152,7 @@ struct vertex_output_visitor : public output_visitor {
 /**
 * Remove intersecting edges.
 */
-bool removeIntersectingEdges(RoadGraph& roadGraph) {
+bool VBOPmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
 	std::vector<RoadEdgeIter> edgesToRemove;
 
 	RoadEdgeIter ei, eend;
@@ -332,7 +332,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	return true;
 }
 
-void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc>>& embedding) {
+void VBOPmBlocks::buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadEdgeDesc>>& embedding) {
 	embedding.clear();
 
 	RoadVertexIter vi, vend;
@@ -411,7 +411,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 	}
 }
 
-void VBOPmBlocks::saveBlockImage(RoadGraph& roads, Polygon3D& contour, const char* filename) {
+void VBOPmBlocks::saveBlockImage(const RoadGraph& roads, const Polygon3D& contour, const char* filename) {
 	BBox bbox = GraphUtil::getAABoundingBox(roads, true);
 	cv::Mat img(bbox.dy() + 1, bbox.dx() + 1, CV_8UC3, cv::Scalar(255, 255, 255));
 

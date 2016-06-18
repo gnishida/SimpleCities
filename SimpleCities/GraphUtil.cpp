@@ -319,8 +319,6 @@ RoadVertexDesc GraphUtil::addVertex(RoadGraph& roads, RoadVertexPtr v) {
 	RoadVertexDesc new_v_desc = boost::add_vertex(roads.graph);
 	roads.graph[new_v_desc] = v;
 
-	roads.setModified();
-
 	return new_v_desc;
 }
 
@@ -346,8 +344,6 @@ void GraphUtil::moveVertex(RoadGraph& roads, RoadVertexDesc v, const QVector2D& 
 
 	// Move the vertex
 	roads.graph[v]->pt = pt;
-
-	roads.setModified();
 }
 
 /**
@@ -411,8 +407,6 @@ void GraphUtil::removeLoop(RoadGraph& roads) {
 			roads.graph[*ei]->valid = false;
 		}
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -458,8 +452,6 @@ void GraphUtil::snapVertex(RoadGraph& roads, RoadVertexDesc v1, RoadVertexDesc v
 
 	// invalidate v1
 	roads.graph[v1]->valid = false;
-
-	roads.setModified();
 }
 
 /**
@@ -674,8 +666,6 @@ int GraphUtil::getNumEdges(RoadGraph& roads, RoadVertexDesc v, int roadType, boo
  * This function creates a straight line of edge.
  */
 RoadEdgeDesc GraphUtil::addEdge(RoadGraph& roads, RoadVertexDesc src, RoadVertexDesc tgt, unsigned int type, unsigned int lanes, bool oneWay, bool link, bool roundabout) {
-	roads.setModified();
-
 	// エッジを新規追加する
 	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(type, lanes, oneWay, link, roundabout));
 	e->addPoint(roads.graph[src]->getPt());
@@ -683,8 +673,6 @@ RoadEdgeDesc GraphUtil::addEdge(RoadGraph& roads, RoadVertexDesc src, RoadVertex
 
 	std::pair<RoadEdgeDesc, bool> edge_pair = boost::add_edge(src, tgt, roads.graph);
 	roads.graph[edge_pair.first] = e;
-
-	roads.setModified();
 
 	return edge_pair.first;
 }
@@ -694,8 +682,6 @@ RoadEdgeDesc GraphUtil::addEdge(RoadGraph& roads, RoadVertexDesc src, RoadVertex
  * This function creates a edge which is copied from the reference edge.
  */
 RoadEdgeDesc GraphUtil::addEdge(RoadGraph& roads, RoadVertexDesc src, RoadVertexDesc tgt, RoadEdgePtr edge) {
-	roads.setModified();
-
 	std::pair<RoadEdgeDesc, bool> edge_pair = boost::add_edge(src, tgt, roads.graph);
 	roads.graph[edge_pair.first] = edge;
 
@@ -920,8 +906,6 @@ void GraphUtil::moveEdge(RoadGraph& roads, RoadEdgeDesc e, QVector2D& src_pos, Q
 		roads.graph[e]->polyline[0] = tgt_pos;
 		roads.graph[e]->polyline[n - 1] = src_pos;
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -1018,10 +1002,6 @@ bool GraphUtil::removeDeadEnd(RoadGraph& roads) {
 		}
 	}
 
-	if (removed) {
-		roads.setModified();
-	}
-
 	return removed;
 }
 
@@ -1043,8 +1023,6 @@ void GraphUtil::removeIsolatedEdges(RoadGraph& roads, bool onlyValidEdge) {
 			roads.graph[tgt]->valid = false;
 		}
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -1756,8 +1734,6 @@ void GraphUtil::loadRoads(RoadGraph& roads, const QString& filename, int roadTyp
 	fclose(fp);
 
 	std::cout << "Total length: " << getTotalEdgeLength(roads) << std::endl;
-
-	roads.setModified();
 }
 
 /**
@@ -1907,8 +1883,6 @@ void GraphUtil::copyRoads(RoadGraph& srcRoads, RoadGraph& dstRoads) {
 		std::pair<RoadEdgeDesc, bool> edge_pair = boost::add_edge(new_src, new_tgt, dstRoads.graph);
 		dstRoads.graph[edge_pair.first] = new_e;
 	}
-
-	dstRoads.setModified();
 }
 
 /**
@@ -1942,14 +1916,12 @@ void GraphUtil::mergeRoads(RoadGraph& roads1, RoadGraph& roads2) {
 
 		addEdge(roads1, src1, tgt1, RoadEdgePtr(new RoadEdge(*roads2.graph[*ei])));
 	}
-
-	roads1.setModified();
 }
 
 /**
  * Return the axix aligned bounding box of the road graph.
  */
-BBox GraphUtil::getAABoundingBox(RoadGraph& roads, bool checkPolyline) {
+BBox GraphUtil::getAABoundingBox(const RoadGraph& roads, bool checkPolyline) {
 	BBox box;
 
 	if (checkPolyline) {
@@ -2018,8 +1990,6 @@ void GraphUtil::extractRoads(RoadGraph& roads, int roadType) {
 	}
 
 	removeIsolatedVertices(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2053,8 +2023,6 @@ void GraphUtil::extractRoads(RoadGraph& roads, Polygon2D& area, bool strict, int
 	}
 
 	removeIsolatedVertices(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2126,8 +2094,6 @@ void GraphUtil::extractRoads2(RoadGraph& roads, const Polygon2D& area, int roadT
 	}
 
 	removeIsolatedVertices(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2224,8 +2190,6 @@ void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
 	}
 
 	removeIsolatedVertices(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2255,8 +2219,6 @@ void GraphUtil::subtractRoads(RoadGraph& roads, Polygon2D& area, bool strict) {
 	}
 
 	removeIsolatedVertices(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2315,8 +2277,6 @@ void GraphUtil::subtractRoads2(RoadGraph& roads, Polygon2D& area) {
 
 	removeIsolatedVertices(roads);
 	reduce(roads);
-
-	roads.setModified();
 }
 
 /**
@@ -2344,8 +2304,6 @@ void GraphUtil::perturb(RoadGraph &roads, const Polygon2D &area, float factor) {
 
 		moveVertex(roads, *vi, roads.graph[*vi]->pt + QVector2D(dx, dy));
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -2697,8 +2655,6 @@ void GraphUtil::clean(RoadGraph& roads) {
 		std::pair<RoadEdgeDesc, bool> edge_pair = boost::add_edge(new_src, new_tgt, roads.graph);
 		roads.graph[edge_pair.first] = new_e;
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -2726,10 +2682,6 @@ void GraphUtil::reduce(RoadGraph& roads) {
 			}
 		}
 	} while (deleted);
-
-	if (actuallReduced) {
-		roads.setModified();
-	}
 }
 
 /**
@@ -2839,87 +2791,6 @@ void GraphUtil::simplify(RoadGraph& roads, float dist_threshold) {
 			}
 		}
 	}
-
-	roads.setModified();
-}
-
-/**
- * ノード間の距離が指定した距離よりも近い場合は、１つにしてしまう。
- * ノードとエッジ間の距離が、閾値よりも小さい場合も、エッジ上にノードを移してしまう。
- */
-void GraphUtil::simplify2(RoadGraph& roads, float dist_threshold) {
-	float threshold2 = dist_threshold * dist_threshold;
-
-	RoadGraph temp;
-	copyRoads(roads, temp);
-
-	roads.clear();
-
-	// 全ての頂点同士で、近いものをグループ化する
-	int group_id = 0;
-	std::vector<QVector2D> group_centers;
-	std::vector<int> group_nums;
-	QHash<RoadVertexDesc, int> groups;
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(temp.graph); vi != vend; ++vi) {
-		if (!temp.graph[*vi]->valid) continue;
-
-		float min_dist = std::numeric_limits<float>::max();
-		int min_group_id = -1;
-		for (int i = 0; i < group_centers.size(); i++) {
-			float dist = (group_centers[i] - temp.graph[*vi]->pt).lengthSquared();
-			if (dist < min_dist) {
-				min_dist = dist;
-				min_group_id = i;
-			}
-		}
-
-		if (min_group_id >= 0 && min_dist < threshold2) {
-			group_centers[min_group_id] = group_centers[min_group_id] * group_nums[min_group_id] + temp.graph[*vi]->pt;
-			group_nums[min_group_id]++;
-			group_centers[min_group_id] /= group_nums[min_group_id];
-		} else {
-			min_group_id = group_centers.size();
-			group_centers.push_back(temp.graph[*vi]->pt);
-			group_nums.push_back(1);
-		}
-		
-		groups[*vi] = min_group_id;
-	}
-
-	// エッジを登録する
-	QHash<int, RoadVertexDesc> conv;	// group center ⇒ 実際の頂点desc
-	RoadGraph temp2;
-	for (int i = 0; i < group_centers.size(); i++) {
-		RoadVertexDesc v = boost::add_vertex(temp2.graph);
-		temp2.graph[v] = RoadVertexPtr(new RoadVertex(group_centers[i]));
-		conv[i] = v;
-	}
-
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(temp.graph); ei != eend; ++ei) {
-		if (!temp.graph[*ei]->valid) continue;
-
-		RoadVertexDesc src = boost::source(*ei, temp.graph);
-		RoadVertexDesc tgt = boost::target(*ei, temp.graph);
-
-		RoadVertexDesc new_src = conv[groups[src]];
-		RoadVertexDesc new_tgt = conv[groups[tgt]];
-
-		// エッジが点に縮退する場合は、スキップ
-		if (new_src == new_tgt) continue;
-
-		// 既にエッジがあれば、スキップ
-		if (hasEdge(temp2, new_src, new_tgt)) continue;
-
-		// エッジを追加
-		RoadEdgeDesc e = addEdge(temp2, new_src, new_tgt, RoadEdgePtr(new RoadEdge(*temp.graph[*ei])));
-		moveEdge(temp2, e, temp2.graph[new_src]->pt, temp2.graph[new_tgt]->pt);
-	}
-
-	copyRoads(temp2, roads);
-
-	roads.setModified();
 }
 
 /**
@@ -3222,8 +3093,6 @@ void GraphUtil::rotate(RoadGraph& roads, float theta, const QVector2D& rotationC
 			roads.graph[*ei]->polyline[i].setY(sinf(theta) * (pos.x() - rotationCenter.x()) + cosf(theta) * (pos.y() - rotationCenter.y()) + rotationCenter.y());
 		}
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -3243,8 +3112,6 @@ void GraphUtil::translate(RoadGraph& roads, const QVector2D& offset) {
 			roads.graph[*ei]->polyline[i] += offset;
 		}
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -3276,8 +3143,6 @@ void GraphUtil::scale(RoadGraph& roads, const BBox& bbox1, const BBox& bbox2) {
 			roads.graph[*ei]->polyline[i].setY(y);
 		}
 	}
-
-	roads.setModified();
 }
 
 /**
@@ -3512,8 +3377,6 @@ void GraphUtil::removeShortDeadend(RoadGraph& roads, float threshold) {
 			}
 		}
 	}
-
-	if (actuallyDeleted) roads.setModified();
 }
 
 float GraphUtil::getTotalEdgeLength(RoadGraph &roads) {

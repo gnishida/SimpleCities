@@ -5,7 +5,7 @@
 #endif
 
 #include "VBORenderManager.h"
-#include "VBOParcel.h"
+#include "Parcel.h"
 #include <QVector3D>
 #include "Polygon3D.h"
 #include "Polygon2D.h"

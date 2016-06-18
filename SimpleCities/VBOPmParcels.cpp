@@ -33,7 +33,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 		tmpParcel.isPark = true;
 		tmpParcels.push_back(tmpParcel);
 	} else {
-		subdivideParcel(block, tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
+		subdivideParcel(tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
 	}
 
 	Block::parcelGraphVertexDesc tmpPGVD;
@@ -61,7 +61,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 * @splitIrregularity: A normalized value 0-1 indicating how far
 *					from the middle point the split line should be
 **/
-bool VBOPmParcels::subdivideParcel(const Block &block, Parcel& parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
+bool VBOPmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
 	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
 	
 	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {
@@ -119,8 +119,8 @@ bool VBOPmParcels::subdivideParcel(const Block &block, Parcel& parcel, float are
 		parcel2.parcelContour = pgon2;
 
 		// call recursive function for both parcels
-		subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
-		subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+		subdivideParcel(parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+		subdivideParcel(parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 	} else {
 		// If the simple splitting fails, try CGAL version which is slow
 		if (parcel.parcelContour.split(splitLine, pgons)) {
@@ -128,7 +128,7 @@ bool VBOPmParcels::subdivideParcel(const Block &block, Parcel& parcel, float are
 				Parcel parcel;
 				parcel.parcelContour = pgons[i];
 
-				subdivideParcel(block, parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+				subdivideParcel(parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 			}
 		} else {
 			parcel.isPark = true;

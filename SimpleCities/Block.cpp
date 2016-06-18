@@ -1,4 +1,4 @@
-#include "VBOBlock.h"
+#include "Block.h"
 #include <QVector2D>
 
 void Block::clear() {

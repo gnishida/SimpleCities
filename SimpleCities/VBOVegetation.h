@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VBOBlock.h"
+#include "Block.h"
 #include "VBOModel_StreetElements.h"
 
 class VBORenderManager;

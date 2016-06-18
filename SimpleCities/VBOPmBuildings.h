@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "VBOBlock.h"
+#include "Block.h"
 
 class VBOPmBuildings{
 public:

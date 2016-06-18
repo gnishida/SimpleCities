@@ -1,11 +1,6 @@
-/************************************************************************************************
- *		Procedural City Generation: Parcel
- *		@author igarciad
- ************************************************************************************************/
-
 #pragma once
 
-#include "VBOBlock.h"
+#include "Block.h"
 
 class VBOPmParcels{
 public:
@@ -13,5 +8,5 @@ public:
 
 private:
 	static void subdivideBlockIntoParcels(Block &block);
-	static bool subdivideParcel(const Block &block, Parcel& parcel, float areaMean, float areaMin, float areaVar, float splitIrregularity, std::vector<Parcel>& outParcels);
+	static bool subdivideParcel(Parcel& parcel, float areaMean, float areaMin, float areaVar, float splitIrregularity, std::vector<Parcel>& outParcels);
 };

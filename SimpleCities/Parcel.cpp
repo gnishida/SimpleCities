@@ -1,4 +1,4 @@
-#include "VBOParcel.h"
+#include "Parcel.h"
 
 Parcel::Parcel() {
 	isPark = false;

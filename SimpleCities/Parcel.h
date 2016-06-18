@@ -1,12 +1,7 @@
-/************************************************************************************************
-*		VBO Parcel
-*		@author igarciad
-************************************************************************************************/
 #pragma once
 
 #include <QSettings>
-#include "VBOBuilding.h"
-#include <QTextStream>
+#include "Building.h"
 #include "Polygon3D.h"
 
 class Parcel {

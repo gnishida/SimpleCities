@@ -95,7 +95,7 @@ public:
 	// The entire graph related functions
 	static void copyRoads(RoadGraph& srcRoads, RoadGraph& dstRoads);
 	static void mergeRoads(RoadGraph& roads1, RoadGraph& roads2);
-	static BBox getAABoundingBox(RoadGraph& roads, bool checkPolyline = false);
+	static BBox getAABoundingBox(const RoadGraph& roads, bool checkPolyline = false);
 	static BBox getBoudingBox(RoadGraph& roads, float theta1, float theta2, float theta_step = 0.087f);
 	static void extractRoads(RoadGraph& roads, int roadType = 0);
 	static void extractRoads(RoadGraph& roads, Polygon2D& area, bool strict, int roadType = 0);
@@ -122,7 +122,6 @@ public:
 	static void reduce(RoadGraph& roads);
 	static bool reduce(RoadGraph& roads, RoadVertexDesc desc);
 	static void simplify(RoadGraph& roads, float dist_threshold);
-	static void simplify2(RoadGraph& srcRoad, float dist_threshold);
 	static void normalize(RoadGraph& roads);
 	static void normalize(RoadGraph& roads, float step_size);
 	static void singlify(RoadGraph& roads);
