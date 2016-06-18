@@ -82,18 +82,18 @@ struct output_visitor : public boost::planar_face_traversal_visitor {
 		}
 
 		//if (blockContourTmp.area() > 100.0f) {
-		if (sidewalkContourTmp.contour.size() >= 3 && sidewalkContourWidths.size() >= 3) {
+		if (sidewalkContourTmp.size() >= 3 && sidewalkContourWidths.size() >= 3) {
 			Block newBlock;
 			newBlock.sidewalkContour = sidewalkContourTmp;
 			newBlock.sidewalkContourRoadsWidths = sidewalkContourWidths;
-			while (newBlock.sidewalkContour.contour.size() > newBlock.sidewalkContourRoadsWidths.size()) {
+			while (newBlock.sidewalkContour.size() > newBlock.sidewalkContourRoadsWidths.size()) {
 				newBlock.sidewalkContourRoadsWidths.push_back(newBlock.sidewalkContourRoadsWidths.back());
 			}
 	
 			blocksPtr->push_back(newBlock);
 			//printf("CREATE block %d: %d\n",blocksPtr->size(),blocksPtr->back().blockContour.contour.size());
 		}else{
-			printf("Contour %d widths %d\n",sidewalkContourTmp.contour.size(),sidewalkContourWidths.size());
+			printf("Contour %d widths %d\n",sidewalkContourTmp.size(),sidewalkContourWidths.size());
 		}
 	}
 };
@@ -270,11 +270,11 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 
 	// Remove invalid data
 	for (int i = 0; i < blocks.size(); ) {
-		if (blocks[i].sidewalkContour.contour.size() != blocks[i].sidewalkContourRoadsWidths.size()) {
-			std::cout << "!!!!! Error: contour:" << blocks[i].sidewalkContour.contour.size() << ", width: " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
+		if (blocks[i].sidewalkContour.size() != blocks[i].sidewalkContourRoadsWidths.size()) {
+			std::cout << "!!!!! Error: contour:" << blocks[i].sidewalkContour.size() << ", width: " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
 			blocks.blocks.erase(blocks.blocks.begin() + i);
 		}
-		else if (blocks[i].sidewalkContour.contour.size() < 3) {
+		else if (blocks[i].sidewalkContour.size() < 3) {
 			std::cout << "!!!!! Error: Contour <3 " << "\n";
 			blocks.blocks.erase(blocks.blocks.begin() + i);
 		}
@@ -318,7 +318,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	// This problem is caused by the computeInset() function.
 	// ToDo: fix the computeInset function.
 	for (int i = 0; i < blocks.size(); ) {
-		if (blocks[i].sidewalkContour.contour.size() < 3) {
+		if (blocks[i].sidewalkContour.size() < 3) {
 			blocks.blocks.erase(blocks.blocks.begin() + i);
 		}
 		else {
@@ -375,10 +375,10 @@ void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& bloc
 		// If the block is below sea level, or on a steep terain, make it invalid or park.
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
-		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
-			int next_pi = (pi + 1) % blocks[i].sidewalkContour.contour.size();
+		for (int pi = 0; pi < blocks[i].sidewalkContour.size(); ++pi) {
+			int next_pi = (pi + 1) % blocks[i].sidewalkContour.size();
 			for (int k = 0; k <= 20; ++k) {
-				QVector3D pt = blocks[i].sidewalkContour.contour[pi] * (float)(20 - k) * 0.05 + blocks[i].sidewalkContour.contour[next_pi] * (float)k * 0.05;
+				QVector3D pt = blocks[i].sidewalkContour[pi] * (float)(20 - k) * 0.05 + blocks[i].sidewalkContour[next_pi] * (float)k * 0.05;
 				float z = renderManager->getTerrainHeight(pt.x(), pt.y());
 				min_z = std::min(min_z, z);
 				max_z = std::max(max_z, z);
@@ -428,8 +428,8 @@ void VBOPmBlocks::saveBlockImage(const RoadGraph& roads, const Polygon3D& contou
 		}
 	}
 
-	for (int i = 0; i < contour.contour.size(); ++i) {
-		int next = (i + 1) % contour.contour.size();
+	for (int i = 0; i < contour.size(); ++i) {
+		int next = (i + 1) % contour.size();
 		int x1 = contour.contour[i].x() - bbox.minPt.x();
 		int y1 = img.rows - (contour.contour[i].y() - bbox.minPt.y());
 		int x2 = contour.contour[next].x() - bbox.minPt.x();

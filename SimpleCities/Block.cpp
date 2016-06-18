@@ -8,20 +8,20 @@ void Block::clear() {
 	this->myParcels.clear();
 }
 
-void Block::findParcelFrontAndBackEdges(const Parcel &inParcel, std::vector<int> &frontEdges, std::vector<int> &rearEdges, std::vector<int> &sideEdges) {
+void Block::findParcelFrontAndBackEdges(const Parcel& inParcel, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges) {
 	frontEdges.clear();
 	rearEdges.clear();
 	sideEdges.clear();
 
 	float kDistTol = 0.01f;
 
-	for (int i = 0; i < inParcel.parcelContour.contour.size(); ++i) {
-		int next = ((i+1)) % inParcel.parcelContour.contour.size();
+	for (int i = 0; i < inParcel.parcelContour.size(); ++i) {
+		int next = ((i + 1)) % inParcel.parcelContour.size();
 
-		QVector3D midPt = 0.5f*(inParcel.parcelContour.contour.at(i) + inParcel.parcelContour.contour.at(next));
+		QVector3D midPt = (inParcel.parcelContour[i] + inParcel.parcelContour[next]) * 0.5f;
 
-		float distPtThis = blockContour.distanceXYToPoint(inParcel.parcelContour.contour.at(i));
-		float distPtNext = blockContour.distanceXYToPoint(inParcel.parcelContour.contour.at(next));
+		float distPtThis = blockContour.distanceXYToPoint(inParcel.parcelContour[i]);
+		float distPtNext = blockContour.distanceXYToPoint(inParcel.parcelContour[next]);
 		float distPtMid = blockContour.distanceXYToPoint(midPt);
 		int numPtsThatAreClose = (int)(distPtThis < kDistTol) + (int)(distPtMid < kDistTol) + (int)(distPtNext < kDistTol);
 

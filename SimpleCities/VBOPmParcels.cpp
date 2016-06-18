@@ -36,18 +36,16 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 		subdivideParcel(tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
 	}
 
-	Block::parcelGraphVertexDesc tmpPGVD;
 	for (int i = 0; i < tmpParcels.size(); ++i) {
-		//add parcel to block parcels graph
-		tmpPGVD = boost::add_vertex(block.myParcels);
-		block.myParcels[tmpPGVD] = tmpParcels[i];
+		//add parcel to block
+		block.myParcels.push_back(tmpParcels[i]);
 
-		if (block.myParcels[tmpPGVD].parcelContour.isClockwise()) {
-			std::reverse(block.myParcels[tmpPGVD].parcelContour.contour.begin(), block.myParcels[tmpPGVD].parcelContour.contour.end());
+		if (block.myParcels.back().parcelContour.isClockwise()) {
+			std::reverse(block.myParcels.back().parcelContour.contour.begin(), block.myParcels.back().parcelContour.contour.end());
 		}
 
 		if (Util::genRand() < 0.05) {
-			block.myParcels[tmpPGVD].isPark = true;
+			block.myParcels.back().isPark = true;
 		}
 	}
 }

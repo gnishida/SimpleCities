@@ -25,12 +25,10 @@
 #endif//BOOST_TYPEOF_SILENT
 
 
-
 /**
 * Geometry.
 * Classes and functions for geometric data
 **/
-
 class Loop3D : public std::vector<QVector3D> {
 public:
 	bool isPointWithinLoop(const QVector3D& pt) const;
@@ -63,6 +61,8 @@ public:
 	const QVector3D& operator[](const int idx) const {
 		return contour.at(idx);
 	}
+
+	size_t size() const { return contour.size(); }
 
 	void push_back(const QVector3D &pt) {
 		contour.push_back(pt);

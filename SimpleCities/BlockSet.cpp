@@ -6,7 +6,7 @@
 int BlockSet::selectBlock(const QVector2D& pos) {
 	for (int i = 0; i < blocks.size(); ++i) {
 		Polygon2D polygon;
-		for (int j = 0; j < blocks[i].blockContour.contour.size(); ++j) {
+		for (int j = 0; j < blocks[i].blockContour.size(); ++j) {
 			polygon.push_back(QVector2D(blocks[i].blockContour[j]));
 		}
 		polygon.correct();
@@ -24,17 +24,16 @@ int BlockSet::selectBlock(const QVector2D& pos) {
 
 std::pair<int, int> BlockSet::selectParcel(const QVector2D& pos) {
 	for (int i = 0; i < blocks.size(); ++i) {
-		Block::parcelGraphVertexIter vi, viEnd;
-		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
+		for (int j = 0; j < blocks[i].myParcels.size(); ++j) {
 			Polygon2D polygon;
-			for (int j = 0; j < blocks[i].myParcels[*vi].parcelContour.contour.size(); ++j) {
-				polygon.push_back(QVector2D(blocks[i].myParcels[*vi].parcelContour[j]));
+			for (int k = 0; k < blocks[i].myParcels[j].parcelContour.size(); ++k) {
+				polygon.push_back(QVector2D(blocks[i].myParcels[j].parcelContour[k]));
 			}
 			polygon.correct();
 
 			if (polygon.contains(pos)) {
 				selectedBlockIndex = i;
-				selectedParcelIndex = *vi;
+				selectedParcelIndex = j;
 
 				return std::make_pair(selectedBlockIndex, selectedParcelIndex);
 			}

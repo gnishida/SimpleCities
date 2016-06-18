@@ -22,15 +22,14 @@
 bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_building");
 		
-	Block::parcelGraphVertexIter vi, viEnd;
 	for (int bN = 0; bN < blocks.size(); bN++) {
 		if (blocks[bN].isPark) continue;
 
-		for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {
-			if (blocks[bN].myParcels[*vi].isPark) continue;
-			if (blocks[bN].myParcels[*vi].myBuilding.buildingFootprint.contour.size() < 3) continue;
+		for (int pN = 0; pN < blocks[bN].myParcels.size(); ++pN) {
+			if (blocks[bN].myParcels[pN].isPark) continue;
+			if (blocks[bN].myParcels[pN].myBuilding.buildingFootprint.size() < 3) continue;
 
-			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].myParcels[*vi].myBuilding);		
+			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].myParcels[pN].myBuilding);
 		}
 	}
 	printf("Building generation is done.\n");

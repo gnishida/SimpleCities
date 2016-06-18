@@ -9,11 +9,9 @@
 
 bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
-		Block::parcelGraphVertexIter vi, viEnd;
-
-		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
-			if (!generateParcelBuildings(rendManager, blocks[i], blocks[i].myParcels[*vi])) {
-				blocks[i].myParcels[*vi].isPark = true;
+		for (int j = 0; j < blocks[i].myParcels.size(); ++j) {
+			if (!generateParcelBuildings(rendManager, blocks[i], blocks[i].myParcels[j])) {
+				blocks[i].myParcels[j].isPark = true;
 			}
 		}
 	}
@@ -55,15 +53,12 @@ bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Bloc
 	if (obbSize.x() > obbSize.y() * 10 || obbSize.y() > obbSize.x() * 10) return false;
 
 	// set the elevation
-	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.contour.size(); ++i) {
+	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.size(); ++i) {
 		inParcel.myBuilding.buildingFootprint[i].setZ(0.0f);
 	}
 
 	// Set building attributes
 	inParcel.myBuilding.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
-	if (inParcel.myBuilding.numStories != 5) {
-		int xxx = 0;
-	}
 	float c = rand() % 192;
 	inParcel.myBuilding.color = QColor(c, c, c);
 	inParcel.myBuilding.bldType = 1;

@@ -588,8 +588,8 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 	float min_elev = std::numeric_limits<float>::max();
 	float max_elev = -std::numeric_limits<float>::max();
 
-	for (int k = 0; k < building.buildingFootprint.contour.size(); ++k) {
-		float z = rendManager.getTerrainHeight(building.buildingFootprint.contour[k].x(), building.buildingFootprint.contour[k].y());
+	for (int k = 0; k < building.buildingFootprint.size(); ++k) {
+		float z = rendManager.getTerrainHeight(building.buildingFootprint[k].x(), building.buildingFootprint[k].y());
 		min_elev = std::min(min_elev, z);
 		max_elev = std::max(max_elev, z);
 	}

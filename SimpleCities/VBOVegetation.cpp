@@ -104,22 +104,20 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 					rendManager.addStreetElementModel("tree",addTree(pos));
 				}
 			}
-		} else {
-			Block::parcelGraphVertexIter vi, viEnd;
-			
-			for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {
-				if (!blocks[bN].myParcels[*vi].isPark) continue;
+		} else {			
+			for (int pN = 0; pN < blocks[bN].myParcels.size(); ++pN) {
+				if (!blocks[bN].myParcels[pN].isPark) continue;
 				
 				QVector3D minCorner, maxCorner;
-				Polygon3D::getLoopAABB(blocks[bN].myParcels[*vi].parcelContour.contour, minCorner, maxCorner);
-				int numTreesInParcel = blocks[bN].myParcels[*vi].parcelContour.area() * treesPerSqMeter;
+				Polygon3D::getLoopAABB(blocks[bN].myParcels[pN].parcelContour.contour, minCorner, maxCorner);
+				int numTreesInParcel = blocks[bN].myParcels[pN].parcelContour.area() * treesPerSqMeter;
 
 				for(int i=0; i<numTreesInParcel; ++i){	
 					QVector3D pos;
 					pos.setX(Util::genRand(minCorner.x(), maxCorner.x()));
 					pos.setY(Util::genRand(minCorner.y(), maxCorner.y()));
 					pos.setZ(deltaZ);
-					if (blocks[bN].myParcels[*vi].parcelContour.isPointWithinLoop(pos)) {
+					if (blocks[bN].myParcels[pN].parcelContour.isPointWithinLoop(pos)) {
 						rendManager.addStreetElementModel("tree",addTree(pos));
 					}
 				}

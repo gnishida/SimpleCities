@@ -272,8 +272,7 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 			
 			Parcel parcel;
 			parcel.parcelContour = block.blockContour;
-			Block::parcelGraphVertexDesc pvd = boost::add_vertex(block.myParcels);
-			block.myParcels[pvd] = parcel;
+			block.myParcels.push_back(parcel);
 
 			blocks.blocks.push_back(block);
 
@@ -290,10 +289,9 @@ void UrbanGeometry::saveParcels(const std::string& filename) {
 
 	gs::Shape shape(wkbPolygon);
 	for (int i = 0; i < blocks.blocks.size(); ++i) {
-		Block::parcelGraphVertexIter vi, viEnd;
-		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
+		for (int pN = 0; pN < blocks.blocks[i].myParcels.size(); ++pN) {
 			// make a closed clockwise polygon
-			Loop3D contour = blocks[i].myParcels[*vi].parcelContour.contour;
+			Loop3D contour = blocks[i].myParcels[pN].parcelContour.contour;
 			if (contour.size() < 3) continue;
 			if (!contour.isClockwise()) {
 				std::reverse(contour.begin(), contour.end());
@@ -390,11 +388,11 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 	// remove the building that is within the other buildings
 	for (int i = 0; i < buildings.size(); ) {
 		bool inside = false;
-		for (int k = 0; k < buildings[i].buildingFootprint.contour.size() && !inside; ++k) {
+		for (int k = 0; k < buildings[i].buildingFootprint.size() && !inside; ++k) {
 			for (int j = 0; j < buildings.size(); ++j) {
 				if (i == j) continue;
 
-				if (buildings[j].buildingFootprint.isPointWithinLoop(buildings[i].buildingFootprint.contour[k])) {
+				if (buildings[j].buildingFootprint.isPointWithinLoop(buildings[i].buildingFootprint[k])) {
 					inside = true;
 					break;
 				}
@@ -419,19 +417,18 @@ void UrbanGeometry::saveBuildings(const std::string& filename) {
 	for (int i = 0; i < blocks.blocks.size(); ++i) {
 		if (blocks[i].isPark) continue;
 
-		Block::parcelGraphVertexIter vi, viEnd;
-		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
-			if (blocks[i].myParcels[*vi].isPark) continue;
-			if (blocks[i].myParcels[*vi].myBuilding.buildingFootprint.contour.size() < 3) continue;
+		for (int j = 0; j < blocks[i].myParcels.size(); ++j) {
+			if (blocks[i].myParcels[j].isPark) continue;
+			if (blocks[i].myParcels[j].myBuilding.buildingFootprint.size() < 3) continue;
 
 			gs::ShapeObject shapeObject;
 			shapeObject.parts.resize(1);
 
 			// set height in the attribute field
-			shapeObject.attributes["NbreEtages"] = std::to_string(blocks[i].myParcels[*vi].myBuilding.numStories);
+			shapeObject.attributes["NbreEtages"] = std::to_string(blocks[i].myParcels[j].myBuilding.numStories);
 
 			// make a closed clockwise polygon
-			Loop3D contour = blocks[i].myParcels[*vi].myBuilding.buildingFootprint.contour;
+			Loop3D contour = blocks[i].myParcels[j].myBuilding.buildingFootprint.contour;
 			if (!contour.isClockwise()) {
 				std::reverse(contour.begin(), contour.end());
 
