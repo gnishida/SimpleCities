@@ -341,12 +341,6 @@
     <ClInclude Include="VBOVegetation.h">
       <Filter>VBO</Filter>
     </ClInclude>
-    <ClInclude Include="Camera2D.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="RoadMeshGenerator.h">
       <Filter>VBO</Filter>
     </ClInclude>
@@ -379,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="Block.h">
       <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

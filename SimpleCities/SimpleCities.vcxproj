@@ -267,13 +267,12 @@
     <ClInclude Include="BBox.h" />
     <ClInclude Include="BlockMeshGenerator.h" />
     <ClInclude Include="BlockSet.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="gisutils.h" />
     <ClInclude Include="GShapefile.h" />
     <ClInclude Include="PMRoadGenerator.h" />
     <ClInclude Include="Polyline2D.h" />
     <ClInclude Include="RoadMeshGenerator.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Camera2D.h" />
     <ClInclude Include="nvModel\nvMath.h" />
     <ClInclude Include="nvModel\nvMatrix.h" />
     <ClInclude Include="nvModel\nvModel.h" />

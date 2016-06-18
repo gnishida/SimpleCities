@@ -27,26 +27,12 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 
 	camera.resetCamera();
 
-	spaceRadius = 30000.0;
-	farPlaneToSpaceRadiusFactor = 5.0f;//N 5.0f
-
-	rotationSensitivity = 0.4f;
-	zoomSensitivity = 10.0f;
-
 	ctrlPressed = false;
 	shiftPressed = false;
 	altPressed = false;
 
 	camera.setRotation(0, 0, 0);
 	camera.setTranslation(0, 0, G::getFloat("MAX_Z"));//6000);
-}
-
-QSize GLWidget3D::minimumSizeHint() const {
-	return QSize(200, 200);
-}
-
-QSize GLWidget3D::sizeHint() const {
-	return QSize(400, 400);
 }
 
 void GLWidget3D::mousePressEvent(QMouseEvent *event) {
@@ -120,16 +106,12 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 			shadow.makeShadowMap(this);
 		}
 	} else if (ctrlPressed) {	// Rotate
-		camera.changeXRotation(rotationSensitivity * dy);
-		camera.changeZRotation(rotationSensitivity * dx);
+		camera.changeXRotation(dy * 0.4);
+		camera.changeZRotation(dx * 0.4);
 		updateCamera();
 		lastPos = event->pos();
 	} else if (event->buttons() & Qt::LeftButton) {	// Translate
-		camera.changeXYZTranslation(-dx, dy, 0);
-		updateCamera();
-		lastPos = event->pos();
-	} else if (event->buttons() & Qt::RightButton) {	// Zoom
-		camera.changeXYZTranslation(0, 0, -zoomSensitivity * dy);
+		camera.changeLookAt(-dx, dy, 0);
 		updateCamera();
 		lastPos = event->pos();
 	}
@@ -354,12 +336,11 @@ void GLWidget3D::mouseTo2D(int x,int y, QVector2D& result) {
 
 // this method should be called after any camera transformation (perspective or modelview)
 // it will update viewport, perspective, view matrix, and update the uniforms
-void GLWidget3D::updateCamera(){
+void GLWidget3D::updateCamera() {
 	// update matrices
 	int height = this->height() ? this->height() : 1;
 	glViewport(0, 0, (GLint)this->width(), (GLint)this->height());
 	camera.updatePerspective(this->width(),height);
-	camera.updateCamMatrix();
 
 	// update uniforms
 	float mvpMatrixArray[16];

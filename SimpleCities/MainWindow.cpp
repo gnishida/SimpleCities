@@ -156,44 +156,37 @@ void MainWindow::onClear() {
 }
 
 void MainWindow::onSaveImage() {
-	if(QDir("screenshots").exists()==false) QDir().mkdir("screenshots");
-	QString fileName="screenshots/"+QDate::currentDate().toString("yyMMdd")+"_"+QTime::currentTime().toString("HHmmss")+".png";
+	if (!QDir("screenshots").exists()) QDir().mkdir("screenshots");
+	QString fileName = "screenshots/" + QDate::currentDate().toString("yyMMdd") + "_" + QTime::currentTime().toString("HHmmss") + ".png";
 	glWidget->grabFrameBuffer().save(fileName);
-	printf("Save %s\n", fileName.toUtf8().constData());
-}//
+}
 
 void MainWindow::onSaveImageHD() {
-	if(QDir("screenshots").exists()==false) QDir().mkdir("screenshots");
-	QString fileName="screenshots/"+QDate::currentDate().toString("yyMMdd")+"_"+QTime::currentTime().toString("HHmmss")+".png";
-	glWidget->grabFrameBuffer().save(fileName);
-
-	QString fileNameHD="screenshots/"+QDate::currentDate().toString("yyMMdd")+"_"+QTime::currentTime().toString("HHmmss")+"_HD.png";
-	int cH=glWidget->height();
-	int cW=glWidget->width();
-	glWidget->resize(cW*3,cH*3);
+	if (!QDir("screenshots").exists()) QDir().mkdir("screenshots");
+	QString fileName = "screenshots/" + QDate::currentDate().toString("yyMMdd") + "_" + QTime::currentTime().toString("HHmmss") + "_HD.png";
+	int cH = glWidget->height();
+	int cW = glWidget->width();
+	glWidget->resize(cW * 3, cH * 3);
 	glWidget->updateGL();
-	glWidget->grabFrameBuffer().save(fileNameHD);
+	glWidget->grabFrameBuffer().save(fileName);
 	glWidget->resize(cW,cH);
 	glWidget->updateGL();
-
-	printf("Save HD %s\n", fileName.toUtf8().constData());
-}//
+}
 
 void MainWindow::onLoadCamera() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Camera file..."), "", tr("Area Files (*.cam)"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Camera file..."), "", tr("Camera files (*.cam)"));
 	if (filename.isEmpty()) return;
 
-	glWidget->camera.loadCameraPose(filename);
+	glWidget->camera.loadCameraPose(filename.toUtf8().constData());
 	glWidget->updateCamera();
-
 	glWidget->updateGL();
 }
 
 void MainWindow::onSaveCamera() {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Camera file..."), "", tr("Area Files (*.cam)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save Camera file..."), "", tr("Camera files (*.cam)"));
 	if (filename.isEmpty()) return;
 	
-	glWidget->camera.saveCameraPose(filename);
+	glWidget->camera.saveCameraPose(filename.toUtf8().constData());
 }
 
 void MainWindow::onResetCamera() {

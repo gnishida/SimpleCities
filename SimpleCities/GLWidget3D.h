@@ -24,7 +24,6 @@ This file is part of QtUrban.
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include "Camera.h"
-#include "Camera2D.h"
 #include "RoadGraph.h"
 
 class MainWindow;
@@ -32,16 +31,12 @@ class MainWindow;
 class GLWidget3D : public QGLWidget {
 public:
 	MainWindow* mainWin;
-	Camera2D camera;
+	Camera camera;
 
 	bool shiftPressed;
 	bool ctrlPressed;
 	bool altPressed;
 	QPoint lastPos;
-	float farPlaneToSpaceRadiusFactor;
-	float spaceRadius;
-	float rotationSensitivity;
-	float zoomSensitivity;
 
 	VBORenderManager vboRenderManager;
 	GLWidgetSimpleShadow shadow;
@@ -49,8 +44,6 @@ public:
 public:
 	GLWidget3D(MainWindow* parent);
 
-	QSize minimumSizeHint() const;
-	QSize sizeHint() const;
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
 	void mouseTo2D(int x, int y, QVector2D& result);
