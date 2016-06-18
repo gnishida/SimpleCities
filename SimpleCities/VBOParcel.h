@@ -49,9 +49,9 @@ public:
 	}
 
 	void initializeParcel() {
-		if(parcelContour.contour.size()>0){
+		/*if(parcelContour.contour.size()>0){
 			boost::geometry::correct(parcelContour.contour);
-		}
+		}*/
 
 		//parcelContour.getBBox3D(bbox.minPt, bbox.maxPt);
 	}

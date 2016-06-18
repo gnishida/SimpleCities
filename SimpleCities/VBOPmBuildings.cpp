@@ -113,30 +113,23 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,	std::vec
  * 指定されたParcelの中に、ビルを建てる。
  */
 bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel) {
-	float probEmptyParcel = 0.0f;
 	Loop3D pContourCpy;
 
-	//if parcel is park, process
-	if (inParcel.isPark) { //park
-		return false;
+	if (inParcel.parcelContour.isClockwise()) {
+		int xxx = 0;
 	}
+	
+	if (inParcel.isPark) return false;
 
-	//Compute parcel frontage
+	// Compute parcel frontage
 	std::vector<int> frontEdges;
 	std::vector<int> rearEdges;
 	std::vector<int> sideEdges;
 
-	pContourCpy.clear();
-	pContourCpy = inParcel.parcelContour.contour;
-	inParcel.parcelContour.contour.clear();
-	
-	Polygon3D::cleanLoop(pContourCpy, inParcel.parcelContour.contour, 1.0f);
-	Polygon3D::reorientFace(inParcel.parcelContour.contour);
-
 	inBlock.findParcelFrontAndBackEdges(inBlock, inParcel, frontEdges, rearEdges, sideEdges);
 
 	// Compute buildable area polygon
-	float bldgFootprintArea = inParcel.computeBuildableArea(G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges,	inParcel.parcelBuildableAreaContour.contour);
+	inParcel.computeBuildableArea(G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges, inParcel.parcelBuildableAreaContour.contour);
 	if (inParcel.parcelBuildableAreaContour.contour.size() == 0) return false;
 	if (inParcel.parcelBuildableAreaContour.isSelfIntersecting()) {
 		inParcel.parcelBuildableAreaContour.contour.clear();

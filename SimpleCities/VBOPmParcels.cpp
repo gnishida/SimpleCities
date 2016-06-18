@@ -43,6 +43,10 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 		tmpPGVD = boost::add_vertex(block.myParcels);
 		block.myParcels[tmpPGVD] = tmpParcels[i];
 
+		if (block.myParcels[tmpPGVD].parcelContour.isClockwise()) {
+			std::reverse(block.myParcels[tmpPGVD].parcelContour.contour.begin(), block.myParcels[tmpPGVD].parcelContour.contour.end());
+		}
+
 		if (Util::genRand() < 0.05) {
 			block.myParcels[tmpPGVD].isPark = true;
 		}

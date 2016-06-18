@@ -39,11 +39,7 @@ void Block::buildableAreaMock(void)
 	}
 }
 
-void Block::findParcelFrontAndBackEdges(Block &inBlock, Parcel &inParcel,
-	std::vector<int> &frontEdges,
-	std::vector<int> &rearEdges,
-	std::vector<int> &sideEdges )
-{
+void Block::findParcelFrontAndBackEdges(Block &inBlock, Parcel &inParcel, std::vector<int> &frontEdges, std::vector<int> &rearEdges, std::vector<int> &sideEdges) {
 	QVector3D midPt;
 	typedef boost::geometry::model::d2::point_xy<double> point_2d;
 	point_2d bg_midPt;
@@ -63,9 +59,8 @@ void Block::findParcelFrontAndBackEdges(Block &inBlock, Parcel &inParcel,
 	float distPtMid;
 	float kDistTol = 0.01f;
 
-	for(int i=0; i<inParcel.parcelContour.contour.size(); ++i)
-	{
-		next = ((i+1))%inParcel.parcelContour.contour.size();
+	for (int i = 0; i < inParcel.parcelContour.contour.size(); ++i) {
+		next = ((i+1)) % inParcel.parcelContour.contour.size();
 
 		midPt = 0.5f*(inParcel.parcelContour.contour.at(i) +
 			inParcel.parcelContour.contour.at(next));
