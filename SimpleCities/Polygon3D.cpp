@@ -146,9 +146,9 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 
 	if (cSz < 3) return 0.0f;
 
-	if (reorientFace(cleanPgon)){				
+	/*if (reorientFace(cleanPgon)){				
 		std::reverse(offsetDistances.begin(), offsetDistances.end() - 1);
-	}
+	}*/
 
 	//if offsets are zero, add a small epsilon just to avoid division by zero
 	for(size_t i=0; i<offsetDistances.size(); ++i){
@@ -158,39 +158,78 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	}
 
 	QVector3D intPt;
-	
-	// ToDo: We should improve this logic to make it more stable.
-	pgonInset.clear();
-	for(int cur=0; cur<cSz; ++cur){
-		//Some geometry and trigonometry
 
-		//point p1 is the point with index cur
-		prev = (cur-1+cSz)%cSz; //point p0
-		next = (cur+1)%cSz;	  //point p2
+	if (offsetDistances[0] > 0) {	// 内側へのoffsetの計算（Block生成、footprint生成などに使用）
+		// ToDo: We should improve this logic to make it more stable.
+		pgonInset.clear();
+		for (int cur = 0; cur<cSz; ++cur){
+			//Some geometry and trigonometry
 
-		if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
-			// For deanend edge
-			QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
-			QVector3D vec2(-vec.y(), vec.x(), 0);
+			//point p1 is the point with index cur
+			prev = (cur - 1 + cSz) % cSz; //point p0
+			next = (cur + 1) % cSz;	  //point p2
 
-			float angle = atan2f(vec2.y(), vec2.x());
-			for (int i = 0; i <= 10; ++i) {
-				float a = angle - (float)i * M_PI / 10.0f;
-				intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
-				pgonInset.push_back(intPt);
-			}
-		} else {
-			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-			
+			if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
+				// For deanend edge
+				QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
+				QVector3D vec2(-vec.y(), vec.x(), 0);
 
-			// For acute angle
-			if (pgonInset.size() >= 2) {
-				if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
-					pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
+				float angle = atan2f(vec2.y(), vec2.x());
+				for (int i = 0; i <= 10; ++i) {
+					float a = angle - (float)i * M_PI / 10.0f;
+					intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
+					pgonInset.push_back(intPt);
 				}
 			}
+			else {
+				Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
+				
+				// For acute angle
+				/*if (pgonInset.size() >= 2) {
+					if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
+						pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
+					}
+				}*/
 
-			pgonInset.push_back(intPt);
+				pgonInset.push_back(intPt);
+			}
+		}
+	}
+	else {	// 外側へのoffsetの計算（ビルの屋根などで使用）
+		// ToDo: We should improve this logic to make it more stable.
+		pgonInset.clear();
+		for (int cur = 0; cur<cSz; ++cur){
+			//Some geometry and trigonometry
+
+			//point p1 is the point with index cur
+			prev = (cur - 1 + cSz) % cSz; //point p0
+			next = (cur + 1) % cSz;	  //point p2
+
+			if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
+				// For deanend edge
+				QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
+				QVector3D vec2(-vec.y(), vec.x(), 0);
+
+				float angle = atan2f(vec2.y(), vec2.x());
+				for (int i = 0; i <= 10; ++i) {
+					float a = angle - (float)i * M_PI / 10.0f;
+					intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
+					pgonInset.push_back(intPt);
+				}
+			}
+			else {
+				Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
+
+
+				// For acute angle
+				if (pgonInset.size() >= 2) {
+					if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
+						pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
+					}
+				}
+
+				pgonInset.push_back(intPt);
+			}
 		}
 	}
 	
@@ -203,6 +242,35 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 
 		if (boost::geometry::intersects(bg_contour_inset)) {
 			return computeInset2(offsetDistances[0], pgonInset, computeArea);
+		}
+		else {
+			// 内側へのinsetなのに、areaが大きくなった場合は、CGALを利用する。
+			if (offsetDistances[0] > 0) {
+				if (pgonInset.area() > contour.area()) {
+					return computeInset2(offsetDistances[0], pgonInset, computeArea);
+				}
+			}
+
+			// 元のポリゴンと交差する場合は、CGALを利用する
+			bool intersected = false;
+			for (int i = 0; i < pgonInset.size() && !intersected; ++i) {
+				int next = (i + 1) % pgonInset.size();
+
+				for (int j = 0; j < contour.size(); ++j) {
+					int next2 = (j + 1) % contour.size();
+
+					float tab, tcd;
+					QVector3D intPoint;
+					if (Util::segmentSegmentIntersectXY3D(pgonInset[i], pgonInset[next], contour[j], contour[next2], &tab, &tcd, true, intPoint)) {
+						intersected = true;
+						break;
+					}
+				}
+			}
+
+			if (intersected) {
+				return computeInset2(offsetDistances[0], pgonInset, computeArea);
+			}
 		}
 	}
 	
