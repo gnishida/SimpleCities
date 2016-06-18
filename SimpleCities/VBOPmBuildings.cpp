@@ -35,7 +35,7 @@ bool VBOPmBuildings::generateParcelBuildings(VBORenderManager& rendManager, Bloc
 	std::vector<int> rearEdges;
 	std::vector<int> sideEdges;
 
-	inBlock.findParcelFrontAndBackEdges(inBlock, inParcel, frontEdges, rearEdges, sideEdges);
+	inBlock.findParcelFrontAndBackEdges(inParcel, frontEdges, rearEdges, sideEdges);
 
 	// Compute buildable area polygon
 	Loop3D footprint;

@@ -37,6 +37,7 @@ public:
 	bool isClockwise() const;
 	float area() const;
 	bool isSelfIntersecting() const;
+	float distanceXYToPoint(const QVector3D& pt) const;
 };
 
 /**
@@ -63,33 +64,12 @@ public:
 		return contour.at(idx);
 	}
 
-	inline void push_back(const QVector3D &pt) {
+	void push_back(const QVector3D &pt) {
 		contour.push_back(pt);
 	}
 
-	inline void getBBox3D(QVector3D &ptMin, QVector3D &ptMax)
-	{
-		ptMin.setX(FLT_MAX);
-		ptMin.setY(FLT_MAX);
-		ptMin.setZ(FLT_MAX);
-		ptMax.setX(-FLT_MAX);
-		ptMax.setY(-FLT_MAX);
-		ptMax.setZ(-FLT_MAX);
-
-		for(size_t i=0; i<contour.size(); ++i){
-			if(contour[i].x() < ptMin.x()){ ptMin.setX(contour[i].x()); }
-			if(contour[i].y() < ptMin.y()){ ptMin.setY(contour[i].y()); }
-			if(contour[i].z() < ptMin.z()){ ptMin.setZ(contour[i].z()); }
-
-			if(contour[i].x() > ptMax.x()){ ptMax.setX(contour[i].x()); }
-			if(contour[i].y() > ptMax.y()){ ptMax.setY(contour[i].y()); }
-			if(contour[i].z() > ptMax.z()){ ptMax.setZ(contour[i].z()); }
-		}
-	}
-
-	//Is self intersecting
+	void getBBox3D(QVector3D &ptMin, QVector3D &ptMax) const;
 	bool isSelfIntersecting() const;
-
 	BBox envelope() const;
 	float area() const;
 
@@ -101,8 +81,6 @@ public:
 	float computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea = true) const;
 	float computeInset2(float offsetDistance, Loop3D& pgonInset, bool computeArea = true) const;
 	float computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea = true) const;
-
-	float computeArea(bool parallelToXY = false);
 
 	bool isPointWithinLoop(const QVector3D& pt) const {
 		return contour.isPointWithinLoop(pt);
@@ -122,11 +100,7 @@ public:
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);
 
-	static bool segmentSegmentIntersectXY(QVector2D &a, QVector2D &b, QVector2D &c, QVector2D &d,
-		float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint);
-
-	//Shortest distance from a point to a polygon
-	static float distanceXYToPoint(Loop3D &pin, QVector3D &pt);
+	float distanceXYToPoint(const QVector3D &pt);
 
 	static bool getIrregularBisector(QVector3D &p0, QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt);
 

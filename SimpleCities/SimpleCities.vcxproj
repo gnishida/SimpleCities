@@ -143,6 +143,7 @@
     <ClCompile Include="nvModel\nvModelObj.cpp" />
     <ClCompile Include="nvModel\nvModelQuery.cpp" />
     <ClCompile Include="PMRoadGenerator.cpp" />
+    <ClCompile Include="Polyline2D.cpp" />
     <ClCompile Include="RoadMeshGenerator.cpp" />
     <ClCompile Include="ControlWidget.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_ControlWidget.cpp">
@@ -195,7 +196,6 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
-    <ClCompile Include="Polyline2D.cpp" />
     <ClCompile Include="Polyline3D.cpp" />
     <ClCompile Include="PropertyWidget.cpp" />
     <ClCompile Include="RoadEdge.cpp" />
@@ -273,6 +273,7 @@
     <ClInclude Include="gisutils.h" />
     <ClInclude Include="GShapefile.h" />
     <ClInclude Include="PMRoadGenerator.h" />
+    <ClInclude Include="Polyline2D.h" />
     <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Camera2D.h" />
@@ -291,7 +292,6 @@
     <ClInclude Include="GraphUtil.h" />
     <ClInclude Include="Polygon2D.h" />
     <ClInclude Include="Polygon3D.h" />
-    <ClInclude Include="Polyline2D.h" />
     <ClInclude Include="Polyline3D.h" />
     <CustomBuild Include="TerrainSizeInputDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

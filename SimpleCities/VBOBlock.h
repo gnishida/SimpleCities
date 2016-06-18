@@ -34,10 +34,7 @@ public:
 	Block() : isPark(false), valid(true) {}
 
 	void clear();
-	void buildableAreaMock();
 
-	static void findParcelFrontAndBackEdges(Block &inBlock, Parcel &inParcel, std::vector<int> &frontEdges,	std::vector<int> &rearEdges, std::vector<int> &sideEdges);
-	
-	bool splitBlockParcelsWithRoadSegment(std::vector<QVector3D> &roadSegmentGeometry, float roadSegmentWidth, BBox3D roadSegmentBBox3D, std::list<Parcel> &blockParcels);
+	void findParcelFrontAndBackEdges(const Parcel& inParcel, std::vector<int> &frontEdges, std::vector<int> &rearEdges, std::vector<int> &sideEdges);
 };
 

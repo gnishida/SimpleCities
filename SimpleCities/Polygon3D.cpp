@@ -53,6 +53,21 @@ bool Loop3D::isSelfIntersecting() const {
 	return boost::geometry::intersects(bg_pgon);
 }
 
+float Loop3D::distanceXYToPoint(const QVector3D &pt) const {
+	float minDist = std::numeric_limits<float>::max();
+
+	for (size_t i = 0; i < size(); ++i) {
+		int next = (i + 1) % size();
+
+		QVector2D closestPt;
+		float dist = Util::pointSegmentDistanceXY(QVector2D(at(i)), QVector2D(at(next)), QVector2D(pt), closestPt);
+		if (dist < minDist) {
+			minDist = dist;
+		}
+	}
+	return minDist;
+}
+
 bool Polygon3D::isClockwise() const {
 	return contour.isClockwise();
 }
@@ -283,59 +298,6 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	}
 }
 
-const float MTC_FLOAT_TOL = 1e-6f;
-
-/**
-* Computes the intersection between two line segments on the XY plane
-* Segments must intersect within their extents for the intersection to be valid
-* z coordinate is ignored
-**/
-bool Polygon3D::segmentSegmentIntersectXY(QVector2D &a, QVector2D &b, QVector2D &c, QVector2D &d,
-	float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint)
-{
-	QVector2D u = b - a;
-	QVector2D v = d - c;
-
-	if( u.lengthSquared() < MTC_FLOAT_TOL  ||  v.lengthSquared() < MTC_FLOAT_TOL )
-	{
-		return false;
-	}
-
-	float numer = v.x()*(c.y()-a.y()) + v.y()*(a.x()-c.x());
-	float denom = u.y()*v.x() - u.x()*v.y();
-
-	if (denom == 0.0f)  {
-		// they are parallel
-		*tab = 0.0f;
-		*tcd = 0.0f;
-		return false;
-	}
-
-	float t0 = numer / denom;
-
-	QVector2D ipt = a + t0*u;
-	QVector2D tmp = ipt - c;
-	float t1;
-	if (QVector2D::dotProduct(tmp, v) > 0.0f){
-		t1 = tmp.length() / v.length();
-	}
-	else {
-		t1 = -1.0f * tmp.length() / v.length();
-	}
-
-	//Check if intersection is within segments
-	if( !( (t0 >= MTC_FLOAT_TOL) && (t0 <= 1.0f-MTC_FLOAT_TOL) && (t1 >= MTC_FLOAT_TOL) && (t1 <= 1.0f-MTC_FLOAT_TOL) ) ){
-		return false;
-	}
-
-	*tab = t0;
-	*tcd = t1;
-	QVector2D dirVec = b-a;
-
-	intPoint = a+(*tab)*dirVec;
-	return true;
-}
-
 void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat) {
 	pout = pin;
 	for (int i = 0; i < pin.size(); ++i) {
@@ -344,40 +306,36 @@ void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4&
 }
 
 //Only works for polygons with no holes in them
-bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2)
-{
+bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2) {
 	bool polylineIntersectsPolygon = false;
 
 	int plineSz = pline.size();
 	int contourSz = this->contour.size();
 
-	if(plineSz < 2 || contourSz < 3){
+	if (plineSz < 2 || contourSz < 3) {
 		//std::cout << "ERROR: Cannot split if polygon has fewer than three vertices of if polyline has fewer than two points\n.";
 		return false;
 	}
-
-	QVector2D tmpIntPt;
+		
 	QVector2D firstIntPt;
 	QVector2D secondIntPt;
-	float tPline, tPgon;
 	int firstIntPlineIdx    = -1;
 	int secondIntPlineIdx   = -1;
 	int firstIntContourIdx  = -1;
 	int secondIntContourIdx = -1;
 	int intCount = 0;
-
-
+	
 	//iterate along polyline
-	for(int i=0; i<plineSz-1; ++i){
-		int iNext = i+1;
+	for (int i = 0; i < plineSz - 1; ++i) {
+		int iNext = i + 1;
 
-		for(int j=0; j<contourSz; ++j){
-			int jNext = (j+1)%contourSz;
+		for (int j = 0; j < contourSz; ++j) {
+			int jNext = (j + 1) % contourSz;
 
-			if (segmentSegmentIntersectXY( QVector2D(pline[i]), QVector2D(pline[iNext]),
-				QVector2D(contour[j]), QVector2D(contour[jNext]),
-				&tPline, &tPgon, true, tmpIntPt) ) 
-			{
+			QVector2D tmpIntPt;
+			float tPline, tPgon;
+			if (Util::segmentSegmentIntersectXY(QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(contour[j]), QVector2D(contour[jNext]), &tPline, &tPgon, true, tmpIntPt)) {
+			//if (segmentSegmentIntersectXY( QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(contour[j]), QVector2D(contour[jNext]), &tPline, &tPgon, true, tmpIntPt)) {
 				polylineIntersectsPolygon = true;
 
 				//first intersection
@@ -650,78 +608,14 @@ float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool comp
 	return computeInset(offsetDistances, pgonInset, computeArea);
 }
 
-//Distance from segment ab to point c
-float pointSegmentDistanceXY(QVector3D& a, QVector3D& b, QVector3D& c, QVector3D& closestPtInAB) {
-	float dist;		
-
-	float r_numerator = (c.x()-a.x())*(b.x()-a.x()) + (c.y()-a.y())*(b.y()-a.y());
-	float r_denomenator = (b.x()-a.x())*(b.x()-a.x()) + (b.y()-a.y())*(b.y()-a.y());
-	float r = r_numerator / r_denomenator;
-	//
-	float px = a.x() + r*(b.x()-a.x());
-	float py = a.y() + r*(b.y()-a.y());
-	//    
-	float s =  ((a.y()-c.y())*(b.x()-a.x())-(a.x()-c.x())*(b.y()-a.y()) ) / r_denomenator;
-
-	float distanceLine = fabs(s)*sqrt(r_denomenator);
-
-	//
-	// (xx,yy) is the point on the lineSegment closest to (cx,cy)
-	//
-	closestPtInAB.setX(px);
-	closestPtInAB.setY(py);
-	closestPtInAB.setZ(0.0f);
-
-	if ( (r >= 0) && (r <= 1) )
-	{
-		dist = distanceLine;
-	}
-	else
-	{
-		float dist1 = (c.x()-a.x())*(c.x()-a.x()) + (c.y()-a.y())*(c.y()-a.y());
-		float dist2 = (c.x()-b.x())*(c.x()-b.x()) + (c.y()-b.y())*(c.y()-b.y());
-		if (dist1 < dist2)
-		{	
-			dist = sqrt(dist1);
-		}
-		else
-		{
-			dist = sqrt(dist2);
-		}
-	}
-
-	return abs(dist);
-}
-
-float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c)
-{
-	QVector3D closestPt;
-	return pointSegmentDistanceXY(a, b, c, closestPt);
-
-}
-
-//Shortest distance from a point to a polygon
-float Polygon3D::distanceXYToPoint(Loop3D &pin, QVector3D &pt)
-{
-	float minDist = FLT_MAX;
-	float dist;
-	int idxNext;
-
-	for(size_t i=0; i<pin.size(); ++i){
-		idxNext = (i+1)%(pin.size());
-		dist = pointSegmentDistanceXY(pin.at(i), pin.at(idxNext), pt);
-		if(dist < minDist){
-			minDist = dist;
-		}
-	}
-	return minDist;
+float Polygon3D::distanceXYToPoint(const QVector3D &pt) {
+	return contour.distanceXYToPoint(pt);
 }
 
 /**
 * @brief: Merge consecutive vertices that are within a distance threshold to each other
 **/
-int Polygon3D::cleanLoop(Loop3D &pin, Loop3D &pout, float threshold=1.0f)
-{	
+int Polygon3D::cleanLoop(Loop3D &pin, Loop3D &pout, float threshold=1.0f) {	
 	float thresholdSq = threshold*threshold;
 
 	if(pin.size()<3){
@@ -975,6 +869,25 @@ QVector3D Polygon3D::getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &m
 	}
 	return QVector3D(maxCorner - minCorner);
 }//
+
+void Polygon3D::getBBox3D(QVector3D &ptMin, QVector3D &ptMax) const {
+	ptMin.setX(FLT_MAX);
+	ptMin.setY(FLT_MAX);
+	ptMin.setZ(FLT_MAX);
+	ptMax.setX(-FLT_MAX);
+	ptMax.setY(-FLT_MAX);
+	ptMax.setZ(-FLT_MAX);
+
+	for (size_t i = 0; i < contour.size(); ++i) {
+		if (contour[i].x() < ptMin.x()) { ptMin.setX(contour[i].x()); }
+		if (contour[i].y() < ptMin.y()) { ptMin.setY(contour[i].y()); }
+		if (contour[i].z() < ptMin.z()) { ptMin.setZ(contour[i].z()); }
+
+		if (contour[i].x() > ptMax.x()) { ptMax.setX(contour[i].x()); }
+		if (contour[i].y() > ptMax.y()) { ptMax.setY(contour[i].y()); }
+		if (contour[i].z() > ptMax.z()) { ptMax.setZ(contour[i].z()); }
+	}
+}
 
 bool Polygon3D::isSelfIntersecting() const {
 	return contour.isSelfIntersecting();

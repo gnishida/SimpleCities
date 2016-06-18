@@ -103,9 +103,6 @@
     <ClCompile Include="Polygon3D.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="Polyline2D.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="Polyline3D.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -214,6 +211,9 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
+    <ClCompile Include="Polyline2D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -288,9 +288,6 @@
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="Polygon3D.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="Polyline2D.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="Polyline3D.h">
@@ -400,6 +397,9 @@
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polyline2D.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
