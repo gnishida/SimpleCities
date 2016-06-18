@@ -384,9 +384,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 
 			// 他のエッジにスナップ
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-			roads.graph[tgtDesc]->generationType = "snapped";
-			roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
-			roads.graph[tgtDesc]->properties.remove("example_desc");
 
 			// エッジを生成
 			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
@@ -406,8 +403,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 		if (!found) {
 			// 頂点を追加
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.back()));
-			v->generationType = "pm";
-			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			tgtDesc = GraphUtil::addVertex(roads, v);
 
 			// エリア外なら、onBoundaryフラグをセット
@@ -561,8 +556,6 @@ bool PMRoadGenerator::getVertexForSnapping(VBORenderManager& vboRenderManager, R
 		if (!roads.graph[*vi]->valid) continue;
 		if (*vi == srcDesc) continue;
 
-		if (roads.graph[*vi]->deadend) continue;
-
 		QVector2D vec = roads.graph[*vi]->pt - roads.graph[srcDesc]->pt;
 		float angle2 = atan2f(vec.y(), vec.x());
 		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
@@ -573,11 +566,6 @@ bool PMRoadGenerator::getVertexForSnapping(VBORenderManager& vboRenderManager, R
 		// snap先が水面下かチェック
 		float z = vboRenderManager.getMinTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
-
-		// 共にexampleの場合、元の座標での相対位置と同じなら、スナップしない
-		if (roads.graph[srcDesc]->generationType == "example" && roads.graph[*vi]->generationType == "example") {
-			// ToDo
-		}
 
 		// 既存エッジとの交差をチェック
 		Polyline2D polyline;
@@ -704,17 +692,12 @@ bool PMRoadGenerator::extendRoadAcrossRiver(RoadGraph& roads, VBORenderManager* 
 
 		// 他のエッジにスナップ
 		tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-		roads.graph[tgtDesc]->generationType = "snapped";
-		roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
-		roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
-		roads.graph[tgtDesc]->properties.remove("example_desc");
 
 		return false;
 	}
 	else {
 		// 頂点を追加
 		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(bestPt));
-		v->generationType = "pm";
 		tgtDesc = GraphUtil::addVertex(roads, v);
 
 		// エリア外なら、onBoundaryフラグをセット
@@ -841,12 +824,14 @@ void PMRoadGenerator::saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>&
 		}
 
 		// deadendを描画
+		/*
 		if (roads.graph[*vi]->deadend) {
 			cv::circle(img, cv::Point(x, y), 10, cv::Scalar(0, 0, 255), 3);
 		}
+		*/
 
 		// 頂点IDを描画
-		QString str = QString::number(*vi) + "/" + roads.graph[*vi]->properties["ex_id"].toString();
+		QString str = QString::number(*vi);// +"/" + roads.graph[*vi]->properties["ex_id"].toString();
 		cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 	}
 

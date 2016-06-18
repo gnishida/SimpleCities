@@ -11,7 +11,6 @@
 
 class RoadEdge {
 public:
-	static enum { SHAPE_DEFAULT = 0, SHAPE_GRID, SHAPE_RADIAL, SHAPE_PLAZA };
 	static enum { TYPE_OTHERS = 0, TYPE_STREET = 1, TYPE_AVENUE = 2, TYPE_BOULEVARD = 4, TYPE_HIGHWAY = 8 };
 
 public:
@@ -22,14 +21,8 @@ public:
 	bool roundabout;
 	Polyline2D polyline;
 	Polyline3D polyline3D;
-	QColor color;
-	QColor bgColor;
-	QString generationType;
 
 	bool valid;			// if this edge is valid
-	bool connector;		// if this edge is a connector or not
-
-	QHash<QString, QVariant> properties;
 
 public:
 	RoadEdge(unsigned int type, unsigned int lanes, bool oneWay = false, bool link = false, bool roundabout = false);

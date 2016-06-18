@@ -7,38 +7,7 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 	this->oneWay = oneWay;
 	this->link = link;
 	this->roundabout = roundabout;
-
-	this->color = QColor(255, 255, 255);
-
-	// initialize other members
 	this->valid = true;
-	this->connector = false;
-	this->generationType = "";
-
-	this->properties["seed"] = false;
-	this->properties["shapeType"] = SHAPE_DEFAULT;
-	this->properties["group"] = -1;
-	this->properties["gridness"] = 0.0f;
-	this->properties["fullyPaired"] = false;
-
-	// default color
-	switch (type) {
-	case TYPE_HIGHWAY:
-		color = QColor(255, 225, 104);
-		bgColor = QColor(229, 153, 21);
-		break;
-	case TYPE_BOULEVARD:
-	case TYPE_AVENUE:
-		//color = QColor(247, 247, 185);
-		//bgColor = QColor(203, 202, 149);
-		color = QColor(255, 225, 104);
-		bgColor = QColor(230, 197, 101);
-		break;
-	case TYPE_STREET:
-		color = QColor(255, 255, 255);
-		bgColor = QColor(222, 217, 207);
-		break;
-	}
 }
 
 RoadEdge::~RoadEdge() {

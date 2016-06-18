@@ -14,14 +14,7 @@ public:
 	bool valid;
 	bool fixed;
 	int type;
-	int patchId;
-	bool deadend;
 	bool onBoundary;
-	float rotationAngle;	// 反時計回りの回転角 [rad]
-	bool connector;
-	QString generationType;	// "example" / "pm" / "snapped"
-
-	QHash<QString, QVariant> properties;
 
 public:
 	RoadVertex();
