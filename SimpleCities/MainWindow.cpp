@@ -108,7 +108,7 @@ void MainWindow::onLoadRoads() {
 }
 
 void MainWindow::onSaveRoads() {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Street Map file..."), "", tr("StreetMap Files (*.gsm)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save roads..."), "", tr("Shapefiles Files (*.shp)"));
 	if (filename.isEmpty()) return;
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);

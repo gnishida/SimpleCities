@@ -222,8 +222,22 @@ void UrbanGeometry::loadRoads(const std::string& filename) {
 }
 
 void UrbanGeometry::saveRoads(const std::string &filename) {
+	gs::Shape shape(wkbLineString);
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
 
+		gs::ShapeObject shapeObject;
+		shapeObject.parts.resize(1);
+		for (int k = 0; k < roads.graph[*ei]->polyline.size(); ++k) {
+			float z = mainWin->glWidget->vboRenderManager.getTerrainHeight(roads.graph[*ei]->polyline[k].x(), roads.graph[*ei]->polyline[k].y());
+			shapeObject.parts[0].points.push_back(glm::vec3(roads.graph[*ei]->polyline[k].x(), roads.graph[*ei]->polyline[k].y(), z));
+		}
 
+		shape.shapeObjects.push_back(shapeObject);
+	}
+
+	shape.save(filename);
 }
 
 void UrbanGeometry::loadParcels(const std::string& filename) {
