@@ -31,9 +31,6 @@ public:
 	/** getter for depth */
 	int getDepth() { return depth; }
 
-	void clear();
-	void clearGeometry();
-
 	void generateRoads();
 	void generateBlocks();
 	void generateParcels();
@@ -46,11 +43,13 @@ public:
 
 	void loadZone(const std::string& filename);
 	void loadTerrain(const std::string& filename);
-	void loadParcels(const std::string& filename);
-	void loadBuildings(const std::string& filename);
-
 	void loadRoads(const std::string& filename);
-	void saveRoads(const QString &filename);
-	void clearRoads();
+	void saveRoads(const std::string &filename);
+	void loadParcels(const std::string& filename);
+	void saveParcels(const std::string& filename);
+	void loadBuildings(const std::string& filename);
+	void saveBuildings(const std::string& filename);
+
+	void clear();
 
 };

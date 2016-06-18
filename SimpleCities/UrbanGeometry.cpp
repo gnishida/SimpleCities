@@ -38,15 +38,6 @@ UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
 }
 
-void UrbanGeometry::clear() {
-	clearGeometry();
-}
-
-void UrbanGeometry::clearGeometry() {
-	roads.clear();
-	update(mainWin->glWidget->vboRenderManager);
-}
-
 void UrbanGeometry::generateRoads() {
 	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
 	generator.generateRoadNetwork();
@@ -85,24 +76,7 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 	glLineWidth(5.0f);
 	glPointSize(10.0f);
 
-#if 0
-	// draw the areas
-	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->adaptToTerrain(&vboRenderManager);
-		QColor colorArea(0, 0, 255);
-		QColor colorHintLine(255, 0, 0);
-		if (i != areas.selectedIndex) {
-			colorArea = QColor(196, 196, 255);
-			colorHintLine = QColor(255, 196, 196);
-		}
 
-		// draw the area and the hint line
-		RendererHelper::renderPolyline(vboRenderManager, areas[i]->area3D, colorArea);
-		RendererHelper::renderPolyline(vboRenderManager, areas[i]->hintLine3D, colorHintLine);
-	}
-
-	vboRenderManager.removeStaticGeometry("lines");
-#endif
 }
 
 /**
@@ -183,6 +157,75 @@ void UrbanGeometry::loadTerrain(const std::string& filename) {
 	mainWin->glWidget->vboRenderManager.vboTerrain.setTerrain(layerData);
 }
 
+void UrbanGeometry::loadRoads(const std::string& filename) {
+	roads.clear();
+
+	gs::Shape shape;
+	shape.load(filename);
+
+	if (zone.size() == 0) {
+		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
+		minBound = glm::vec2(shape.minBound);
+		maxBound = glm::vec2(shape.maxBound);
+
+		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
+		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
+		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
+	}
+
+	glm::vec2 offset = (maxBound + minBound) * 0.5f;
+
+	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
+		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
+			QVector2D pt1;
+			RoadVertexDesc desc1;
+			pt1.setX(shape.shapeObjects[i].parts[j].points.front().x - offset.x);
+			pt1.setY(shape.shapeObjects[i].parts[j].points.front().y - offset.y);
+
+			if (!GraphUtil::getVertex(roads, pt1, 0.1f, desc1)) {
+				RoadVertexPtr v(new RoadVertex(pt1));
+				desc1 = GraphUtil::addVertex(roads, v);
+			}
+
+			QVector2D pt2;
+			RoadVertexDesc desc2;
+			pt2.setX(shape.shapeObjects[i].parts[j].points.back().x - offset.x);
+			pt2.setY(shape.shapeObjects[i].parts[j].points.back().y - offset.y);
+
+			if (!GraphUtil::getVertex(roads, pt2, 0.1f, desc2)) {
+				RoadVertexPtr v(new RoadVertex(pt2));
+				desc2 = GraphUtil::addVertex(roads, v);
+			}
+
+			RoadEdgePtr edge(new RoadEdge(RoadEdge::TYPE_STREET, 1, false, false, false));
+			for (int k = 0; k < shape.shapeObjects[i].parts[j].points.size(); ++k) {
+				QVector2D pt;
+				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
+				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
+				edge->addPoint(pt);
+			}
+
+			if (GraphUtil::hasEdge(roads, desc1, desc2)) {
+				// duplicate edge, so ignore this edge
+			}
+			else {
+				GraphUtil::addEdge(roads, desc1, desc2, edge);
+			}
+
+			// we use only the first part
+			break;
+		}
+	}
+
+	update(mainWin->glWidget->vboRenderManager);
+}
+
+void UrbanGeometry::saveRoads(const std::string &filename) {
+
+
+}
+
 void UrbanGeometry::loadParcels(const std::string& filename) {
 	blocks.clear();
 
@@ -225,6 +268,10 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 	}
 
 	update(mainWin->glWidget->vboRenderManager);
+}
+
+void UrbanGeometry::saveParcels(const std::string& filename) {
+
 }
 
 void UrbanGeometry::loadBuildings(const std::string& filename) {
@@ -324,82 +371,13 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::loadRoads(const std::string& filename) {
-	roads.clear();
+void UrbanGeometry::saveBuildings(const std::string& filename) {
 
-	gs::Shape shape;
-	shape.load(filename);
-
-	if (zone.size() == 0) {
-		glm::vec2 offset = (glm::vec2(shape.maxBound) + glm::vec2(shape.minBound)) * 0.5f;
-		minBound = glm::vec2(shape.minBound);
-		maxBound = glm::vec2(shape.maxBound);
-
-		zone.push_back(QVector2D(minBound.x - offset.x, minBound.y - offset.y));
-		zone.push_back(QVector2D(maxBound.x - offset.x, minBound.y - offset.y));
-		zone.push_back(QVector2D(maxBound.x - offset.x, maxBound.y - offset.y));
-		zone.push_back(QVector2D(minBound.x - offset.x, maxBound.y - offset.y));
-	}
-
-	glm::vec2 offset = (maxBound + minBound) * 0.5f;
-
-	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
-		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
-			QVector2D pt1;
-			RoadVertexDesc desc1;
-			pt1.setX(shape.shapeObjects[i].parts[j].points.front().x - offset.x);
-			pt1.setY(shape.shapeObjects[i].parts[j].points.front().y - offset.y);
-
-			if (!GraphUtil::getVertex(roads, pt1, 0.1f, desc1)) {
-				RoadVertexPtr v(new RoadVertex(pt1));
-				desc1 = GraphUtil::addVertex(roads, v);
-			}
-
-			QVector2D pt2;
-			RoadVertexDesc desc2;
-			pt2.setX(shape.shapeObjects[i].parts[j].points.back().x - offset.x);
-			pt2.setY(shape.shapeObjects[i].parts[j].points.back().y - offset.y);
-
-			if (!GraphUtil::getVertex(roads, pt2, 0.1f, desc2)) {
-				RoadVertexPtr v(new RoadVertex(pt2));
-				desc2 = GraphUtil::addVertex(roads, v);
-			}
-			
-			RoadEdgePtr edge(new RoadEdge(RoadEdge::TYPE_STREET, 1, false, false, false));
-			for (int k = 0; k < shape.shapeObjects[i].parts[j].points.size(); ++k) {
-				QVector2D pt;
-				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
-				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
-				edge->addPoint(pt);
-			}
-
-			if (GraphUtil::hasEdge(roads, desc1, desc2)) {
-				// duplicate edge, so ignore this edge
-			}
-			else {
-				GraphUtil::addEdge(roads, desc1, desc2, edge);
-			}
-
-			// we use only the first part
-			break;
-		}
-	}
-
-	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::saveRoads(const QString &filename) {
-	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly)) {
-		std::cerr << "The file is not accessible: " << filename.toUtf8().constData() << endl;
-		throw "The file is not accessible: " + filename;
-	}
-
-	GraphUtil::saveRoads(roads, filename);
-}
-
-void UrbanGeometry::clearRoads() {
+void UrbanGeometry::clear() {
 	roads.clear();
+	blocks.clear();
 	update(mainWin->glWidget->vboRenderManager);
 }
 

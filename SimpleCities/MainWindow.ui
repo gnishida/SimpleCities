@@ -38,12 +38,16 @@
     <addaction name="actionOpenTerrain"/>
     <addaction name="actionSaveTerrain"/>
     <addaction name="separator"/>
-    <addaction name="actionLoadParcels"/>
-    <addaction name="actionLoadBuildings"/>
-    <addaction name="separator"/>
     <addaction name="actionLoadRoads"/>
     <addaction name="actionSaveRoads"/>
-    <addaction name="actionClearRoads"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadParcels"/>
+    <addaction name="actionSaveParcels"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadBuildings"/>
+    <addaction name="actionSaveBuildings"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear"/>
     <addaction name="separator"/>
     <addaction name="actionSaveImage"/>
     <addaction name="actionSaveImageHD"/>
@@ -134,9 +138,9 @@
     <string>Load Roads</string>
    </property>
   </action>
-  <action name="actionClearRoads">
+  <action name="actionClear">
    <property name="text">
-    <string>Clear Roads</string>
+    <string>Clear</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -225,6 +229,16 @@
   <action name="actionLoadZone">
    <property name="text">
     <string>Load Zone</string>
+   </property>
+  </action>
+  <action name="actionSaveParcels">
+   <property name="text">
+    <string>Save Parcels</string>
+   </property>
+  </action>
+  <action name="actionSaveBuildings">
+   <property name="text">
+    <string>Save Buildings</string>
    </property>
   </action>
  </widget>

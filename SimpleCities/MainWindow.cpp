@@ -21,11 +21,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionNewTerrain, SIGNAL(triggered()), this, SLOT(onNewTerrain()));
 	connect(ui.actionOpenTerrain, SIGNAL(triggered()), this, SLOT(onLoadTerrain()));
 	connect(ui.actionSaveTerrain, SIGNAL(triggered()), this, SLOT(onSaveTerrain()));
-	connect(ui.actionLoadParcels, SIGNAL(triggered()), this, SLOT(onLoadParcels()));
-	connect(ui.actionLoadBuildings, SIGNAL(triggered()), this, SLOT(onLoadBuildings()));
 	connect(ui.actionLoadRoads, SIGNAL(triggered()), this, SLOT(onLoadRoads()));
 	connect(ui.actionSaveRoads, SIGNAL(triggered()), this, SLOT(onSaveRoads()));
-	connect(ui.actionClearRoads, SIGNAL(triggered()), this, SLOT(onClearRoads()));
+	connect(ui.actionLoadParcels, SIGNAL(triggered()), this, SLOT(onLoadParcels()));
+	connect(ui.actionSaveParcels, SIGNAL(triggered()), this, SLOT(onSaveParcels()));
+	connect(ui.actionLoadBuildings, SIGNAL(triggered()), this, SLOT(onLoadBuildings()));
+	connect(ui.actionSaveBuildings, SIGNAL(triggered()), this, SLOT(onSaveBuildings()));
+	connect(ui.actionClear, SIGNAL(triggered()), this, SLOT(onClear()));
+
 	connect(ui.actionSaveImage, SIGNAL(triggered()), this, SLOT(onSaveImage()));
 	connect(ui.actionSaveImageHD, SIGNAL(triggered()), this, SLOT(onSaveImageHD()));
 	connect(ui.actionLoadCamera, SIGNAL(triggered()), this, SLOT(onLoadCamera()));
@@ -96,22 +99,6 @@ void MainWindow::onSaveTerrain() {
 	glWidget->vboRenderManager.vboTerrain.saveTerrain(filename);
 }
 
-void MainWindow::onLoadBuildings() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Load buildings..."), "", tr("Shapefiles (*.shp)"));
-	if (filename.isEmpty()) return;
-
-	urbanGeometry->loadBuildings(filename.toUtf8().constData());
-	glWidget->updateGL();
-}
-
-void MainWindow::onLoadParcels() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Load parcels..."), "", tr("Shapefiles (*.shp)"));
-	if (filename.isEmpty()) return;
-
-	urbanGeometry->loadParcels(filename.toUtf8().constData());
-	glWidget->updateGL();
-}
-
 void MainWindow::onLoadRoads() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load roads..."), "", tr("Shapefiles (*.shp)"));
 	if (filename.isEmpty()) return;
@@ -126,13 +113,45 @@ void MainWindow::onSaveRoads() {
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 
-	urbanGeometry->saveRoads(filename);
+	urbanGeometry->saveRoads(filename.toUtf8().constData());
 
 	QApplication::restoreOverrideCursor();
 }
 
-void MainWindow::onClearRoads() {
-	urbanGeometry->clearRoads();
+void MainWindow::onLoadParcels() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Load parcels..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->loadParcels(filename.toUtf8().constData());
+	glWidget->updateGL();
+}
+
+void MainWindow::onSaveParcels() {
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save parcels..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->saveParcels(filename.toUtf8().constData());
+	glWidget->updateGL();
+}
+
+void MainWindow::onLoadBuildings() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Load buildings..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->loadBuildings(filename.toUtf8().constData());
+	glWidget->updateGL();
+}
+
+void MainWindow::onSaveBuildings() {
+	QString filename = QFileDialog::getSaveFileName(this, tr("Load buildings..."), "", tr("Shapefiles (*.shp)"));
+	if (filename.isEmpty()) return;
+
+	urbanGeometry->saveBuildings(filename.toUtf8().constData());
+	glWidget->updateGL();
+}
+
+void MainWindow::onClear() {
+	urbanGeometry->clear();
 	glWidget->updateGL();
 }
 

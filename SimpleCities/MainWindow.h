@@ -33,11 +33,13 @@ public slots:
 	void onNewTerrain();
 	void onLoadTerrain();
 	void onSaveTerrain();
-	void onLoadParcels();
-	void onLoadBuildings();
 	void onLoadRoads();
 	void onSaveRoads();
-	void onClearRoads();
+	void onLoadParcels();
+	void onSaveParcels();
+	void onLoadBuildings();
+	void onSaveBuildings();
+	void onClear();
 
 	void onSaveImage();
 	void onSaveImageHD();
