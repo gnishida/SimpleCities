@@ -35,7 +35,7 @@ public:
 	Camera2D camera;
 
 	bool shiftPressed;
-	bool controlPressed;
+	bool ctrlPressed;
 	bool altPressed;
 	QPoint lastPos;
 	float farPlaneToSpaceRadiusFactor;
@@ -47,17 +47,14 @@ public:
 	GLWidgetSimpleShadow shadow;
 
 public:
-	GLWidget3D(MainWindow *parent);
+	GLWidget3D(MainWindow* parent);
 
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
-
-	void mouseTo2D(int x, int y, QVector2D &result);
-
+	void mouseTo2D(int x, int y, QVector2D& result);
 	void drawScene(int drawMode);
-
 	void updateCamera();
 
 protected:
@@ -66,8 +63,9 @@ protected:
 	void resizeGL(int width, int height);
 	void paintGL();    
 
-	void mousePressEvent(QMouseEvent *e);
-	void mouseMoveEvent(QMouseEvent *e);
-	void mouseReleaseEvent(QMouseEvent *e);
+	void mousePressEvent(QMouseEvent* e);
+	void mouseMoveEvent(QMouseEvent* e);
+	void wheelEvent(QWheelEvent* e);
+	void mouseReleaseEvent(QMouseEvent* e);
 };
 

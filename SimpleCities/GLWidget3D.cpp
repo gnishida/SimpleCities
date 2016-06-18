@@ -26,18 +26,16 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	this->mainWin = mainWin;
 
 	camera.resetCamera();
-	//camera = &camera2D;
-	//camera = &flyCamera;
 
-	spaceRadius=30000.0;
-	farPlaneToSpaceRadiusFactor=5.0f;//N 5.0f
+	spaceRadius = 30000.0;
+	farPlaneToSpaceRadiusFactor = 5.0f;//N 5.0f
 
 	rotationSensitivity = 0.4f;
 	zoomSensitivity = 10.0f;
 
-	controlPressed=false;
-	shiftPressed=false;
-	altPressed=false;
+	ctrlPressed = false;
+	shiftPressed = false;
+	altPressed = false;
 
 	camera.setRotation(0, 0, 0);
 	camera.setTranslation(0, 0, G::getFloat("MAX_Z"));//6000);
@@ -55,9 +53,9 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 	QVector2D pos;
 
 	if (Qt::ControlModifier == event->modifiers()) {
-		controlPressed = true;
+		ctrlPressed = true;
 	} else {
-		controlPressed = false;
+		ctrlPressed = false;
 	}
 
 	this->setFocus();
@@ -102,7 +100,7 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 	vboRenderManager.mousePos3D=pos.toVector3D();
 	
 	if (altPressed) {	// editing
-		if (event->buttons() & Qt::RightButton||event->buttons() & Qt::LeftButton||event->buttons() & Qt::MiddleButton) {//make sure something is clicking
+		if (event->buttons() & Qt::RightButton || event->buttons() & Qt::LeftButton || event->buttons() & Qt::MiddleButton) {//make sure something is clicking
 			// normal Gaussian edition
 			float height = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
 			float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.size.x;
@@ -111,20 +109,22 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 
 			if (event->buttons() & Qt::LeftButton) {
 				vboRenderManager.vboTerrain.updateGaussian(xM, yM, height * 0.2f, radi);
-			} else if (event->buttons() & Qt::RightButton) {
+			}
+			else if (event->buttons() & Qt::RightButton) {
 				vboRenderManager.vboTerrain.updateGaussian(xM, yM, -height * 0.2f, radi);
-			} else if (event->buttons() & Qt::MiddleButton) {
+			}
+			else if (event->buttons() & Qt::MiddleButton) {
 				vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 			}
 
 			shadow.makeShadowMap(this);
 		}
-	} else if (event->buttons() & Qt::LeftButton) {	// Rotate
+	} else if (ctrlPressed) {	// Rotate
 		camera.changeXRotation(rotationSensitivity * dy);
-		camera.changeZRotation(-rotationSensitivity * dx);    
+		camera.changeZRotation(rotationSensitivity * dx);
 		updateCamera();
 		lastPos = event->pos();
-	} else if (event->buttons() & Qt::MidButton) {
+	} else if (event->buttons() & Qt::LeftButton) {	// Translate
 		camera.changeXYZTranslation(-dx, dy, 0);
 		updateCamera();
 		lastPos = event->pos();
@@ -133,6 +133,13 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 		updateCamera();
 		lastPos = event->pos();
 	}
+
+	updateGL();
+}
+
+void GLWidget3D::wheelEvent(QWheelEvent* e) {
+	camera.changeXYZTranslation(0, 0, -e->delta() * 0.2);
+	updateCamera();
 
 	updateGL();
 }
@@ -239,22 +246,22 @@ void GLWidget3D::drawScene(int drawMode) {
 	}
 }
 
-void GLWidget3D::keyPressEvent( QKeyEvent *e ){
+void GLWidget3D::keyPressEvent(QKeyEvent*e) {
 	shiftPressed=false;
-	controlPressed=false;
+	ctrlPressed = false;
 	altPressed=false;
 
 	switch( e->key() ){
 	case Qt::Key_Shift:
-		shiftPressed=true;
+		shiftPressed = true;
 		//clientMain->statusBar()->showMessage("Shift pressed");
 		break;
 	case Qt::Key_Control:
-		controlPressed=true;
+		ctrlPressed = true;
 		break;
 	case Qt::Key_Alt:
 		altPressed=true;
-		vboRenderManager.editionMode=true;
+		vboRenderManager.editionMode = true;
 		updateGL();
 		setMouseTracking(true);
 		break;
@@ -274,14 +281,14 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent* e) {
 	}
 	switch (e->key()) {
 	case Qt::Key_Shift:
-		shiftPressed=false;
+		shiftPressed = false;
 		break;
 	case Qt::Key_Control:
-		controlPressed=false;
+		ctrlPressed = false;
 		break;
 	case Qt::Key_Alt:
-		altPressed=false;
-		vboRenderManager.editionMode=false;
+		altPressed = false;
+		vboRenderManager.editionMode = false;
 		setMouseTracking(false);
 		updateGL();
 	default:
@@ -292,7 +299,7 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent* e) {
 /**
  * Convert the screen space coordinate (x, y) to the model space coordinate.
  */
-void GLWidget3D::mouseTo2D(int x,int y, QVector2D &result) {
+void GLWidget3D::mouseTo2D(int x,int y, QVector2D& result) {
 #if 0
 	updateCamera();
 	updateGL();
