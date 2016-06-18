@@ -285,7 +285,32 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 }
 
 void UrbanGeometry::saveParcels(const std::string& filename) {
+	gs::Shape shape(wkbPolygon);
 
+	for (int i = 0; i < blocks.blocks.size(); ++i) {
+		Block::parcelGraphVertexIter vi, viEnd;
+		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
+			gs::ShapeObject shapeObject;
+			shapeObject.parts.resize(1);
+
+			// make a closed clockwise polygon
+			Loop3D contour = blocks[i].myParcels[*vi].parcelContour.contour;
+			if (!contour.isClockwise()) {
+				std::reverse(contour.begin(), contour.end());
+
+			}
+			contour.push_back(contour.front());
+
+			for (int k = 0; k < contour.size(); ++k) {
+				float z = mainWin->glWidget->vboRenderManager.getTerrainHeight(contour[k].x(), contour[k].y());
+				shapeObject.parts[0].points.push_back(glm::vec3(contour[k].x(), contour[k].y(), z));
+			}
+
+			shape.shapeObjects.push_back(shapeObject);
+		}
+	}
+
+	shape.save(filename);
 }
 
 void UrbanGeometry::loadBuildings(const std::string& filename) {
@@ -386,7 +411,37 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 }
 
 void UrbanGeometry::saveBuildings(const std::string& filename) {
+	gs::Shape shape(wkbPolygon);
 
+	for (int i = 0; i < blocks.blocks.size(); ++i) {
+		if (blocks[i].isPark) continue;
+
+		Block::parcelGraphVertexIter vi, viEnd;
+		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi) {
+			if (blocks[i].myParcels[*vi].isPark) continue;
+			if (blocks[i].myParcels[*vi].myBuilding.buildingFootprint.contour.size() < 3) continue;
+
+			gs::ShapeObject shapeObject;
+			shapeObject.parts.resize(1);
+
+			// make a closed clockwise polygon
+			Loop3D contour = blocks[i].myParcels[*vi].myBuilding.buildingFootprint.contour;
+			if (!contour.isClockwise()) {
+				std::reverse(contour.begin(), contour.end());
+
+			}
+			contour.push_back(contour.front());
+
+			for (int k = 0; k < contour.size(); ++k) {
+				float z = mainWin->glWidget->vboRenderManager.getTerrainHeight(contour[k].x(), contour[k].y());
+				shapeObject.parts[0].points.push_back(glm::vec3(contour[k].x(), contour[k].y(), z));
+			}
+
+			shape.shapeObjects.push_back(shapeObject);
+		}
+	}
+
+	shape.save(filename);
 }
 
 void UrbanGeometry::clear() {
