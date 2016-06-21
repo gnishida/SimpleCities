@@ -8,7 +8,7 @@ class Parcel {
 public:
 	Polygon3D parcelContour;
 	bool isPark;
-	Building myBuilding;
+	Building building;
 
 public:
 	Parcel();

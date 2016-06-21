@@ -12,7 +12,7 @@ public:
 	Polygon3D sidewalkContour;
 	std::vector<float> sidewalkContourRoadsWidths;
 	bool isPark;
-	std::vector<Parcel> myParcels;
+	std::vector<Parcel> parcels;
 
 public:
 	Block() : isPark(false) {}

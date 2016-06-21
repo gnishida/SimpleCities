@@ -100,12 +100,12 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	if (G::getBool("shader2D")) {
 		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
 		BlockMeshGenerator::generate2DParcelMesh(vboRenderManager, blocks);
-	} else {
+	}
+	else {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
 		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 		BlockMeshGenerator::generateParcelMesh(vboRenderManager, blocks);
 		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
-		//VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, buildings);
 		VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	}
 }
@@ -272,7 +272,7 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 			
 			Parcel parcel;
 			parcel.parcelContour = block.blockContour;
-			block.myParcels.push_back(parcel);
+			block.parcels.push_back(parcel);
 
 			blocks.blocks.push_back(block);
 
@@ -289,9 +289,9 @@ void UrbanGeometry::saveParcels(const std::string& filename) {
 
 	gs::Shape shape(wkbPolygon);
 	for (int i = 0; i < blocks.blocks.size(); ++i) {
-		for (int pN = 0; pN < blocks.blocks[i].myParcels.size(); ++pN) {
+		for (int pN = 0; pN < blocks.blocks[i].parcels.size(); ++pN) {
 			// make a closed clockwise polygon
-			Loop3D contour = blocks[i].myParcels[pN].parcelContour.contour;
+			Loop3D contour = blocks[i].parcels[pN].parcelContour.contour;
 			if (contour.size() < 3) continue;
 			if (!contour.isClockwise()) {
 				std::reverse(contour.begin(), contour.end());
@@ -314,7 +314,7 @@ void UrbanGeometry::saveParcels(const std::string& filename) {
 }
 
 void UrbanGeometry::loadBuildings(const std::string& filename) {
-	buildings.clear();
+	std::vector<Building> buildings;
 
 	gs::Shape shape;
 	shape.load(filename);
@@ -376,7 +376,7 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 
 				building.buildingFootprint.push_back(pt);
 			}
-
+			
 			buildings.push_back(building);
 			
 			// we use only the first part
@@ -392,7 +392,7 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 			for (int j = 0; j < buildings.size(); ++j) {
 				if (i == j) continue;
 
-				if (buildings[j].buildingFootprint.isPointWithinLoop(buildings[i].buildingFootprint[k])) {
+				if (buildings[j].buildingFootprint.contains(buildings[i].buildingFootprint[k])) {
 					inside = true;
 					break;
 				}
@@ -407,6 +407,38 @@ void UrbanGeometry::loadBuildings(const std::string& filename) {
 		}
 	}
 
+	// find a parcel that contains this building
+	for (int i = 0; i < buildings.size(); ++i) {
+		std::vector<Loop3D> offsetFootprints;
+		buildings[i].buildingFootprint.offsetInside(0.01, offsetFootprints);
+
+		Loop3D offsetFootprint;
+		bool parcelFound = false;
+		if (offsetFootprints.size() > 0) {
+			for (int k = 0; k < offsetFootprints[0].size(); ++k) {
+				int next = (k + 1) % offsetFootprints[0].size();
+				offsetFootprint.push_back(offsetFootprints[0][k]);
+				offsetFootprint.push_back((offsetFootprints[0][k] + offsetFootprints[0][next]) * 0.5);
+			}
+
+			for (int bN = 0; bN < blocks.size() && !parcelFound; ++bN) {
+				if (blocks[bN].isPark) continue;
+
+				for (int pN = 0; pN < blocks[bN].parcels.size() && !parcelFound; ++pN) {
+					if (blocks[bN].parcels[pN].isPark) continue;
+
+					for (int k = 0; k < offsetFootprint.size(); ++k) {
+						if (blocks[bN].parcels[pN].parcelContour.contains(offsetFootprint[k])) {
+							blocks[bN].parcels[pN].building = buildings[i];
+							parcelFound = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -417,18 +449,18 @@ void UrbanGeometry::saveBuildings(const std::string& filename) {
 	for (int i = 0; i < blocks.blocks.size(); ++i) {
 		if (blocks[i].isPark) continue;
 
-		for (int j = 0; j < blocks[i].myParcels.size(); ++j) {
-			if (blocks[i].myParcels[j].isPark) continue;
-			if (blocks[i].myParcels[j].myBuilding.buildingFootprint.size() < 3) continue;
+		for (int j = 0; j < blocks[i].parcels.size(); ++j) {
+			if (blocks[i].parcels[j].isPark) continue;
+			if (blocks[i].parcels[j].building.buildingFootprint.size() < 3) continue;
 
 			gs::ShapeObject shapeObject;
 			shapeObject.parts.resize(1);
 
 			// set height in the attribute field
-			shapeObject.attributes["NbreEtages"] = std::to_string(blocks[i].myParcels[j].myBuilding.numStories);
+			shapeObject.attributes["NbreEtages"] = std::to_string(blocks[i].parcels[j].building.numStories);
 
 			// make a closed clockwise polygon
-			Loop3D contour = blocks[i].myParcels[j].myBuilding.buildingFootprint.contour;
+			Loop3D contour = blocks[i].parcels[j].building.buildingFootprint.contour;
 			if (!contour.isClockwise()) {
 				std::reverse(contour.begin(), contour.end());
 

@@ -127,8 +127,8 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, const
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (blocks.blocks[i].isPark) continue;
 							
-		for (int pN = 0; pN < blocks[i].myParcels.size(); ++pN) {
-			const Polygon3D& contour = blocks[i].myParcels[pN].parcelContour;
+		for (int pN = 0; pN < blocks[i].parcels.size(); ++pN) {
+			const Polygon3D& contour = blocks[i].parcels[pN].parcelContour;
 
 			if (contour.isSelfIntersecting()) continue;
 
@@ -190,8 +190,8 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 		for(int bN = 0; bN < blocks.size(); ++bN) {
 			if (blocks[bN].isPark) continue;
 						
-			for (int pN = 0; pN < blocks[bN].myParcels.size(); ++pN) {
-				const Parcel& parcel = blocks[bN].myParcels[pN];
+			for (int pN = 0; pN < blocks[bN].parcels.size(); ++pN) {
+				const Parcel& parcel = blocks[bN].parcels[pN];
 
 				if (parcel.parcelContour.isSelfIntersecting()) continue;
 
@@ -206,7 +206,7 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 				}
 				else {
 					// ビルのfootprintを描画
-					const Loop3D& footprint = parcel.myBuilding.buildingFootprint.contour;
+					const Loop3D& footprint = parcel.building.buildingFootprint.contour;
 					for (int i = 0; i < footprint.size(); ++i) {
 						int next = (i + 1) % footprint.size();
 						vert.push_back(Vertex(footprint[i] + QVector3D(0, 0, deltaZ), QColor(156, 143, 186), QVector3D(0, 0, 1), QVector3D()));

@@ -24,10 +24,10 @@ int BlockSet::selectBlock(const QVector2D& pos) {
 
 std::pair<int, int> BlockSet::selectParcel(const QVector2D& pos) {
 	for (int i = 0; i < blocks.size(); ++i) {
-		for (int j = 0; j < blocks[i].myParcels.size(); ++j) {
+		for (int j = 0; j < blocks[i].parcels.size(); ++j) {
 			Polygon2D polygon;
-			for (int k = 0; k < blocks[i].myParcels[j].parcelContour.size(); ++k) {
-				polygon.push_back(QVector2D(blocks[i].myParcels[j].parcelContour[k]));
+			for (int k = 0; k < blocks[i].parcels[j].parcelContour.size(); ++k) {
+				polygon.push_back(QVector2D(blocks[i].parcels[j].parcelContour[k]));
 			}
 			polygon.correct();
 

@@ -21,7 +21,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 	//srand(block.randSeed);
 	std::vector<Parcel> tmpParcels;
 
-	block.myParcels.clear();
+	block.parcels.clear();
 
 	// set the initial parcel be the block itself
 	Parcel tmpParcel;
@@ -36,14 +36,14 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 
 	for (int i = 0; i < tmpParcels.size(); ++i) {
 		//add parcel to block
-		block.myParcels.push_back(tmpParcels[i]);
+		block.parcels.push_back(tmpParcels[i]);
 
-		if (block.myParcels.back().parcelContour.isClockwise()) {
-			std::reverse(block.myParcels.back().parcelContour.contour.begin(), block.myParcels.back().parcelContour.contour.end());
+		if (block.parcels.back().parcelContour.isClockwise()) {
+			std::reverse(block.parcels.back().parcelContour.contour.begin(), block.parcels.back().parcelContour.contour.end());
 		}
 
 		if (Util::genRand() < G::getFloat("parksRatio")) {
-			block.myParcels.back().isPark = true;
+			block.parcels.back().isPark = true;
 		}
 	}
 }

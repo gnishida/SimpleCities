@@ -8,7 +8,10 @@ ToDo:
 
 9. VBORenderManagerは、shapeのタイプも含めて、異なるキーとしてオブジェクトを保存すべき。現状は、それがないため、オブジェクト名を必要に応じて変えて保存している。
 10. Polygonのcompute insetを改善したい。できるだけ、CGALを使わないようにしたい。
-11. BUildingのshapeファイルを読み込んだら、buildingをparcelの中に入れること！
+11. Buildingのshapeファイルを読み込んだら、buildingをparcelの中に入れること！
+　　　　⇒　とりあえず、いれるようにした。ただし、1つのparcel内に複数のビルが存在するケースがあり、完全には対応できていない。
+　　　　　　また、そもそも、どのparcelにも入っていないビルも存在する。
+      基本的に、既存cityをshapefileから再現するのは、難しいと思われる。
 12. parcelの中で、building footprint以外の場所に、少し、木を植える。
 13. 歩道の木は削除する。
 14. 木が、generateVegetationをしてないのに作成されてしまっている。

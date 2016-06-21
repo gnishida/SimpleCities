@@ -17,7 +17,6 @@ public:
 	MainWindow* mainWin;
 	RoadGraph roads;
 	BlockSet blocks;
-	std::vector<Building> buildings;
 	glm::vec2 minBound;
 	glm::vec2 maxBound;
 	Polygon2D zone;

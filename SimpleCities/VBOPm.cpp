@@ -25,23 +25,12 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 	for (int bN = 0; bN < blocks.size(); bN++) {
 		if (blocks[bN].isPark) continue;
 
-		for (int pN = 0; pN < blocks[bN].myParcels.size(); ++pN) {
-			if (blocks[bN].myParcels[pN].isPark) continue;
-			if (blocks[bN].myParcels[pN].myBuilding.buildingFootprint.size() < 3) continue;
+		for (int pN = 0; pN < blocks[bN].parcels.size(); ++pN) {
+			if (blocks[bN].parcels[pN].isPark) continue;
+			if (blocks[bN].parcels[pN].building.buildingFootprint.size() < 3) continue;
 
-			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].myParcels[pN].myBuilding);
+			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].parcels[pN].building);
 		}
-	}
-	printf("Building generation is done.\n");
-
-	return true;
-}
-
-bool VBOPm::generateBuildings(VBORenderManager& rendManager, std::vector<Building>& buildings) {
-	rendManager.removeStaticGeometry("3d_building");
-
-	for (int i = 0; i < buildings.size(); i++) {
-		VBOGeoBuilding::generateBuilding(rendManager, buildings[i]);
 	}
 	printf("Building generation is done.\n");
 

@@ -5,7 +5,7 @@ void Block::clear() {
 	this->blockContour.contour.clear();
 	this->sidewalkContour.clear();
 	this->sidewalkContourRoadsWidths.clear();
-	this->myParcels.clear();
+	this->parcels.clear();
 }
 
 void Block::findParcelFrontAndBackEdges(const Parcel& inParcel, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges) {

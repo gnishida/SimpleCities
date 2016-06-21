@@ -11,7 +11,7 @@
 #include <CGAL/Partition_traits_2.h>
 #include <CGAL/partition_2.h>
 
-bool Loop3D::isPointWithinLoop(const QVector3D& pt) const {
+bool Loop3D::contains(const QVector3D& pt) const {
 	Loop3D closedLoop = *this;
 	if (closedLoop.front().x() != closedLoop.back().x() || closedLoop.front().y() != closedLoop.back().y()) {
 		closedLoop.push_back(closedLoop.front());
@@ -20,6 +20,14 @@ bool Loop3D::isPointWithinLoop(const QVector3D& pt) const {
 		std::reverse(closedLoop.begin(), closedLoop.end());
 	}
 	return boost::geometry::within(pt, closedLoop);
+}
+
+bool Loop3D::contains(const Loop3D& polygon) const {
+	for (int i = 0; i < polygon.size(); ++i) {
+		if (!contains(polygon[i])) return false;
+	}
+
+	return true;
 }
 
 bool Loop3D::isClockwise() const {

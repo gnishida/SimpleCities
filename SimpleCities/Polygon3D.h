@@ -31,7 +31,8 @@
 **/
 class Loop3D : public std::vector<QVector3D> {
 public:
-	bool isPointWithinLoop(const QVector3D& pt) const;
+	bool contains(const QVector3D& pt) const;
+	bool contains(const Loop3D& polygon) const;
 	bool isClockwise() const;
 	float area() const;
 	bool isSelfIntersecting() const;
@@ -83,8 +84,8 @@ public:
 	void offsetInside(std::vector<float>& offsetDistances, std::vector<Loop3D>& pgonInsets) const;
 	void offsetInsideCGAL(float offsetDistance, std::vector<Loop3D>& pgonInsets) const;
 
-	bool isPointWithinLoop(const QVector3D& pt) const {
-		return contour.isPointWithinLoop(pt);
+	bool contains(const QVector3D& pt) const {
+		return contour.contains(pt);
 	}
 
 	static void transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat);
