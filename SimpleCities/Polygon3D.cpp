@@ -152,6 +152,44 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 
 	QVector3D intPt;
 
+	bool wrongDirection = false;
+	for (int cur = 0; cur<cSz; ++cur) {
+		prev = (cur - 1 + cSz) % cSz;
+		next = (cur + 1) % cSz;
+
+		if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
+			// For deanend edge
+			QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
+			QVector3D vec2(-vec.y(), vec.x(), 0);
+
+			float angle = atan2f(vec2.y(), vec2.x());
+			for (int i = 0; i <= 10; ++i) {
+				float a = angle - (float)i * M_PI / 10.0f;
+				intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
+				pgonInset.push_back(intPt);
+			}
+		}
+		else {
+			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
+
+			// 方向をチェック
+			if (pgonInset.size() > 0) {
+				if (QVector3D::dotProduct(cleanPgon[cur] - cleanPgon[prev], intPt - pgonInset.back()) < 0) {
+					wrongDirection = true;
+					break;
+				}
+			}
+
+			pgonInset.push_back(intPt);
+		}
+	}
+
+	// naive 方式が失敗したら、CGALを利用する。
+	if (wrongDirection) {
+		computeInset2(offsetDistances[0], pgonInset);
+	}
+
+#if 0
 	if (offsetDistances[0] > 0) {	// 内側へのoffsetの計算（Block生成、footprint生成などに使用）
 		// ToDo: We should improve this logic to make it more stable.
 		pgonInset.clear();
@@ -268,6 +306,7 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 			}
 		}
 	}
+#endif
 }
 
 void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat) {
