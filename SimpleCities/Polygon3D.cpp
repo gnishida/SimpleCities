@@ -126,22 +126,86 @@ void Polygon3D::correct() {
 	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
 }*/
 
-void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const {
-	pgonInset.clear();
+void Polygon3D::offsetOutside(float offsetDistance, Loop3D& polygonOffset) const {
+	QVector3D intPt;
 
-	Loop3D cleanPgon; 
+	polygonOffset.clear();
+	bool wrongDirection = false;
+	for (int cur = 0; cur < contour.size(); ++cur) {
+		int prev = (cur - 1 + contour.size()) % contour.size();
+		int next = (cur + 1) % contour.size();
+
+		if (Util::diffAngle(contour[prev] - contour[cur], contour[next] - contour[cur]) < 0.1f) {
+			// For deanend edge
+			QVector3D vec = contour[cur] - contour[prev];
+			QVector3D vec2(-vec.y(), vec.x(), 0);
+
+			float angle = atan2f(vec2.y(), vec2.x());
+			for (int i = 0; i <= 10; ++i) {
+				float a = angle - (float)i * M_PI / 10.0f;
+				intPt = QVector3D(contour[cur].x() + cosf(a) * offsetDistance, contour[cur].y() + sinf(a) * offsetDistance, contour[cur].z());
+				polygonOffset.push_back(intPt);
+			}
+		}
+		else {
+			Util::getIrregularBisector(contour[prev], contour[cur], contour[next], offsetDistance, offsetDistance, intPt);
+
+			// 方向をチェック
+			if (polygonOffset.size() > 0) {
+				if (QVector3D::dotProduct(contour[cur] - contour[prev], intPt - polygonOffset.back()) < 0) {
+					wrongDirection = true;
+					break;
+				}
+			}
+
+			polygonOffset.push_back(intPt);
+		}
+	}
+
+	// naive 方式が失敗したら、CGALを利用する。
+	if (wrongDirection) {
+		offsetOutsideCGAL(offsetDistance, polygonOffset);
+	}
+}
+
+void Polygon3D::offsetOutsideCGAL(float offsetDistance, Loop3D& polygonOffset) const {
+	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+	typedef CGAL::Partition_traits_2<K> Traits;
+	typedef Traits::Polygon_2 Polygon_2;
+	typedef boost::shared_ptr<Polygon_2> PolygonPtr;
+
+	polygonOffset.clear();
+
+	Polygon_2 poly;
+
+	for (int i = 0; i < contour.size(); ++i) {
+		poly.push_back(K::Point_2(contour[i].x(), contour[i].y()));
+	}
+	poly.push_back(K::Point_2(contour[0].x(), contour[0].y()));
+
+	std::vector<PolygonPtr> offset_poly;
+	K::FT lOffset = offsetDistance;
+	offset_poly = CGAL::create_exterior_skeleton_and_offset_polygons_2(lOffset, poly);
+
+	if (offset_poly.size() >= 2) {
+		for (auto it = offset_poly[1]->vertices_begin(); it != offset_poly[1]->vertices_end(); ++it) {
+			polygonOffset.push_back(QVector3D(it->x(), it->y(), 0));
+		}
+		std::reverse(polygonOffset.begin(), polygonOffset.end());
+	}
+}
+
+void Polygon3D::offsetInside(float offsetDistance, std::vector<Loop3D>& pgonInsets) const {
+	if (contour.size() < 3) return;
+
+	std::vector<float> offsetDistances(contour.size(), offsetDistance);
+	offsetInside(offsetDistances, pgonInsets);
+}
+
+void Polygon3D::offsetInside(std::vector<float>& offsetDistances, std::vector<Loop3D>& pgonInsets) const {
+	pgonInsets.clear();
+
 	double tol = 0.01f;
-
-	cleanPgon = this->contour;
-
-	int prev, next;
-	int cSz = cleanPgon.size();
-
-	if (cSz < 3) return;
-
-	/*if (reorientFace(cleanPgon)){				
-		std::reverse(offsetDistances.begin(), offsetDistances.end() - 1);
-	}*/
 
 	//if offsets are zero, add a small epsilon just to avoid division by zero
 	for(size_t i=0; i<offsetDistances.size(); ++i){
@@ -150,31 +214,30 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 		}
 	}
 
-	QVector3D intPt;
-
+	Loop3D pgonInset;
 	bool wrongDirection = false;
-	for (int cur = 0; cur<cSz; ++cur) {
-		prev = (cur - 1 + cSz) % cSz;
-		next = (cur + 1) % cSz;
+	for (int cur = 0; cur < contour.size(); ++cur) {
+		int prev = (cur - 1 + contour.size()) % contour.size();
+		int next = (cur + 1) % contour.size();
 
-		if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
-			// For deanend edge
-			QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
+		if (Util::diffAngle(contour[prev] - contour[cur], contour[next] - contour[cur]) < 0.1f) {
+			QVector3D vec = contour[cur] - contour[prev];
 			QVector3D vec2(-vec.y(), vec.x(), 0);
 
 			float angle = atan2f(vec2.y(), vec2.x());
 			for (int i = 0; i <= 10; ++i) {
 				float a = angle - (float)i * M_PI / 10.0f;
-				intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
+				QVector3D intPt(contour[cur].x() + cosf(a) * offsetDistances[cur], contour[cur].y() + sinf(a) * offsetDistances[cur], contour[cur].z());
 				pgonInset.push_back(intPt);
 			}
 		}
 		else {
-			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
+			QVector3D intPt;
+			Util::getIrregularBisector(contour[prev], contour[cur], contour[next], offsetDistances[prev], offsetDistances[cur], intPt);
 
 			// 方向をチェック
 			if (pgonInset.size() > 0) {
-				if (QVector3D::dotProduct(cleanPgon[cur] - cleanPgon[prev], intPt - pgonInset.back()) < 0) {
+				if (QVector3D::dotProduct(contour[cur] - contour[prev], intPt - pgonInset.back()) < 0) {
 					wrongDirection = true;
 					break;
 				}
@@ -186,7 +249,10 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 
 	// naive 方式が失敗したら、CGALを利用する。
 	if (wrongDirection) {
-		computeInset2(offsetDistances[0], pgonInset);
+		offsetInsideCGAL(offsetDistances[0], pgonInsets);
+	}
+	else {
+		pgonInsets.push_back(pgonInset);
 	}
 
 #if 0
@@ -307,6 +373,45 @@ void Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonIn
 		}
 	}
 #endif
+}
+
+/**
+* @brief: Given a polygon, this function computes the polygon's inwards offset. The offset distance
+* is not assumed to be constant and must be specified in the vector offsetDistances. The size of this
+* vector must be equal to the number of vertices of the polygon.
+* Note that the i-th polygon segment is defined by vertices i and i+1.
+* The polygon vertices are assumed to be oriented clockwise
+* @param[in] offsetDistances: Perpendicular distance from offset segment i to polygon segment i.
+* @param[out] pgonInset: The vertices of the polygon inset
+* @return insetArea: Returns the area of the polygon inset
+**/
+void Polygon3D::offsetInsideCGAL(float offsetDistance, std::vector<Loop3D>& pgonInsets) const {
+	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+	typedef CGAL::Partition_traits_2<K> Traits;
+	typedef Traits::Polygon_2 Polygon_2;
+	typedef boost::shared_ptr<Polygon_2> PolygonPtr;
+
+	pgonInsets.clear();
+
+	Polygon_2 poly;
+
+	for (int i = 0; i < contour.size(); ++i) {
+		poly.push_back(K::Point_2(contour[i].x(), contour[i].y()));
+	}
+	poly.push_back(K::Point_2(contour[0].x(), contour[0].y()));
+
+	std::vector<PolygonPtr> offset_poly;
+
+	K::FT lOffset = offsetDistance;
+	offset_poly = CGAL::create_interior_skeleton_and_offset_polygons_2(lOffset, poly);
+
+	pgonInsets.resize(offset_poly.size());
+	for (int i = 0; i < offset_poly.size(); ++i) {
+		pgonInsets[i].clear();
+		for (auto it = offset_poly[i]->vertices_begin(); it != offset_poly[i]->vertices_end(); ++it) {
+			pgonInsets[i].push_back(QVector3D(it->x(), it->y(), 0));
+		}
+	}
 }
 
 void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat) {
@@ -525,64 +630,6 @@ bool Polygon3D::split(const std::vector<QVector3D> &pline, std::vector<Polygon3D
 	}
 
 	return true;
-}
-
-/**
-* @brief: Given a polygon, this function computes the polygon's inwards offset. The offset distance
-* is not assumed to be constant and must be specified in the vector offsetDistances. The size of this
-* vector must be equal to the number of vertices of the polygon.
-* Note that the i-th polygon segment is defined by vertices i and i+1.
-* The polygon vertices are assumed to be oriented clockwise
-* @param[in] offsetDistances: Perpendicular distance from offset segment i to polygon segment i.
-* @param[out] pgonInset: The vertices of the polygon inset
-* @return insetArea: Returns the area of the polygon inset		
-**/
-void Polygon3D::computeInset2(float offsetDistance, Loop3D &pgonInset) const {
-	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-	typedef CGAL::Partition_traits_2<K> Traits;
-	typedef Traits::Polygon_2 Polygon_2;
-	typedef boost::shared_ptr<Polygon_2> PolygonPtr;
-
-	pgonInset.clear();
-
-	Polygon_2 poly;
-
-	for (int i = 0; i < contour.size(); ++i) {
-		poly.push_back(K::Point_2(contour[i].x(), contour[i].y()));
-	}
-	poly.push_back(K::Point_2(contour[0].x(), contour[0].y()));
-
-	std::vector<PolygonPtr> offset_poly;
-	if (offsetDistance < 0) {
-		K::FT lOffset = -offsetDistance;
-		offset_poly = CGAL::create_exterior_skeleton_and_offset_polygons_2(lOffset, poly);
-
-		if (offset_poly.size() >= 2) {
-			for (auto it = offset_poly[1]->vertices_begin(); it != offset_poly[1]->vertices_end(); ++it) {
-				pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
-			}
-			std::reverse(pgonInset.begin(), pgonInset.end());
-		}
-	}
-	else {
-		K::FT lOffset = offsetDistance;
-		offset_poly = CGAL::create_interior_skeleton_and_offset_polygons_2(lOffset, poly);
-
-		if (offset_poly.size() > 0) {
-			for (auto it = offset_poly[0]->vertices_begin(); it != offset_poly[0]->vertices_end(); ++it) {
-				pgonInset.push_back(QVector3D(it->x(), it->y(), 0));
-			}
-		}
-	}
-}
-
-
-void Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset) const {
-	pgonInset.clear();
-	if (contour.size() < 3) return;				
-
-	std::vector<float> offsetDistances(contour.size(), offsetDistance);
-	computeInset(offsetDistances, pgonInset);
 }
 
 float Polygon3D::distanceXYToPoint(const QVector3D &pt) const {

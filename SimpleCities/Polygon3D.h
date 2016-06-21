@@ -77,9 +77,11 @@ public:
 	bool splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);
 	bool split(const std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons);
 
-	void computeInset(float offsetDistance, Loop3D &pgonInset) const;
-	void computeInset2(float offsetDistance, Loop3D& pgonInset) const;
-	void computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset) const;
+	void offsetOutside(float offsetDistance, Loop3D& polygonOffset) const;
+	void offsetOutsideCGAL(float offsetDistance, Loop3D& polygonOffset) const;
+	void offsetInside(float offsetDistance, std::vector<Loop3D>& pgonInsets) const;
+	void offsetInside(std::vector<float>& offsetDistances, std::vector<Loop3D>& pgonInsets) const;
+	void offsetInsideCGAL(float offsetDistance, std::vector<Loop3D>& pgonInsets) const;
 
 	bool isPointWithinLoop(const QVector3D& pt) const {
 		return contour.isPointWithinLoop(pt);

@@ -157,9 +157,17 @@ bool VBOPmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
 
 	RoadEdgeIter ei, eend;
 	for (boost::tie(ei, eend) = boost::edges(roadGraph.graph); ei != eend; ++ei) {
+		RoadVertexDesc src = boost::source(*ei, roadGraph.graph);
+		RoadVertexDesc tgt = boost::target(*ei, roadGraph.graph);
+
 		RoadEdgeIter ei2;
 		for (ei2 = ei; ei2 != eend; ++ei2) {
 			if (ei2 != ei) {
+				RoadVertexDesc src2 = boost::source(*ei2, roadGraph.graph);
+				RoadVertexDesc tgt2 = boost::target(*ei2, roadGraph.graph);
+
+				if (src == src2 || src == tgt2 || tgt == src2 || tgt == tgt2) continue;
+
 				if (GraphUtil::isIntersect(roadGraph, roadGraph.graph[*ei]->polyline, roadGraph.graph[*ei2]->polyline)) {
 					if (std::find(edgesToRemove.begin(), edgesToRemove.end(), ei2) == edgesToRemove.end()) {
 						edgesToRemove.push_back(ei2);
@@ -173,11 +181,11 @@ bool VBOPmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
 		}		
 	}
 
-	for(int i=0; i<edgesToRemove.size(); ++i){
+	for (int i = 0; i < edgesToRemove.size(); ++i) {
 		boost::remove_edge(*(edgesToRemove[i]), roadGraph.graph);
 	}
 
-	if(edgesToRemove.size()>0){
+	if (edgesToRemove.size() > 0) {
 		printf("Edge removed %d\n", edgesToRemove.size());
 		return true;
 	} else {
@@ -193,16 +201,15 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	GraphUtil::normalizeLoop(roadGraph);
 
 	roadGraphPtr = &roadGraph;
-	blocksPtr = &blocks.blocks;
+	//blocksPtr = &blocks.blocks;
+	std::vector<Block> tmpBlocks;
+	blocksPtr = &tmpBlocks;
 	blocksPtr->clear();
 
 	bool isPlanar = false;
 	bool converges = true;
-
-	//GraphUtil::planarify(roadGraph);
-	//GraphUtil::clean(roadGraph);
 	
-	//Make sure graph is planar
+	// Make sure graph is planar
 	typedef std::vector< RoadEdgeDesc > tEdgeDescriptorVector;
 	std::vector<tEdgeDescriptorVector> embedding(boost::num_vertices(roadGraph.graph));
 
@@ -237,7 +244,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	buildEmbedding(roadGraph, embedding);
 	printf("embedding was built.\n");
 
-	//Create edge index property map?	
+	// Create edge index property map?	
 	typedef std::map<RoadEdgeDesc, size_t> EdgeIndexMap;
 	EdgeIndexMap mapEdgeIdx;
 	boost::associative_property_map<EdgeIndexMap> pmEdgeIndex(mapEdgeIdx);		
@@ -247,36 +254,21 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 		mapEdgeIdx.insert(std::make_pair(*ei, edge_count++));	
 	}
 
-	//Extract blocks from road graph using boost graph planar_face_traversal
+	// Extract blocks from road graph using boost graph planar_face_traversal
 	vertex_output_visitor v_vis;	
 	boost::planar_face_traversal(roadGraph.graph, &embedding[0], v_vis, pmEdgeIndex);
 
 	printf("roads graph was traversed. %d blocks were extracted.\n", blocks.size());
 
-	//Misc postprocessing operations on blocks =======
-	int maxVtxCount = 0;
-	int maxVtxCountIdx = -1;
-	std::vector<float> blockAreas;
-
-
-
-	/*
-	for (int i = 0; i < blocks.size(); ++i) {
-		char filename[255];
-		sprintf(filename, "block_images/block_%d.jpg", i);
-		VBOPmBlocks::saveBlockImage(roadGraph, blocks[i].sidewalkContour, filename);
-	}
-	*/
-
 	// Remove invalid data
-	for (int i = 0; i < blocks.size(); ) {
-		if (blocks[i].sidewalkContour.size() != blocks[i].sidewalkContourRoadsWidths.size()) {
-			std::cout << "!!!!! Error: contour:" << blocks[i].sidewalkContour.size() << ", width: " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
-			blocks.blocks.erase(blocks.blocks.begin() + i);
+	for (int i = 0; i < tmpBlocks.size();) {
+		if (tmpBlocks[i].sidewalkContour.size() != tmpBlocks[i].sidewalkContourRoadsWidths.size()) {
+			std::cout << "!!!!! Error: contour:" << tmpBlocks[i].sidewalkContour.size() << ", width: " << tmpBlocks[i].sidewalkContourRoadsWidths.size() << "\n";
+			tmpBlocks.erase(tmpBlocks.begin() + i);
 		}
-		else if (blocks[i].sidewalkContour.size() < 3) {
+		else if (tmpBlocks[i].sidewalkContour.size() < 3) {
 			std::cout << "!!!!! Error: Contour <3 " << "\n";
-			blocks.blocks.erase(blocks.blocks.begin() + i);
+			tmpBlocks.erase(tmpBlocks.begin() + i);
 		}
 		else {
 			i++;
@@ -286,34 +278,35 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	// Remove the largest block
 	float maxArea = -std::numeric_limits<float>::max();
 	int maxAreaIdx = -1;
-	for (int i = 0; i < blocks.size(); ++i) {
+	for (int i = 0; i < tmpBlocks.size(); ++i) {
 		// order the face in counter clockwise
-		if (blocks[i].sidewalkContour.isClockwise()) {
-			std::reverse(blocks[i].sidewalkContour.contour.begin(), blocks[i].sidewalkContour.contour.end());
-			std::reverse(blocks[i].sidewalkContourRoadsWidths.begin(), blocks[i].sidewalkContourRoadsWidths.end());
+		if (tmpBlocks[i].sidewalkContour.isClockwise()) {
+			std::reverse(tmpBlocks[i].sidewalkContour.contour.begin(), tmpBlocks[i].sidewalkContour.contour.end());
+			std::reverse(tmpBlocks[i].sidewalkContourRoadsWidths.begin(), tmpBlocks[i].sidewalkContourRoadsWidths.end());
 		}
 
-		float area = blocks[i].sidewalkContour.area();
+		float area = tmpBlocks[i].sidewalkContour.area();
 		if (area > maxArea) {
 			maxArea = area;
 			maxAreaIdx = i;
 		}
 	}
 	if (maxAreaIdx != -1) {
-		blocks.blocks.erase(blocks.blocks.begin() + maxAreaIdx);
+		tmpBlocks.erase(tmpBlocks.begin() + maxAreaIdx);
 	}
 
-
-	for (int i = 0; i < blocks.size(); ++i) {
+	blocks.clear();
+	for (int i = 0; i < tmpBlocks.size(); ++i) {
 		// Compute block offset
-		Loop3D sidewalkContourInset;
-		blocks[i].sidewalkContour.computeInset(blocks[i].sidewalkContourRoadsWidths, sidewalkContourInset);
+		std::vector<Loop3D> sidewalkContours;
+		tmpBlocks[i].sidewalkContour.offsetInside(tmpBlocks[i].sidewalkContourRoadsWidths, sidewalkContours);
 
-		blocks[i].sidewalkContour.contour = sidewalkContourInset;
+		for (int j = 0; j < sidewalkContours.size(); ++j) {
+			blocks.blocks.push_back(Block());
+			blocks.blocks.back().sidewalkContour.contour = sidewalkContours[j];
+		}
 	}
-
-
-
+	
 	// GEN: remove the blocks whose edges are less than 3
 	// This problem is caused by the computeInset() function.
 	// ToDo: fix the computeInset function.
@@ -386,12 +379,12 @@ void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& bloc
 		}
 
 		if (min_z < G::getFloat("sea_level")) {
+			blocks.blocks.erase(blocks.blocks.begin() + i);
 			blocks[i].valid = false;
 			continue;
 		}
 		else if (max_z - min_z > 20.0f) {
 			blocks[i].isPark = true;
-			continue;
 		}
 	}
 }
@@ -406,8 +399,12 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");
-		blocks[i].sidewalkContour.computeInset(sidewalk_width, blockContourInset);
-		blocks[i].blockContour.contour = blockContourInset;
+		std::vector<Loop3D> contours;
+		blocks[i].sidewalkContour.offsetInside(sidewalk_width, contours);
+
+		if (contours.size() > 0) {
+			blocks[i].blockContour.contour = contours[0];
+		}
 	}
 }
 
