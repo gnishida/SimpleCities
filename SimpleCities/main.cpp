@@ -10,15 +10,7 @@ int main(int argc, char *argv[]) {
 	G::global()["showParcels"] = true;
 	G::global()["showTrees"] = true;
 
-	G::global()["parcelAreaMean"] = 3600;
-	G::global()["parcelAreaDeviation"] = 49;
-	G::global()["parcelSplitDeviation"] = 0.19;
-	G::global()["parkPercentage"] = 0.2f;
 	G::global()["parksRatio"] = 0.05f;
-
-	G::global()["meanBuildingFloorHeight"] = 3.0f;
-	G::global()["maxHeightBaseAspectRatio"] = 1.0f;
-	G::global()["minBuildingArea"] = 10.0f;
 
 	G::global()["roadAngleTolerance"] = 0.52f;
 	G::global()["slopeTolerance"] = 0.3f;
@@ -39,7 +31,6 @@ int main(int argc, char *argv[]) {
 	G::global()["parcel_setback_front"] = 5.0f;
 	G::global()["parcel_setback_rear"] = 5.0f;
 	G::global()["parcel_setback_sides"] = 5.0f;
-	G::global()["building_max_frontage"] = 0.0f;
 	G::global()["building_max_depth"] = 0.0f;
 	G::global()["building_stories_deviation"] = 0.0f;// 2.0f;
 	G::global()["building_stories_mean"] = 5;

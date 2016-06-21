@@ -65,7 +65,7 @@ void addTexExtrudedGeom(VBORenderManager& rendManager, const QString& name, cons
 	rendManager.addStaticGeometry(name, vert, facadeTex[randomFacade], GL_TRIANGLES, 2 | mode_Lighting);
 }
 
-void addConvexPoly(VBORenderManager& rendManager, QString geoName, const Loop3D& polygon, const QColor& color, const QVector3D& norm, float z){
+void addConvexPoly(VBORenderManager& rendManager, QString geoName, const Loop3D& polygon, const QColor& color, float z, bool flipped = false) {
 	if (polygon.size() < 3) return;
 
 	VBORenderManager::PolygonSetP polySet;
@@ -87,8 +87,13 @@ void addConvexPoly(VBORenderManager& rendManager, QString geoName, const Loop3D&
 	boost::polygon::get_trapezoids(allP, polySet);
 	std::vector<Vertex> vert;
 
+	QVector3D norm(0, 0, 1);
+	if (flipped) {
+		norm = QVector3D(0, 0, -1);
+	}
+
 	for (int i = 0; i < allP.size(); ++i) {
-		Polygon2D points;
+		Loop3D points;
 		std::vector<QVector3D> texP;
 		for (auto it = allP[i].begin(); it != allP[i].end(); ++it) {
 			VBORenderManager::pointP cP = *it;
@@ -96,8 +101,9 @@ void addConvexPoly(VBORenderManager& rendManager, QString geoName, const Loop3D&
 		}
 
 		if (points.size() >= 3) {
-			points.correct();
-			std::reverse(points.begin(), points.end());
+			if ((!flipped && points.isClockwise()) || (flipped && !points.isClockwise())) {
+				std::reverse(points.begin(), points.end());
+			}
 			for (int k = 1; k < points.size() - 1; ++k) {
 				vert.push_back(Vertex(QVector3D(points[0].x(), points[0].y(), z), color, norm, QVector3D(0, 0, 0)));
 				vert.push_back(Vertex(QVector3D(points[k].x(), points[k].y(), z), color, norm, QVector3D(0, 0, 0)));
@@ -109,7 +115,7 @@ void addConvexPoly(VBORenderManager& rendManager, QString geoName, const Loop3D&
 	rendManager.addStaticGeometry(geoName, vert, "", GL_TRIANGLES, 1 | mode_Lighting);
 }
 
-void addTexConvexPoly(VBORenderManager& rendManager, const QString& geoName, const QString& textureName, int shaderMode, const Loop3D& pos, const QColor& col, const QVector3D& norm, float zShift, const QVector3D& texScale) {
+void addTexConvexPoly(VBORenderManager& rendManager, const QString& geoName, const QString& textureName, int shaderMode, const Loop3D& pos, const QColor& col, float zShift, const QVector3D& texScale, bool flipped = false) {
 	if (pos.size() < 3) return;
 
 	VBORenderManager::PolygonSetP polySet;
@@ -134,13 +140,18 @@ void addTexConvexPoly(VBORenderManager& rendManager, const QString& geoName, con
 		maxY = std::max<float>(maxY, xformPos[i].y());
 	}
 
+	QVector3D norm(0, 0, 1);
+	if (flipped) {
+		norm = QVector3D(0, 0, -1);
+	}
+
 	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
 	polySet += tempPolyP;
 	std::vector<VBORenderManager::polygonP> allP;
 	boost::polygon::get_trapezoids(allP,polySet);
 	std::vector<Vertex> vert;
 	for (int i = 0; i < allP.size(); ++i) {
-		Polygon3D points;
+		Loop3D points;
 		std::vector<QVector3D> texP;
 		for (auto it = allP[i].begin(); it != allP[i].end(); ++it) {
 			VBORenderManager::pointP cP=*it;
@@ -153,14 +164,14 @@ void addTexConvexPoly(VBORenderManager& rendManager, const QString& geoName, con
 				QVector3D cP2 = xformMat * QVector3D(cP.x(), cP.y(), 0);
 				texP.push_back(QVector3D((cP2.x() - minX) * texScale.x(), (cP2.y() - minY) * texScale.y(), 0.0f));
 			}
-
-			if (points.isClockwise()) {
-				std::reverse(points.contour.begin(), points.contour.end());
-				std::reverse(texP.begin(), texP.end());
-			}
 		}
 
-		for (int k = 1; k < points.contour.size() - 1; ++k) {
+		if ((!flipped && points.isClockwise()) || (flipped && !points.isClockwise())) {
+			std::reverse(points.begin(), points.end());
+			std::reverse(texP.begin(), texP.end());
+		}
+
+		for (int k = 1; k < points.size() - 1; ++k) {
 			vert.push_back(Vertex(points[0], col, norm, texP[0]));
 			vert.push_back(Vertex(points[k], col, norm, texP[k]));
 			vert.push_back(Vertex(points[k + 1], col, norm, texP[k + 1]));
@@ -187,22 +198,20 @@ void addFirstFloor(VBORenderManager& rendManager, std::vector<QVector3D>& footpr
 	rendManager.addStaticGeometry("3d_building", sideVert, "", GL_TRIANGLES, 1 | mode_Lighting);//|LC::mode_Lighting);
 }
 
-void addBox(VBORenderManager& rendManager, const Loop3D& roofOffCont,QColor boxColor,float initHeight,float boxSize){
-	addConvexPoly(rendManager, "3d_building", roofOffCont, boxColor, QVector3D(0, 0, 1.0f), initHeight+boxSize);
+void addBox(VBORenderManager& rendManager, const Loop3D& roofOffCont, const QColor& color, float z, float height) {
+	addConvexPoly(rendManager, "3d_building", roofOffCont, color, z + height);
 
-	Loop3D cont = roofOffCont;
-	std::reverse(cont.begin(), cont.end());
-	addConvexPoly(rendManager, "3d_building", cont, boxColor, QVector3D(0, 0, -1.0f), initHeight);
+	addConvexPoly(rendManager, "3d_building", roofOffCont, color, z, true);
 
-	addExtrudedGeom(rendManager, "3d_building", roofOffCont, boxColor, initHeight, boxSize);
+	addExtrudedGeom(rendManager, "3d_building", roofOffCont, color, z, height);
 }
 
 void addRoof(VBORenderManager& rendManager, const Loop3D& roofOffCont, const QColor& roofColor, float initHeight, float roofHeight) {
-	addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, roofOffCont, roofColor, QVector3D(0, 0, 1.0f), initHeight + roofHeight, QVector3D(0, 0, 0));
+	addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, roofOffCont, roofColor, initHeight + roofHeight, QVector3D(0, 0, 0));
 
-	Loop3D cont = roofOffCont;
-	std::reverse(cont.begin(), cont.end());
-	addTexConvexPoly(rendManager, "3d_building", "", 1 | mode_Lighting, cont, roofColor, QVector3D(0, 0, -1.0f), initHeight, QVector3D(0, 0, 0));
+	Loop3D reversed_contour = roofOffCont;
+	std::reverse(reversed_contour.begin(), reversed_contour.end());
+	addConvexPoly(rendManager, "3d_building", reversed_contour, roofColor, initHeight, true);
 
 	addExtrudedGeom(rendManager, "3d_building", roofOffCont, roofColor, initHeight, roofHeight);
 }
@@ -600,7 +609,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 		//addExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z, building.numStories * storyHeight);
 		addTexExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, building.color, min_elev, building.numStories * storyHeight);
 		//addConvexPoly(rendManager, "3d_building", building.buildingFootprint.contour, building.color, z + building.numStories * storyHeight);
-		addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, building.buildingFootprint.contour, building.color, QVector3D(0, 0, 1), min_elev + building.numStories * storyHeight, QVector3D(0, 0, 0));
+		addTexConvexPoly(rendManager, "3d_building", roofTex[qrand() % roofTex.size()], 2 | mode_Lighting, building.buildingFootprint.contour, building.color, min_elev + building.numStories * storyHeight, QVector3D(0, 0, 0));
 	}
 
 	if (building.bldType == 1) {
@@ -621,6 +630,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager, Building& b
 		///////////////////////////
 		// Add Base
 		addExtrudedGeom(rendManager, "3d_building", building.buildingFootprint.contour, bldgColor, min_elev, baseHeight);
+		addConvexPoly(rendManager, "3d_building", building.buildingFootprint.contour, bldgColor, min_elev + baseHeight);
 
 		/// Add columns
 		std::vector<QVector3D> columnContour;

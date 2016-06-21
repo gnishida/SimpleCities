@@ -42,7 +42,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 			std::reverse(block.myParcels.back().parcelContour.contour.begin(), block.myParcels.back().parcelContour.contour.end());
 		}
 
-		if (Util::genRand() < 0.05) {
+		if (Util::genRand() < G::getFloat("parksRatio")) {
 			block.myParcels.back().isPark = true;
 		}
 	}

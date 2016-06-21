@@ -280,6 +280,10 @@ float Util::angleThreePoints(const QVector3D& pa, const QVector3D& pb, const QVe
 	return acos(0.999f * (a*a + c*c - b*b) / (2.0f*a*c));
 }
 
+double Util::angleBetweenVectors(const QVector2D& vec1, const QVector2D& vec2) {
+	return acos(0.999*(QVector2D::dotProduct(vec1, vec2)) / (vec1.length() * vec2.length()));
+}
+
 double Util::angleBetweenVectors(const QVector3D& vec1, const QVector3D& vec2) {
 	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
 }

@@ -135,24 +135,26 @@ void Polygon3D::offsetOutside(float offsetDistance, Loop3D& polygonOffset) const
 		int prev = (cur - 1 + contour.size()) % contour.size();
 		int next = (cur + 1) % contour.size();
 
-		if (Util::diffAngle(contour[prev] - contour[cur], contour[next] - contour[cur]) < 0.1f) {
-			// For deanend edge
+		QVector2D vec1 = QVector2D(contour[cur] - contour[prev]);
+		QVector2D vec2 = QVector2D(contour[next] - contour[cur]);
+		if (vec1.x() * vec2.y() - vec1.y() * vec2.x() > 0 && Util::angleBetweenVectors(-vec1, vec2) < 0.1f) {
+			// For a acute bump
 			QVector3D vec = contour[cur] - contour[prev];
-			QVector3D vec2(-vec.y(), vec.x(), 0);
+			QVector3D perp(vec.y(), -vec.x(), 0);
 
-			float angle = atan2f(vec2.y(), vec2.x());
+			float angle = atan2f(perp.y(), perp.x());
 			for (int i = 0; i <= 10; ++i) {
-				float a = angle - (float)i * M_PI / 10.0f;
+				float a = angle + (float)i * M_PI / 10.0f;
 				intPt = QVector3D(contour[cur].x() + cosf(a) * offsetDistance, contour[cur].y() + sinf(a) * offsetDistance, contour[cur].z());
 				polygonOffset.push_back(intPt);
 			}
 		}
 		else {
-			Util::getIrregularBisector(contour[prev], contour[cur], contour[next], offsetDistance, offsetDistance, intPt);
+			Util::getIrregularBisector(contour[prev], contour[cur], contour[next], -offsetDistance, -offsetDistance, intPt);
 
 			// 方向をチェック
 			if (polygonOffset.size() > 0) {
-				if (QVector3D::dotProduct(contour[cur] - contour[prev], intPt - polygonOffset.back()) < 0) {
+				if (QVector3D::dotProduct(vec1, intPt - polygonOffset.back()) < 0) {
 					wrongDirection = true;
 					break;
 				}
@@ -222,9 +224,9 @@ void Polygon3D::offsetInside(std::vector<float>& offsetDistances, std::vector<Lo
 
 		if (Util::diffAngle(contour[prev] - contour[cur], contour[next] - contour[cur]) < 0.1f) {
 			QVector3D vec = contour[cur] - contour[prev];
-			QVector3D vec2(-vec.y(), vec.x(), 0);
+			QVector3D perp(-vec.y(), vec.x(), 0);
 
-			float angle = atan2f(vec2.y(), vec2.x());
+			float angle = atan2f(perp.y(), perp.x());
 			for (int i = 0; i <= 10; ++i) {
 				float a = angle - (float)i * M_PI / 10.0f;
 				QVector3D intPt(contour[cur].x() + cosf(a) * offsetDistances[cur], contour[cur].y() + sinf(a) * offsetDistances[cur], contour[cur].z());
