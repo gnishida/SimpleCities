@@ -108,11 +108,9 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 	} else if (ctrlPressed) {	// Rotate
 		camera.changeXRotation(dy * 0.4);
 		camera.changeZRotation(dx * 0.4);
-		updateCamera();
 		lastPos = event->pos();
 	} else if (event->buttons() & Qt::LeftButton) {	// Translate
 		camera.changeLookAt(-dx, dy, 0);
-		updateCamera();
 		lastPos = event->pos();
 	}
 
@@ -121,7 +119,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 
 void GLWidget3D::wheelEvent(QWheelEvent* e) {
 	camera.changeXYZTranslation(0, 0, -e->delta() * 0.2);
-	updateCamera();
 
 	updateGL();
 }
@@ -155,14 +152,13 @@ void GLWidget3D::initializeGL() {
 
 	///
 	vboRenderManager.init();
-	updateCamera();
 	shadow.initShadow(vboRenderManager.program,this);
 	glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);//SHADOW: Disable
 	glUniform1i(glGetUniformLocation(vboRenderManager.program, "terrainMode"), 0);//FLAT
 }
 
 void GLWidget3D::resizeGL(int width, int height) {
-	updateCamera();
+	camera.updatePerspective(width, height);
 }
 
 void GLWidget3D::paintGL() {
@@ -172,6 +168,7 @@ void GLWidget3D::paintGL() {
 	glDisable(GL_TEXTURE_2D);
 	
 	// NOTE: camera transformation is not necessary here since the updateCamera updates the uniforms each time they are changed
+	updateCamera();
 
 	drawScene(0);		
 }
