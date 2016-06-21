@@ -353,15 +353,14 @@ void VBOPmBlocks::buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadE
 
 
 void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks) {
-	for (int i = 0; i < blocks.size(); ++i) {
-		if (!blocks[i].valid) continue;
-
+	for (int i = 0; i < blocks.size(); ) {
 		BBox3D bbox;
 		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
 
 		// If the block is too narrow, make it park.
 		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
 			blocks[i].isPark = true;
+			i++;
 			continue;
 		}
 
@@ -380,11 +379,13 @@ void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& bloc
 
 		if (min_z < G::getFloat("sea_level")) {
 			blocks.blocks.erase(blocks.blocks.begin() + i);
-			blocks[i].valid = false;
-			continue;
 		}
-		else if (max_z - min_z > 20.0f) {
-			blocks[i].isPark = true;
+		else {
+			if (max_z - min_z > 20.0f) {
+				blocks[i].isPark = true;
+			}
+
+			i++;
 		}
 	}
 }
@@ -395,8 +396,6 @@ void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& bloc
 void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
 	// Compute the block contour (the outer part becomes sidewalks)
 	for (int i = 0; i < blocks.size(); ++i) {
-		if (!blocks[i].valid) continue;
-
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");
 		std::vector<Loop3D> contours;

@@ -47,8 +47,6 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, const 
 	const float deltaZ = 2.3f;
 
 	for (int i = 0; i < blocks.size(); ++i) {
-		if (!blocks[i].valid) continue;
-
 		// side walks
 		{
 			std::vector<QVector3D> polygon;
@@ -175,7 +173,6 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 
 	QColor parkColor(0xca, 0xdf, 0xaa);
 	for (int bN = 0; bN < blocks.size(); ++bN) {
-		if (!blocks[bN].valid) continue;
 		if (blocks[bN].isPark) {
 			Loop3D parkC = blocks[bN].blockContour.contour;
 			if (parkC.size() > 2) {
@@ -190,7 +187,7 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, con
 	if (parcelLine > 0) {
 		glLineWidth(parcelLine);
 		std::vector<Vertex> vert;
-		for(int bN=0;bN<blocks.size();bN++){
+		for(int bN = 0; bN < blocks.size(); ++bN) {
 			if (blocks[bN].isPark) continue;
 						
 			for (int pN = 0; pN < blocks[bN].myParcels.size(); ++pN) {

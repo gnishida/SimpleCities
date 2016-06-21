@@ -13,10 +13,9 @@ public:
 	std::vector<float> sidewalkContourRoadsWidths;
 	bool isPark;
 	std::vector<Parcel> myParcels;
-	bool valid;
 
 public:
-	Block() : isPark(false), valid(true) {}
+	Block() : isPark(false) {}
 
 	void clear();
 	void findParcelFrontAndBackEdges(const Parcel& inParcel, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges);
