@@ -46,7 +46,6 @@ public:
 
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);
-	void mouseTo2D(int x, int y, QVector2D& result);
 	void drawScene(int drawMode);
 	void updateCamera();
 

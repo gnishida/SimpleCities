@@ -93,7 +93,6 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	vboRenderManager.removeStaticGeometry("3d_parcels");
 	vboRenderManager.removeStaticGeometry("3d_roads");
 	vboRenderManager.removeStaticGeometry("3d_building");
-	vboRenderManager.removeStaticGeometry("3d_building_fac");
 	vboRenderManager.removeStaticGeometry("tree");
 	vboRenderManager.removeStaticGeometry("streetLamp");
 

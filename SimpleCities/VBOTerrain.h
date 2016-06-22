@@ -31,7 +31,7 @@ public:
 	//int resolution() { return _resolution; };
 	void init(VBORenderManager* rendManager, const glm::vec2& size);
 
-	void render(bool drawEditingCircle);
+	void render();
 	void updateGaussian(float u, float v, float height, float rad_ratio);
 	void excavate(float u, float v, float height, float rad_ratio);
 	void smoothTerrain();

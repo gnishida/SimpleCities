@@ -38,7 +38,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 	generateAvenueSeeds(seeds);
 
 	// Avenueを生成
-	std::cout << "Avenue generation started." << std::endl;
+	//std::cout << "Avenue generation started." << std::endl;
 	{
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < 100; ) {
@@ -61,7 +61,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			std::cout << "attemptExpansion (avenue): " << iter << " (Seed: " << desc << ")" << std::endl;
+			//std::cout << "attemptExpansion (avenue): " << iter << " (Seed: " << desc << ")" << std::endl;
 			attemptExpansion(RoadEdge::TYPE_AVENUE, desc, seeds);
 
 			if (false) {

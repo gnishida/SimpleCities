@@ -24,9 +24,6 @@
 #include <boost/polygon/polygon.hpp>
 #endif
 
-//class VBOTerrain;
-//class vboWater;
-
 const int mode_AdaptTerrain=0x0100;
 const int mode_Lighting=0x0200;
 const int mode_TexArray=0x0400;
@@ -35,38 +32,47 @@ const int mode_Tex3D=0x0800;
 //0x0100 --> adapt vboRenderManager
 //0x0200 --> lighting
 
-struct RenderSt{
-	uint texNum;//0 means use color
-	//int gridIndex;
+struct RenderSt {
+	uint texNum; //0 means use color
 	GLuint vbo;
 	GLuint vao;
-	int numVertex;//defines if the vbo has been created
+	int numVertex; //defines if the vbo has been created
 	std::vector<Vertex> vertices;
 
 	GLenum geometryType;
 	int shaderMode;
 
-	RenderSt(uint _texNum,std::vector<Vertex> _vertices,GLenum geoT,int shModer){
-		texNum=_texNum;
-		vertices=_vertices;
-		geometryType=geoT;
-		shaderMode=shModer;
-		numVertex=-1;
+	RenderSt(uint _texNum, const std::vector<Vertex>& _vertices, GLenum geoT, int shModer) {
+		texNum = _texNum;
+		vertices = _vertices;
+		geometryType = geoT;
+		shaderMode = shModer;
+		numVertex = -1;
 	}
-	RenderSt(){
-		numVertex=-1;
+	RenderSt() {
+		numVertex = -1;
 	}
 };
-
-typedef QHash<uint,RenderSt> renderGrid;
 
 /////////////////////////////////////
 // VBORenderManager
 
 class VBORenderManager {
+public:
+	GLuint program;
+	
+	VBOTerrain vboTerrain;
+	QVector3D minPos;
+	QVector3D maxPos;
+	glm::vec2 size;
+	VBOSkyBox vboSkyBox;	// sky
+	VBOWater vboWater;		// water
+
+	QHash<QString, QHash<uint, RenderSt>> geoName2StaticRender;
+		
+	QHash<QString, std::vector<ModelSpec>> nameToVectorModels;	// models
 
 public:
-
 	// POLYGON
 	typedef boost::polygon::point_data<double> pointP;
 	typedef boost::polygon::polygon_set_data<double> polygon_setP;
@@ -74,39 +80,22 @@ public:
 	typedef std::pair<pointP, pointP> edgeP;
 	typedef std::vector<boost::polygon::polygon_data<double> > PolygonSetP;
 
-
-	QMap<QString,int> geoNameToGeoNum;
-	GLuint program;
-	int currentIndexGeo;
-
 	VBORenderManager();
 	~VBORenderManager();
 
 	void init();
 
-	// layers & vboRenderManager
-	bool editionMode;
-	QVector3D mousePos3D;
-	VBOTerrain vboTerrain;
 	void changeTerrainDimensions(const glm::vec2& terrainSize);
 	float getTerrainHeight(float x, float y);
 	float getMinTerrainHeight(float x, float y, float radius = 20.0f);
 	void changeTerrainShader(int newMode);
-	QVector3D minPos;
-	QVector3D maxPos;
-	glm::vec2 size;
 
-	// sky
-	VBOSkyBox vboSkyBox;
-
-	/// water
-	VBOWater vboWater;
 	void renderWater();
 
 	// textures
 	QHash<QString,GLuint> nameToTexId;
-	GLuint loadTexture(const QString fileName,bool mirrored=false);
-	GLuint loadArrayTexture(QString texName,std::vector<QString> fileNames);
+	GLuint loadTexture(const QString fileName, bool mirrored = false);
+	GLuint loadArrayTexture(QString texName, const std::vector<QString>& fileNames);
 
 	//static
 	bool addStaticGeometry(const QString& geoName, const std::vector<Vertex>& vert, const QString& textureName, GLenum geometryType, int shaderMode);
@@ -114,24 +103,14 @@ public:
 	bool removeStaticGeometry(const QString& geoName);
 	void renderStaticGeometry(const QString& geoName);
 
-	void addPoint(const QString &name, const QVector2D& pt, const QColor& color, float height);
-	void addPolyline(const QString &linesN, const Polyline3D& polyline, const QColor& color);
-
-	//models
-	QHash<QString,std::vector<ModelSpec>> nameToVectorModels;
-	bool initializedStreetElements;
-	void addStreetElementModel(const QString& name,ModelSpec mSpec);
+	void addStreetElementModel(const QString& name, const ModelSpec& mSpec);
 	void renderAllStreetElementName(const QString& name);
 	void removeAllStreetElementName(const QString& name);
 	
-	void renderAll(bool cleanVertex);
+	void renderAll();
+
 private:
-
-	QHash<QString, QHash<int, renderGrid>> geoName2RenderGrids;
-	QHash<QString, renderGrid> geoName2StaticRender;
-
-	void renderVAO(RenderSt& renderSt, bool cleanVertex);
+	void renderVAO(RenderSt& renderSt);
 	bool createVAO(const std::vector<Vertex>& vert, GLuint& vbo, GLuint& vao, int& numVertex);
 	void cleanVAO(GLuint vbo, GLuint vao);
-
 };

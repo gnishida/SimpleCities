@@ -81,13 +81,8 @@ void VBOTerrain::init(VBORenderManager* rendManager, const glm::vec2& size) {
 	initialized = true;
 }
 
-void VBOTerrain::render(bool drawEditingCircle) {
-	bool editionMode = rendManager->editionMode;
-	QVector3D mousePos = rendManager->mousePos3D;
-
-	//////////////////////////////////////////
-	// TERRAIN
-	//glCullFace(GL_FRONT);
+void VBOTerrain::render() {
+	// glCullFace(GL_FRONT);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	GLuint vao;
@@ -131,62 +126,6 @@ void VBOTerrain::render(bool drawEditingCircle) {
 	glEnable(GL_CULL_FACE);
 	glBindVertexArray(0);
 	glDeleteVertexArrays(1,&vao);
-
-	//////////////////////
-	// EDITION
-	if (editionMode && drawEditingCircle) {
-		glLineWidth(5.0f);
-		glPointSize(10.0f);
-
-		VBOUtil::check_gl_error(">>editionMode");
-
-		const float pointOffset=5.0f;
-		GLuint vao;
-		glGenVertexArrays(1,&vao);
-		glBindVertexArray(vao);
-		GLuint edPointsVBO;
-		glGenBuffers(1, &edPointsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, edPointsVBO);
-			
-		std::vector<Vertex> points;
-		int numPointsCircle=20;
-		points.resize(numPointsCircle);
-
-		QVector3D posM = rendManager->mousePos3D;//(0,0,0);
-		// circle
-		float radius = G::global().getFloat("2DterrainEditSize");
-		int degreesSegmentCircle=360.0f/numPointsCircle;
-		for (int i=0; i < numPointsCircle; i++){
-			float degInRad = i*degreesSegmentCircle*0.0174532925f;//degree to rad
-			QVector3D pos(cos(degInRad)*radius,sin(degInRad)*radius,0);
-			pos+=posM;
-			pos.setZ(50.0f);
-			points[i] = Vertex(pos.x(),pos.y(),pos.z(), QColor(), 0,0,1.0f,0,0,0);
-		}
-
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*points.size(), points.data(), GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),0);
-		glEnableVertexAttribArray(1);
-		VBOUtil::check_gl_error("aa editionMode");
-		glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(3*sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(6*sizeof(float)));
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(9*sizeof(float)));
-		glUniform1i(glGetUniformLocation(rendManager->program, "mode"), 1|mode_AdaptTerrain);//MODE: color
-
-		//draw points
-		glDrawArrays(GL_POINTS,0,points.size()-numPointsCircle);
-		//draw circle
-		glDrawArrays(GL_LINE_LOOP,points.size()-numPointsCircle,numPointsCircle);
-
-		glDeleteBuffers(1,&edPointsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glDeleteVertexArrays(1,&vao);
-	}
 }
 
 /**
