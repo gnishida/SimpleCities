@@ -9,7 +9,7 @@
 
 class VBORenderManager;
 
-class VBOGeoBuilding {
+class GeoBuilding {
 public:
 	static void generateBuilding(VBORenderManager& rendManager, Building& building);
 	static void generateHouse(VBORenderManager& rendManager, Building& building);

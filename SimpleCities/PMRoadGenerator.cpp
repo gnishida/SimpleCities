@@ -73,7 +73,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			iter++;
 		}
 	}
-	std::cout << "Avenue generation completed." << std::endl;
+	//std::cout << "Avenue generation completed." << std::endl;
 
 	seeds.clear();
 
@@ -102,7 +102,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
+			//std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
 
 			// エリアの外なら、スキップする
 			if (!targetArea.contains(roads.graph[desc]->pt)) {

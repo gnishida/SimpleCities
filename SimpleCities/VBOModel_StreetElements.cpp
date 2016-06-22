@@ -28,7 +28,7 @@
 		
 		streetElementsModels[ind].initModel(fileNames);
 		//streetElementsModels[ind].initScale(0.1f);//trees too big
-		streetElementsModels[ind].initScale(0.08f);
+		streetElementsModels[ind].initScale(0.04f);
 		streetElementsModels[ind].loadModel();
 
 		// street light
@@ -37,7 +37,7 @@
 		fileNames.clear();
 		fileNames.push_back("../data/models/street_lamp.obj");//3m
 		streetElementsModels[ind].initModel(fileNames);
-		streetElementsModels[ind].initScale(5.0f);
+		streetElementsModels[ind].initScale(4.0f);
 		streetElementsModels[ind].loadModel();
 
 		/*// sun

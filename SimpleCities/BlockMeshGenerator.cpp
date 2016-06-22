@@ -74,11 +74,9 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, const 
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_TRIANGLES, 1 | mode_Lighting | mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_QUADS, 1 | mode_Lighting | mode_AdaptTerrain);
 		}
 
 		// parks
@@ -107,11 +105,9 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, const 
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_parks", vert, "", GL_TRIANGLES, 1 | mode_Lighting | mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parks", vert, "", GL_QUADS, 1 | mode_Lighting | mode_AdaptTerrain);
 		}
 	}
 }
@@ -130,7 +126,10 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, const
 		for (int pN = 0; pN < blocks[i].parcels.size(); ++pN) {
 			const Polygon3D& contour = blocks[i].parcels[pN].parcelContour;
 
-			if (contour.isSelfIntersecting()) continue;
+			if (contour.isSelfIntersecting()) {
+				std::cout << "ERROR!!!!!!!!!!!!!   parcel contour is self intersected." << std::endl;
+				continue;
+			}
 
 			if (contour.isClockwise()) {
 				std::cout << "ERROR!!!!!!!!!!!!!   parcel contour is clockwised." << std::endl;
@@ -146,20 +145,18 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, const
 				int ind1 = sN;
 				int ind2 = (sN + 1) % contour.size();
 				
-				QVector3D p1(contour[ind2].x(), contour[ind2].y(), 0);
-				QVector3D p2(contour[ind1].x(), contour[ind1].y(), 0);
-				QVector3D p3(contour[ind1].x(), contour[ind1].y(), deltaZ);
-				QVector3D p4(contour[ind2].x(), contour[ind2].y(), deltaZ);
-				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
+				QVector3D p1(contour[ind1].x(), contour[ind1].y(), 0);
+				QVector3D p2(contour[ind2].x(), contour[ind2].y(), 0);
+				QVector3D p3(contour[ind2].x(), contour[ind2].y(), deltaZ);
+				QVector3D p4(contour[ind1].x(), contour[ind1].y(), deltaZ);
+				QVector3D normal = QVector3D::crossProduct(p2 - p1, p4 - p1).normalized();
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
-				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
 
-			rendManager.addStaticGeometry("3d_parcels", vert, "", GL_TRIANGLES, 1 | mode_Lighting | mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parcels", vert, "", GL_QUADS, 1 | mode_Lighting | mode_AdaptTerrain);
 		}
 	}
 }

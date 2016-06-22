@@ -16,7 +16,7 @@
 
 class VBORenderManager;
 
-class VBOPmBlocks
+class PmBlocks
 {
 public:
 

@@ -10,27 +10,17 @@
 //const int BLDG_WITH_BLDG=1;	// 1 BLDG
 
 
-class Building{
-
+class Building {
 public:
-
-	Building(void){
-		bldType=-1;
-		numStories=0;
-	}
-
-	/**
-	* Destructor
-	**/
-	~Building(void){
-	}
-
-	/**
-	* Data members
-	**/
 	Polygon3D buildingFootprint;
 	int bldType;
 	int subType;
 	int numStories;
 	QColor color;
+
+public:
+	Building() {
+		bldType = -1;
+		numStories = 0;
+	}
 };

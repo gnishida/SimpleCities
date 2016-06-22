@@ -112,8 +112,8 @@ void VBORenderManager::renderVAO(RenderSt& renderSt) {
 		glBindTexture(GL_TEXTURE_2D, renderSt.texNum);
 	}
 
-	glUniform1i (glGetUniformLocation (program, "mode"), mode);
-	glUniform1i (glGetUniformLocation (program, "tex0"), 0);
+	glUniform1i(glGetUniformLocation (program, "mode"), mode);
+	glUniform1i(glGetUniformLocation (program, "tex0"), 0);
 
 	glBindVertexArray(renderSt.vao);
 	glDrawArrays(renderSt.geometryType,0,renderSt.numVertex);
@@ -123,7 +123,9 @@ void VBORenderManager::renderVAO(RenderSt& renderSt) {
 void VBORenderManager::renderAll() {
 	for (auto it = geoName2StaticRender.begin(); it != geoName2StaticRender.end(); ++it) {
 		for (auto it2 = it->begin(); it2 != it->end(); ++it2) {
-			renderVAO(*it2);
+			for (auto it3 = it2->begin(); it3 != it2->end(); ++it3) {
+				renderVAO(*it3);
+			}
 		}
 	}
 }
@@ -207,17 +209,17 @@ bool VBORenderManager::addStaticGeometry(const QString& geoName, const std::vect
 		nameToTexId[texName] = texId;
 	}
 	
-	if (!geoName2StaticRender.contains(geoName) || !geoName2StaticRender[geoName].contains(texId)) {
-		geoName2StaticRender[geoName][texId] = RenderSt(texId, vert, geometryType, shaderMode);
+	if (!geoName2StaticRender.contains(geoName) || !geoName2StaticRender[geoName].contains(texId) || !geoName2StaticRender[geoName][texId].contains(geometryType)) {
+		geoName2StaticRender[geoName][texId][geometryType] = RenderSt(texId, vert, geometryType, shaderMode);
 	}
 
-	if (geoName2StaticRender[geoName][texId].numVertex > 0) {
+	if (geoName2StaticRender[geoName][texId][geometryType].numVertex > 0) {
 		std::cout << "Old vao is removed." << std::endl;
-		geoName2StaticRender[geoName][texId].numVertex = -1;
-		cleanVAO(geoName2StaticRender[geoName][texId].vbo, geoName2StaticRender[geoName][texId].vao);
+		geoName2StaticRender[geoName][texId][geometryType].numVertex = -1;
+		cleanVAO(geoName2StaticRender[geoName][texId][geometryType].vbo, geoName2StaticRender[geoName][texId][geometryType].vao);
 	}
 
-	geoName2StaticRender[geoName][texId].vertices.insert(geoName2StaticRender[geoName][texId].vertices.end(), vert.begin(), vert.end());
+	geoName2StaticRender[geoName][texId][geometryType].vertices.insert(geoName2StaticRender[geoName][texId][geometryType].vertices.end(), vert.begin(), vert.end());
 
 	return true;
 }
@@ -254,7 +256,7 @@ bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vec
 	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
 	polySet += tempPolyP;
 	std::vector<polygonP> allP;
-	boost::polygon::get_trapezoids(allP,polySet);
+	boost::polygon::get_trapezoids(allP, polySet);
 		
 	std::vector<Vertex> vert;
 
@@ -287,9 +289,10 @@ bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vec
 bool VBORenderManager::removeStaticGeometry(const QString& geoName) {
 	if (geoName2StaticRender.contains(geoName)) {
 		for (auto it = geoName2StaticRender[geoName].begin(); it != geoName2StaticRender[geoName].end(); ++it) {
-			cleanVAO(it->vbo, it->vao);
+			for (auto it2 = it->begin(); it2 != it->end(); ++it2) {
+				cleanVAO(it2->vbo, it2->vao);
+			}
 		}
-		geoName2StaticRender[geoName].clear();
 		geoName2StaticRender.remove(geoName);
 	} else {
 		//std::cerr << "ERROR: Remove geometry " << geoName.toUtf8().constData() << ", but it did not exist." << std::endl;
@@ -302,7 +305,9 @@ bool VBORenderManager::removeStaticGeometry(const QString& geoName) {
 void VBORenderManager::renderStaticGeometry(const QString& geoName) {
 	if (geoName2StaticRender.contains(geoName)) {
 		for (auto it = geoName2StaticRender[geoName].begin(); it != geoName2StaticRender[geoName].end(); ++it) {
-			renderVAO(*it);
+			for (auto it2 = it->begin(); it2 != it->end(); ++it2) {
+				renderVAO(*it2);
+			}
 		}
 	} else {
 		//std::cerr << "ERROR: Render geometry " << geoName.toUtf8().constData() << ", but it did not exist." << std::endl;
@@ -317,7 +322,7 @@ void VBORenderManager::addStreetElementModel(const QString& name, const ModelSpe
 }
 
 void VBORenderManager::renderAllStreetElementName(const QString& name) {
-	for(int i=0;i<nameToVectorModels[name].size();i++){
+	for (int i = 0; i < nameToVectorModels[name].size(); ++i) {
 		VBOModel_StreetElements::renderOneStreetElement(program,nameToVectorModels[name][i]);
 	}
 }

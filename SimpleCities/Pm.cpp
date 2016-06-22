@@ -3,23 +3,23 @@
  *		@author igarciad
  ************************************************************************************************/
 
-#include "VBOPm.h"
+#include "Pm.h"
 #include "Polygon3D.h"
 
 #include <qdir.h>
 #include <QStringList>
 #include <QTime>
 
-#include "VBOPmBlocks.h"
-#include "VBOPmParcels.h"
-#include "VBOPmBuildings.h"
+#include "PmBlocks.h"
+#include "PmParcels.h"
+#include "PmBuildings.h"
 #include "BlockSet.h"
-#include "VBOGeoBuilding.h"
-#include "VBOVegetation.h"
+#include "GeoBuilding.h"
+#include "PmVegetation.h"
 #include "Polygon3D.h"
 #include "Util.h"
 
-bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
+bool Pm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_building");
 		
 	for (int bN = 0; bN < blocks.size(); bN++) {
@@ -29,7 +29,7 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 			if (blocks[bN].parcels[pN].isPark) continue;
 			if (blocks[bN].parcels[pN].building.buildingFootprint.size() < 3) continue;
 
-			VBOGeoBuilding::generateBuilding(rendManager, blocks[bN].parcels[pN].building);
+			GeoBuilding::generateBuilding(rendManager, blocks[bN].parcels[pN].building);
 		}
 	}
 	printf("Building generation is done.\n");
@@ -37,8 +37,8 @@ bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 	return true;
 }
 
-bool VBOPm::generateVegetation(VBORenderManager& rendManager, BlockSet& blocks) {
-	VBOVegetation::generateVegetation(rendManager, blocks.blocks);
+bool Pm::generateVegetation(VBORenderManager& rendManager, BlockSet& blocks) {
+	PmVegetation::generateVegetation(rendManager, blocks.blocks);
 
 	return true;
 }

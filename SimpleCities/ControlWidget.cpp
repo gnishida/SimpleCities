@@ -106,7 +106,6 @@ void ControlWidget::changeTerrainShader(int) {
 		terrainMode=1;
 	}
 
-	printf("terrainMode %d\n", terrainMode);
 	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->shadow.makeShadowMap(mainWin->glWidget);

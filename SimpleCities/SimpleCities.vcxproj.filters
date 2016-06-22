@@ -127,21 +127,6 @@
     <ClCompile Include="GLWidget3D_Shadows.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
-    <ClCompile Include="VBOGeoBuilding.cpp">
-      <Filter>PM</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOPm.cpp">
-      <Filter>PM</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOPmBlocks.cpp">
-      <Filter>PM</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOPmBuildings.cpp">
-      <Filter>PM</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOPmParcels.cpp">
-      <Filter>PM</Filter>
-    </ClCompile>
     <ClCompile Include="PropertyWidget.cpp">
       <Filter>Form Files</Filter>
     </ClCompile>
@@ -165,9 +150,6 @@
     </ClCompile>
     <ClCompile Include="nvModel\nvModelQuery.cpp">
       <Filter>VBO\nvModels</Filter>
-    </ClCompile>
-    <ClCompile Include="VBOVegetation.cpp">
-      <Filter>VBO</Filter>
     </ClCompile>
     <ClCompile Include="ControlWidget.cpp">
       <Filter>Form Files</Filter>
@@ -201,6 +183,24 @@
     </ClCompile>
     <ClCompile Include="Block.cpp">
       <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PmParcels.cpp">
+      <Filter>PM</Filter>
+    </ClCompile>
+    <ClCompile Include="PmBuildings.cpp">
+      <Filter>PM</Filter>
+    </ClCompile>
+    <ClCompile Include="PmBlocks.cpp">
+      <Filter>PM</Filter>
+    </ClCompile>
+    <ClCompile Include="Pm.cpp">
+      <Filter>PM</Filter>
+    </ClCompile>
+    <ClCompile Include="GeoBuilding.cpp">
+      <Filter>PM</Filter>
+    </ClCompile>
+    <ClCompile Include="PmVegetation.cpp">
+      <Filter>PM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,21 +302,6 @@
     <ClInclude Include="GLWidget3D_Shadows.h">
       <Filter>Main Files</Filter>
     </ClInclude>
-    <ClInclude Include="VBOPmParcels.h">
-      <Filter>PM</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOGeoBuilding.h">
-      <Filter>PM</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOPm.h">
-      <Filter>PM</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOPmBlocks.h">
-      <Filter>PM</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOPmBuildings.h">
-      <Filter>PM</Filter>
-    </ClInclude>
     <ClInclude Include="VBOModel.h">
       <Filter>VBO\nvModels</Filter>
     </ClInclude>
@@ -337,9 +322,6 @@
     </ClInclude>
     <ClInclude Include="nvModel\nvVector.h">
       <Filter>VBO\nvModels</Filter>
-    </ClInclude>
-    <ClInclude Include="VBOVegetation.h">
-      <Filter>VBO</Filter>
     </ClInclude>
     <ClInclude Include="RoadMeshGenerator.h">
       <Filter>VBO</Filter>
@@ -376,6 +358,24 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="PmParcels.h">
+      <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="PmBuildings.h">
+      <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="PmBlocks.h">
+      <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="Pm.h">
+      <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="GeoBuilding.h">
+      <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="PmVegetation.h">
+      <Filter>PM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

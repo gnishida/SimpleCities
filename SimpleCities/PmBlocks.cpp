@@ -3,14 +3,14 @@
  *		@author igarciad
  ************************************************************************************************/
 
-#include "VBOPmBlocks.h"
+#include "PmBlocks.h"
 #include "Polygon3D.h"
 
 #include <qdir.h>
 #include <QStringList>
 #include "GraphUtil.h"
 #include "Util.h"
-#include "VBOPmParcels.h"
+#include "PmParcels.h"
 #include "global.h"
 
 ///////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ struct output_visitor : public boost::planar_face_traversal_visitor {
 
 			char filename[255];
 			sprintf(filename, "block_images/block_%d.jpg", face_index);
-			VBOPmBlocks::saveBlockImage(*roadGraphPtr, sidewalkContourTmp, filename);
+			PmBlocks::saveBlockImage(*roadGraphPtr, sidewalkContourTmp, filename);
 
 			return;
 		}
@@ -152,7 +152,7 @@ struct vertex_output_visitor : public output_visitor {
 /**
 * Remove intersecting edges.
 */
-bool VBOPmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
+bool PmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
 	std::vector<RoadEdgeIter> edgesToRemove;
 
 	RoadEdgeIter ei, eend;
@@ -197,7 +197,7 @@ bool VBOPmBlocks::removeIntersectingEdges(RoadGraph& roadGraph) {
 /**
  * Generate blocks from the road network
  */
-bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGraph, BlockSet& blocks) {
+bool PmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGraph, BlockSet& blocks) {
 	GraphUtil::normalizeLoop(roadGraph);
 
 	roadGraphPtr = &roadGraph;
@@ -239,10 +239,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	*/
 	
 	// build embedding manually
-	//embedding.clear();
-	//embedding.resize(boost::num_vertices(roadGraph.graph));
 	buildEmbedding(roadGraph, embedding);
-	printf("embedding was built.\n");
 
 	// Create edge index property map?	
 	typedef std::map<RoadEdgeDesc, size_t> EdgeIndexMap;
@@ -258,7 +255,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	vertex_output_visitor v_vis;	
 	boost::planar_face_traversal(roadGraph.graph, &embedding[0], v_vis, pmEdgeIndex);
 
-	printf("roads graph was traversed. %d blocks were extracted.\n", blocks.size());
+	//printf("roads graph was traversed. %d blocks were extracted.\n", tmpBlocks.size());
 
 	// Remove invalid data
 	for (int i = 0; i < tmpBlocks.size();) {
@@ -325,7 +322,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roa
 	return true;
 }
 
-void VBOPmBlocks::buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadEdgeDesc>>& embedding) {
+void PmBlocks::buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadEdgeDesc>>& embedding) {
 	embedding.clear();
 
 	RoadVertexIter vi, vend;
@@ -352,7 +349,7 @@ void VBOPmBlocks::buildEmbedding(RoadGraph& roads, std::vector<std::vector<RoadE
 }
 
 
-void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks) {
+void PmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks) {
 	for (int i = 0; i < blocks.size(); ) {
 		BBox3D bbox;
 		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
@@ -393,7 +390,7 @@ void VBOPmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& bloc
 /**
  * Generate side walks
  */
-void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
+void PmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
 	// Compute the block contour (the outer part becomes sidewalks)
 	for (int i = 0; i < blocks.size(); ++i) {
 		Loop3D blockContourInset;
@@ -407,7 +404,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 	}
 }
 
-void VBOPmBlocks::saveBlockImage(const RoadGraph& roads, const Polygon3D& contour, const char* filename) {
+void PmBlocks::saveBlockImage(const RoadGraph& roads, const Polygon3D& contour, const char* filename) {
 	BBox bbox = GraphUtil::getAABoundingBox(roads, true);
 	cv::Mat img(bbox.dy() + 1, bbox.dx() + 1, CV_8UC3, cv::Scalar(255, 255, 255));
 

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	G::global()["building_max_depth"] = 0.0f;
 	G::global()["building_stories_deviation"] = 0.0f;// 2.0f;
 	G::global()["building_stories_mean"] = 5;
-	G::global()["tree_setback"] = 1.0f;
+	G::global()["tree_setback"] = 1.3f;
 
 	QApplication a(argc, argv);
 	MainWindow w;

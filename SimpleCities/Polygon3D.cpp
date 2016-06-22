@@ -12,6 +12,8 @@
 #include <CGAL/partition_2.h>
 
 bool Loop3D::contains(const QVector3D& pt) const {
+	if (size() < 3) return false;
+
 	Loop3D closedLoop = *this;
 	if (closedLoop.front().x() != closedLoop.back().x() || closedLoop.front().y() != closedLoop.back().y()) {
 		closedLoop.push_back(closedLoop.front());

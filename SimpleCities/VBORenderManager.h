@@ -68,8 +68,9 @@ public:
 	VBOSkyBox vboSkyBox;	// sky
 	VBOWater vboWater;		// water
 
-	QHash<QString, QHash<uint, RenderSt>> geoName2StaticRender;
-		
+	//QHash<QString, QHash<uint, RenderSt>> geoName2StaticRender;
+	QHash<QString, QHash<uint, QHash<uint, RenderSt>>> geoName2StaticRender;
+
 	QHash<QString, std::vector<ModelSpec>> nameToVectorModels;	// models
 
 public:

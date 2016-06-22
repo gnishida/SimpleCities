@@ -205,20 +205,20 @@
     <ClCompile Include="UrbanGeometry.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="Block.cpp" />
-    <ClCompile Include="VBOGeoBuilding.cpp" />
+    <ClCompile Include="GeoBuilding.cpp" />
     <ClCompile Include="VBOModel.cpp" />
     <ClCompile Include="VBOModel_StreetElements.cpp" />
     <ClCompile Include="Parcel.cpp" />
-    <ClCompile Include="VBOPm.cpp" />
-    <ClCompile Include="VBOPmBlocks.cpp" />
-    <ClCompile Include="VBOPmBuildings.cpp" />
-    <ClCompile Include="VBOPmParcels.cpp" />
+    <ClCompile Include="Pm.cpp" />
+    <ClCompile Include="PmBlocks.cpp" />
+    <ClCompile Include="PmBuildings.cpp" />
+    <ClCompile Include="PmParcels.cpp" />
     <ClCompile Include="VBORenderManager.cpp" />
     <ClCompile Include="VBOShader.cpp" />
     <ClCompile Include="VBOSkyBox.cpp" />
     <ClCompile Include="VBOTerrain.cpp" />
     <ClCompile Include="VBOUtil.cpp" />
-    <ClCompile Include="VBOVegetation.cpp" />
+    <ClCompile Include="PmVegetation.cpp" />
     <ClCompile Include="VBOWater.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -310,20 +310,20 @@
     <ClInclude Include="UrbanGeometry.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="Building.h" />
-    <ClInclude Include="VBOGeoBuilding.h" />
+    <ClInclude Include="GeoBuilding.h" />
     <ClInclude Include="VBOModel.h" />
     <ClInclude Include="VBOModel_StreetElements.h" />
     <ClInclude Include="Parcel.h" />
-    <ClInclude Include="VBOPm.h" />
-    <ClInclude Include="VBOPmBlocks.h" />
-    <ClInclude Include="VBOPmBuildings.h" />
-    <ClInclude Include="VBOPmParcels.h" />
+    <ClInclude Include="Pm.h" />
+    <ClInclude Include="PmBlocks.h" />
+    <ClInclude Include="PmBuildings.h" />
+    <ClInclude Include="PmParcels.h" />
     <ClInclude Include="VBORenderManager.h" />
     <ClInclude Include="VBOShader.h" />
     <ClInclude Include="VBOSkyBox.h" />
     <ClInclude Include="VBOTerrain.h" />
     <ClInclude Include="VBOUtil.h" />
-    <ClInclude Include="VBOVegetation.h" />
+    <ClInclude Include="PmVegetation.h" />
     <ClInclude Include="VBOWater.h" />
     <CustomBuild Include="PropertyWidget.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

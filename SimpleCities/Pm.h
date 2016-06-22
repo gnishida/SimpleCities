@@ -14,7 +14,7 @@
 
 class VBORenderManager;
 
-class VBOPm {
+class Pm {
 public:
 	static bool generateBuildings(VBORenderManager& rendManager, BlockSet& blocks);
 	static bool generateVegetation(VBORenderManager& rendManager, BlockSet& blocks);

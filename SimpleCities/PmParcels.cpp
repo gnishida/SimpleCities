@@ -3,12 +3,12 @@
  *		@author igarciad
  ************************************************************************************************/
 
-#include "VBOPmParcels.h"
+#include "PmParcels.h"
 #include "qmatrix4x4.h"
 #include "global.h"
 #include "Util.h"
 
-bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
+bool PmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
 	srand(0);
 	for (int i = 0; i < blocks.size(); ++i) {
 		subdivideBlockIntoParcels(blocks[i]);
@@ -17,7 +17,7 @@ bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< B
 	return true;
 }
 
-void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
+void PmParcels::subdivideBlockIntoParcels(Block &block) {
 	//srand(block.randSeed);
 	std::vector<Parcel> tmpParcels;
 
@@ -57,7 +57,7 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 * @splitIrregularity: A normalized value 0-1 indicating how far
 *					from the middle point the split line should be
 **/
-bool VBOPmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
+bool PmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, float areaStd, float splitIrregularity, std::vector<Parcel> &outParcels) {
 	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
 	
 	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {

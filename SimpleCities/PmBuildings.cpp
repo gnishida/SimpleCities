@@ -3,11 +3,11 @@
 *		@author igarciad
 ************************************************************************************************/
 
-#include "VBOPmBuildings.h"
+#include "PmBuildings.h"
 #include "global.h"
 #include "Util.h"
 
-bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks) {
+bool PmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector<Block>& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
 		for (int j = 0; j < blocks[i].parcels.size(); ++j) {
 			if (!generateBuilding(rendManager, blocks[i], blocks[i].parcels[j])) {
@@ -23,7 +23,7 @@ bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vecto
  * 指定されたParcelの中に、ビルを建てる。
  * ビルを建てられない場合は、falseを返却する。
  */
-bool VBOPmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, Parcel& parcel) {
+bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, Parcel& parcel) {
 	Loop3D pContourCpy;
 	
 	if (parcel.isPark) return false;

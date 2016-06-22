@@ -2,7 +2,7 @@
 
 #include "Block.h"
 
-class VBOPmParcels{
+class PmParcels{
 public:
 	static bool generateParcels(VBORenderManager& rendManager, std::vector<Block>& blocks);
 

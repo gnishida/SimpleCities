@@ -25,11 +25,11 @@ This file is part of QtUrban.
 #include "Util.h"
 #include "RoadMeshGenerator.h"
 #include "BlockMeshGenerator.h"
-#include "VBOPm.h"
-#include "VBOPmBlocks.h"
-#include "VBOPmParcels.h"
-#include "VBOPmBuildings.h"
-#include "VBOVegetation.h"
+#include "Pm.h"
+#include "PmBlocks.h"
+#include "PmParcels.h"
+#include "PmBuildings.h"
+#include "PmVegetation.h"
 #include "GShapefile.h"
 #include "GraphUtil.h"
 #include "PMRoadGenerator.h"
@@ -45,30 +45,30 @@ void UrbanGeometry::generateRoads() {
 }
 
 void UrbanGeometry::generateBlocks() {
-	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
+	PmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateParcels() {
-	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	PmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	//VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateBuildings() {
-	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	PmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateVegetation() {
-	VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	PmVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateAll() {
-	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
-	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
-	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	PmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
+	PmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	PmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -80,12 +80,12 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 }
 
 /**
- * 道路、歩道、区画、ビル、木のジオミトリを作成しなおす。
- * この関数を頻繁に呼ぶべきではない。道路が更新/生成された時、2D/3D表示の変更、PMメニューから新規にジオミトリを生成した時だけ。
+ * Update all the geometry
+ *
+ * This function may take time, so don't call this function so often.
+ * It is recommnded to call this function only when the geometry is changed, added, or the 2d/3d mode is changed.
  */
 void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
-	printf("updating geometry.\n");
-
 	// 地面が変わっている可能性などがあるので、ビルなどのジオミトリも一旦削除してしまう。
 	// 道路以外のジオミトリは、別途、PMメニューから作成すること
 	vboRenderManager.removeStaticGeometry("3d_blocks");
@@ -104,8 +104,8 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
 		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 		BlockMeshGenerator::generateParcelMesh(vboRenderManager, blocks);
-		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
-		VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
+		Pm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+		PmVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	}
 }
 
@@ -131,7 +131,6 @@ void UrbanGeometry::loadZone(const std::string& filename) {
 }
 
 void UrbanGeometry::loadTerrain(const std::string& filename) {
-	//mainWin->glWidget->vboRenderManager.vboTerrain.loadTerrain(filename.c_str());
 	gs::DEM dem;
 	dem.load(filename);
 
