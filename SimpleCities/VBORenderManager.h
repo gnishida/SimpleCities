@@ -75,11 +75,8 @@ public:
 
 public:
 	// POLYGON
-	typedef boost::polygon::point_data<double> pointP;
-	typedef boost::polygon::polygon_set_data<double> polygon_setP;
 	typedef boost::polygon::polygon_with_holes_data<double> polygonP;
-	typedef std::pair<pointP, pointP> edgeP;
-	typedef std::vector<boost::polygon::polygon_data<double> > PolygonSetP;
+	typedef boost::polygon::polygon_traits<polygonP>::point_type pointP;
 
 	VBORenderManager();
 	~VBORenderManager();
@@ -101,6 +98,7 @@ public:
 	//static
 	bool addStaticGeometry(const QString& geoName, const std::vector<Vertex>& vert, const QString& textureName, GLenum geometryType, int shaderMode);
 	bool addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
+	bool addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<QVector3D>& hole, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
 	bool removeStaticGeometry(const QString& geoName);
 	void renderStaticGeometry(const QString& geoName);
 

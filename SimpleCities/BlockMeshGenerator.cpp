@@ -11,20 +11,21 @@ std::vector<QString> BlockMeshGenerator::grassFileNames;
  * Load texture
  */
 void BlockMeshGenerator::init() {
-	QString pathName="../data/textures/LC";
+	QString pathName = "../data/textures/LC";
+
 	// 3. sidewalk
-	QDir directorySW(pathName+"/sidewalk/");
+	QDir directorySW(pathName + "/sidewalk/");
 	QStringList nameFilter;
 	nameFilter << "*.png" << "*.jpg" << "*.gif";
-	QStringList list = directorySW.entryList( nameFilter, QDir::Files );
-	for(int lE=0;lE<list.size();lE++){
-		if(QFile::exists(pathName+"/sidewalk/"+list[lE])){
-			sideWalkFileNames.push_back(pathName+"/sidewalk/"+list[lE]);
-			QStringList scaleS=list[lE].split("_");
-			if(scaleS.size()!=4)
-				sideWalkScale.push_back(QVector3D(1.0f,1.0f,0));
+	QStringList list = directorySW.entryList(nameFilter, QDir::Files);
+	for (int lE = 0; lE < list.size(); ++lE) {
+		if (QFile::exists(pathName + "/sidewalk/" + list[lE])) {
+			sideWalkFileNames.push_back(pathName + "/sidewalk/" + list[lE]);
+			QStringList scaleS = list[lE].split("_");
+			if (scaleS.size() != 4)
+				sideWalkScale.push_back(QVector3D(1.0f, 1.0f, 0));
 			else{
-				sideWalkScale.push_back(QVector3D(scaleS[1].toFloat(),scaleS[2].toFloat(),0));
+				sideWalkScale.push_back(QVector3D(scaleS[1].toFloat(), scaleS[2].toFloat(), 0));
 			}
 		}
 	}
@@ -32,7 +33,6 @@ void BlockMeshGenerator::init() {
 	grassFileNames.push_back("../data/textures/LC/grass/grass02.jpg");
 	grassFileNames.push_back("../data/textures/LC/grass/grass03.jpg");
 	grassFileNames.push_back("../data/textures/LC/grass/grass04.jpg");
-	printf("-->Initialized LC\n");
 
 	initialized = true;
 }
@@ -54,8 +54,15 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, const 
 				polygon.push_back(QVector3D(blocks[i].sidewalkContour[pi].x(), blocks[i].sidewalkContour[pi].y(), deltaZ));
 			}
 
+
+			std::vector<QVector3D> hole;
+			for (int pi = 0; pi < blocks[i].blockContour.size(); ++pi) {
+				hole.push_back(QVector3D(blocks[i].blockContour[pi].x(), blocks[i].blockContour[pi].y(), deltaZ));
+			}
+
 			int randSidewalk = 2; //qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_blocks", polygon, 0.0f,  sideWalkFileNames[randSidewalk], 2 | mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
+			//rendManager.addStaticGeometry2("3d_blocks", polygon, 0.0f,  sideWalkFileNames[randSidewalk], 2 | mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
+			rendManager.addStaticGeometry2WithHole("3d_blocks", polygon, hole, 0.0f, sideWalkFileNames[randSidewalk], 2 | mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
 
 			// side of the side walks
 			std::vector<Vertex> vert;

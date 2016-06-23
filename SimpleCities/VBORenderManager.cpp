@@ -1,8 +1,6 @@
 ﻿#include "VBORenderManager.h"
 #include "global.h"
 
-using namespace boost::polygon::operators;
-
 VBORenderManager::VBORenderManager() {
 	size = glm::vec2(1000.0f, 1000.0f);
 	minPos = QVector3D(-size.x / 2.0f, -size.y / 2.0f, 0);
@@ -231,20 +229,25 @@ bool VBORenderManager::addStaticGeometry(const QString& geoName, const std::vect
 bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
 	if (pos.size() < 3) return false;
 
-	PolygonSetP polySet;
-	polygonP tempPolyP;
+	return addStaticGeometry2WithHole(geoName, pos, std::vector<QVector3D>(), zShift, textureName, shaderMode, texScale, color);
+}
+
+bool VBORenderManager::addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<QVector3D>& hole, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
+	if (pos.size() < 3) return false;
 
 	std::vector<pointP> vP;
 	vP.resize(pos.size());
-	float minX=FLT_MAX,minY=FLT_MAX;
-	float maxX=-FLT_MAX,maxY=-FLT_MAX;
+	float minX = std::numeric_limits<float>::max();
+	float minY = std::numeric_limits<float>::max();
+	float maxX = -std::numeric_limits<float>::max();
+	float maxY = -std::numeric_limits<float>::max();
 
 	for (int i = 0; i < pos.size(); ++i) {
-		vP[i] = boost::polygon::construct<pointP>(pos[i].x(),pos[i].y());
-		minX = std::min<float>(minX,pos[i].x());
-		minY = std::min<float>(minY,pos[i].y());
-		maxX = std::max<float>(maxX,pos[i].x());
-		maxY = std::max<float>(maxY,pos[i].y());
+		vP[i] = boost::polygon::construct<pointP>(pos[i].x(), pos[i].y());
+		minX = std::min<float>(minX, pos[i].x());
+		minY = std::min<float>(minY, pos[i].y());
+		maxX = std::max<float>(maxX, pos[i].x());
+		maxY = std::max<float>(maxY, pos[i].y());
 	}
 
 	// close the polygon
@@ -252,22 +255,38 @@ bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vec
 		vP.push_back(vP[0]);
 	}
 
-	// trapezoid the polygon
-	boost::polygon::set_points(tempPolyP, vP.begin(), vP.end());
-	polySet += tempPolyP;
-	std::vector<polygonP> allP;
-	boost::polygon::get_trapezoids(allP, polySet);
-		
+	// create boost polygon
+	polygonP polygon;
+	boost::polygon::set_points(polygon, vP.begin(), vP.end());
+
+	if (hole.size() >= 3) {
+		// add hole
+		boost::polygon::polygon_with_holes_traits<polygonP>::hole_type hole_polys[1];
+		std::vector<pointP> hole_poly(hole.size());
+		for (int i = hole.size() - 1; i >= 0; --i) {
+			hole_poly[i] = boost::polygon::construct<pointP>(hole[i].x(), hole[i].y());
+		}
+		hole_poly.push_back(hole_poly[0]);
+		boost::polygon::set_points(hole_polys[0], hole_poly.begin(), hole_poly.end());
+		boost::polygon::set_holes(polygon, hole_polys, hole_polys + 1);
+	}
+
+	std::vector<polygonP> polySet;
+	polySet.push_back(polygon);
+
+	std::vector<polygonP> polygons;
+	boost::polygon::get_trapezoids(polygons, polySet);
+
 	std::vector<Vertex> vert;
 
 	// triangulate each trapezoid
-	for (int i = 0; i < allP.size(); i++) {
+	for (int i = 0; i < polygons.size(); i++) {
 		Polygon3D points;
 		std::vector<QVector3D> texP;
-		for (auto it = allP[i].begin(); it != allP[i].end(); ++it) {
+		for (auto it = polygons[i].begin(); it != polygons[i].end(); ++it) {
 			pointP cP = *it;
-			points.push_back(QVector3D(cP.x(), cP.y(), pos[0].z() + zShift));
-			texP.push_back(QVector3D((cP.x() - minX) * texScale.x(), (cP.y() - minY) * texScale.y(), 0.0f));
+			points.push_back(QVector3D(it->x(), it->y(), pos[0].z() + zShift));
+			texP.push_back(QVector3D((it->x() - minX) * texScale.x(), (it->y() - minY) * texScale.y(), 0.0f));
 		}
 
 		if (points.isClockwise()) {
@@ -284,7 +303,6 @@ bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vec
 
 	return addStaticGeometry(geoName, vert, textureName, GL_TRIANGLES, shaderMode);
 }
-
 
 bool VBORenderManager::removeStaticGeometry(const QString& geoName) {
 	if (geoName2StaticRender.contains(geoName)) {
