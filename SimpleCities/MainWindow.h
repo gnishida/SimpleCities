@@ -5,7 +5,6 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 #include "ControlWidget.h"
-#include "PropertyWidget.h"
 #include "GLWidget3D.h"
 #include "UrbanGeometry.h"
 
@@ -16,7 +15,6 @@ class MainWindow : public QMainWindow
 public:
 	Ui::MainWindow ui;
 	ControlWidget* controlWidget;
-	PropertyWidget* propertyWidget;
 	GLWidget3D* glWidget;
 	UrbanGeometry* urbanGeometry;
 
@@ -54,8 +52,9 @@ public slots:
 	void onGenerateVegetation();
 	void onGenerateAll();
 
+	void onGenerateScenarios();
+
 	void onShowControlWidget();
-	void onShowPropertyWidget();
 };
 
 #endif // MAINWINDOW_H

@@ -10,7 +10,8 @@ int main(int argc, char *argv[]) {
 	G::global()["showParcels"] = true;
 	G::global()["showTrees"] = true;
 
-	G::global()["parksRatio"] = 0.05f;
+	G::global()["MAX_Z"] = 1000.0f;
+	G::global()["shader2D"] = true;
 
 	G::global()["roadAngleTolerance"] = 0.52f;
 	G::global()["slopeTolerance"] = 0.3f;
@@ -18,11 +19,13 @@ int main(int argc, char *argv[]) {
 	G::global()["road_min_level"] = 61.0f;
 	G::global()["acrossRiverTolerance"] = 200.0f;
 
-	G::global()["MAX_Z"] = 1000.0f;
-	G::global()["shader2D"] = true;
-
 	G::global()["2DroadsStroke"] = 1.5f;
 
+	G::global()["avenueAvgSegmentLength"] = 100.0f;
+	G::global()["streetAvgSegmentLength"] = 20.0f;
+	G::global()["road_curvature"] = 0.2f;
+
+	G::global()["parksRatio"] = 0.05f;
 	G::global()["sidewalk_width"] = 2.0f;
 	G::global()["parcel_area_mean"] = 1000.0f;
 	G::global()["parcel_area_min"] = 200.0f;

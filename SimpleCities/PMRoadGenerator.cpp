@@ -246,11 +246,11 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 		}*/
 
 		// ステップ数、長さ、曲率を決定する
-		float step = 100;
+		float step = G::getFloat("avenueAvgSegmentLength");
 		int num_steps = 5;
-		float curvature = 0.2f;
+		float curvature = G::getFloat("road_curvature");
 		if (roadType == RoadEdge::TYPE_STREET) {
-			step = 20;
+			step = G::getFloat("streetAvgSegmentLength");
 		}
 			
 		// 坂が急なら、キャンセル

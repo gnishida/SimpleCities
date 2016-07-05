@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include <QShortcut>
 #include "TerrainSizeInputDialog.h"
+#include "ScenarioGenerationDialog.h"
 #include "GraphUtil.h"
 #include "Util.h"
 
@@ -10,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 	// setup the docking widgets
 	controlWidget = new ControlWidget(this);
-	propertyWidget = new PropertyWidget(this);
 
 	// setup the toolbar
 	ui.fileToolBar->addAction(ui.actionNewTerrain);
@@ -43,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(ui.actionGenerateVegetation, SIGNAL(triggered()), this, SLOT(onGenerateVegetation()));
 	connect(ui.actionGenerateAll, SIGNAL(triggered()), this, SLOT(onGenerateAll()));
 
+	connect(ui.actionGenerateScenarios, SIGNAL(triggered()), this, SLOT(onGenerateScenarios()));
+
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
-	connect(ui.actionPropertyWidget, SIGNAL(triggered()), this, SLOT(onShowPropertyWidget()));
 
 	// setup the GL widget
 	glWidget = new GLWidget3D(this);
@@ -231,12 +232,36 @@ void MainWindow::onGenerateAll() {
 	glWidget->updateGL();
 }
 
+void MainWindow::onGenerateScenarios() {
+	ScenarioGenerationDialog dlg;
+	if (!dlg.exec()) return;
+
+	QString zone_file = dlg.ui.lineEditZone->text();
+	QString terrain_file = dlg.ui.lineEditTerrain->text();
+	int numScenarios = dlg.ui.lineEditNumScenarios->text().toInt();
+	QString output_dir = dlg.ui.lineEditOutputDirectory->text();
+	std::pair<float, float> avenueSegmentLengthRange = std::make_pair(dlg.ui.lineEditAvenueSegmentLengthMin->text().toFloat(), dlg.ui.lineEditAvenueSegmentLengthMax->text().toFloat());
+	std::pair<float, float> streetSegmentLengthRange = std::make_pair(dlg.ui.lineEditStreetSegmentLengthMin->text().toFloat(), dlg.ui.lineEditStreetSegmentLengthMax->text().toFloat());
+	std::pair<float, float> roadCurvatureRange = std::make_pair(dlg.ui.lineEditRoadCurvatureMin->text().toFloat(), dlg.ui.lineEditRoadCurvatureMax->text().toFloat());
+	std::pair<float, float> parkRatioRange = std::make_pair(dlg.ui.lineEditParkRatioMin->text().toFloat(), dlg.ui.lineEditParkRatioMax->text().toFloat());
+	std::pair<float, float> pacelAreaRange = std::make_pair(dlg.ui.lineEditParcelAreaMin->text().toFloat(), dlg.ui.lineEditParcelAreaMax->text().toFloat());
+	std::pair<float, float> setbackFrontRange = std::make_pair(dlg.ui.lineEditSetbackFrontMin->text().toFloat(), dlg.ui.lineEditSetbackFrontMax->text().toFloat());
+	std::pair<float, float> setbackRearRange = std::make_pair(dlg.ui.lineEditSetbackRearMin->text().toFloat(), dlg.ui.lineEditSetbackRearMax->text().toFloat());
+	std::pair<float, float> setbackSideRange = std::make_pair(dlg.ui.lineEditSetbackSideMin->text().toFloat(), dlg.ui.lineEditSetbackSideMax->text().toFloat());
+	std::pair<float, float> numStoriesRange = std::make_pair(dlg.ui.lineEditNumStoriesMin->text().toFloat(), dlg.ui.lineEditNumStoriesMax->text().toFloat());
+
+	// load zone
+	urbanGeometry->loadZone(zone_file.toUtf8().constData());
+
+	// load terrain
+	urbanGeometry->loadTerrain(terrain_file.toUtf8().constData());
+
+	// generate scenarios
+	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, streetSegmentLengthRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange);
+}
+
 void MainWindow::onShowControlWidget() {
 	controlWidget->show();
 	addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }
 
-void MainWindow::onShowPropertyWidget() {
-	propertyWidget->show();
-	addDockWidget(Qt::RightDockWidgetArea, propertyWidget);
-}

@@ -51,6 +51,7 @@ public:
     QAction *actionLoadZone;
     QAction *actionSaveParcels;
     QAction *actionSaveBuildings;
+    QAction *actionGenerateScenarios;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -115,6 +116,8 @@ public:
         actionSaveParcels->setObjectName(QStringLiteral("actionSaveParcels"));
         actionSaveBuildings = new QAction(MainWindow);
         actionSaveBuildings->setObjectName(QStringLiteral("actionSaveBuildings"));
+        actionGenerateScenarios = new QAction(MainWindow);
+        actionGenerateScenarios->setObjectName(QStringLiteral("actionGenerateScenarios"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -163,13 +166,14 @@ public:
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
         menuWindow->addAction(actionControlWidget);
-        menuWindow->addAction(actionPropertyWidget);
         menuPM->addAction(actionGenerateRoads);
         menuPM->addAction(actionGenerateBlocks);
         menuPM->addAction(actionGenerateParcels);
         menuPM->addAction(actionGenerateBuildings);
         menuPM->addAction(actionGenerateVegetation);
         menuPM->addAction(actionGenerateAll);
+        menuPM->addSeparator();
+        menuPM->addAction(actionGenerateScenarios);
 
         retranslateUi(MainWindow);
 
@@ -213,6 +217,7 @@ public:
         actionLoadZone->setText(QApplication::translate("MainWindow", "Load Zone", 0));
         actionSaveParcels->setText(QApplication::translate("MainWindow", "Save Parcels", 0));
         actionSaveBuildings->setText(QApplication::translate("MainWindow", "Save Buildings", 0));
+        actionGenerateScenarios->setText(QApplication::translate("MainWindow", "Generate Scenarios", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0));

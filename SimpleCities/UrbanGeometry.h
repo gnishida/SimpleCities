@@ -24,20 +24,14 @@ public:
 public:
 	UrbanGeometry(MainWindow* mainWin);
 
-	/** getter for width */
-	int getWidth() { return width; }
-
-	/** getter for depth */
-	int getDepth() { return depth; }
-
 	void generateRoads();
 	void generateBlocks();
 	void generateParcels();
 	void generateBuildings();
 	void generateVegetation();
 	void generateAll();
+	void generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& streetSegmentLengthRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<float, float>& numStoriesRange);
 
-	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);
 
 	void loadZone(const std::string& filename);
@@ -50,5 +44,4 @@ public:
 	void saveBuildings(const std::string& filename);
 
 	void clear();
-
 };

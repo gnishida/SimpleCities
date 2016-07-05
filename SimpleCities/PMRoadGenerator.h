@@ -3,7 +3,6 @@
 #include "Polygon2D.h"
 #include "RoadGraph.h"
 #include "MainWindow.h"
-//#include "Terrain.h"
 #include "VBORenderManager.h"
 
 class PMRoadGenerator {

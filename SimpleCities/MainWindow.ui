@@ -63,7 +63,6 @@
      <string>Window</string>
     </property>
     <addaction name="actionControlWidget"/>
-    <addaction name="actionPropertyWidget"/>
    </widget>
    <widget class="QMenu" name="menuPM">
     <property name="title">
@@ -75,6 +74,8 @@
     <addaction name="actionGenerateBuildings"/>
     <addaction name="actionGenerateVegetation"/>
     <addaction name="actionGenerateAll"/>
+    <addaction name="separator"/>
+    <addaction name="actionGenerateScenarios"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPM"/>
@@ -239,6 +240,11 @@
   <action name="actionSaveBuildings">
    <property name="text">
     <string>Save Buildings</string>
+   </property>
+  </action>
+  <action name="actionGenerateScenarios">
+   <property name="text">
+    <string>Generate Scenarios</string>
    </property>
   </action>
  </widget>

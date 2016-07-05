@@ -1,0 +1,4 @@
+No.,avenueAvgSegmentLength,streetAvgSegmentLength,road_curvature,parksRatio,parcel_area_mean,parcel_setback_front,parcel_setback_rear,parcel_setback_sides,building_stories_mean
+1,50.1877,32.5427,0.0966492,0.1,1000,5,5,5,5
+2,115.913,38.7292,0.165131,0.1,1000,5,5,5,5
+3,136.407,38.9661,0.305939,0.1,1000,5,5,5,5

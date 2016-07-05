@@ -1,20 +1,4 @@
-﻿/*********************************************************************
-This file is part of QtUrban.
-
-    QtUrban is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, version 3 of the License.
-
-    QtUrban is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with QtUrban.  If not, see <http://www.gnu.org/licenses/>.
-***********************************************************************/
-
-#include "GLWidget3D.h"
+﻿#include "GLWidget3D.h"
 #include "Util.h"
 #include "GraphUtil.h"
 #include "MainWindow.h"
@@ -129,8 +113,6 @@ void GLWidget3D::paintGL() {
 
 void GLWidget3D::drawScene(int drawMode) {
 	if (G::getBool("shader2D")) {
-		mainWin->urbanGeometry->render(vboRenderManager);
-		
 		vboRenderManager.vboTerrain.render();
 		glLineWidth(1);
 		vboRenderManager.renderStaticGeometry("2d_blocks_contour");
@@ -142,7 +124,6 @@ void GLWidget3D::drawScene(int drawMode) {
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);
 			vboRenderManager.renderStaticGeometry("sky");
 			vboRenderManager.vboWater.render(vboRenderManager);
-			mainWin->urbanGeometry->render(vboRenderManager);
 			
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);
 			vboRenderManager.vboTerrain.render();

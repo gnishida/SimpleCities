@@ -1,8 +1,3 @@
-/************************************************************************************************
- *		Procedural City Generation: Blocks
- *		@author igarciad
- ************************************************************************************************/
-
 #pragma once
 
 #include <boost/graph/planar_face_traversal.hpp>
@@ -16,11 +11,8 @@
 
 class VBORenderManager;
 
-class PmBlocks
-{
+class PmBlocks {
 public:
-
-	//Generate Blocks
 	static bool generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGraph, BlockSet& blocks);
 
 	static bool removeIntersectingEdges(RoadGraph& roadGraph);

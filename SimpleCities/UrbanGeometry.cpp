@@ -1,20 +1,4 @@
-﻿/*********************************************************************
-This file is part of QtUrban.
-
-    QtUrban is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, version 3 of the License.
-
-    QtUrban is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with QtUrban.  If not, see <http://www.gnu.org/licenses/>.
-***********************************************************************/
-
-#include "UrbanGeometry.h"
+﻿#include "UrbanGeometry.h"
 #include <limits>
 #include <iostream>
 #include <QFile>
@@ -33,6 +17,7 @@ This file is part of QtUrban.
 #include "GShapefile.h"
 #include "GraphUtil.h"
 #include "PMRoadGenerator.h"
+#include <QDir>
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -51,7 +36,6 @@ void UrbanGeometry::generateBlocks() {
 
 void UrbanGeometry::generateParcels() {
 	PmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
-	//VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -66,17 +50,88 @@ void UrbanGeometry::generateVegetation() {
 }
 
 void UrbanGeometry::generateAll() {
+	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
+	generator.generateRoadNetwork();
 	PmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	PmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	PmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
-	glLineWidth(5.0f);
-	glPointSize(10.0f);
+void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& streetSegmentLengthRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<float, float>& numStoriesRange) {
+	if (QDir(output_dir).exists()) {
+		std::cout << "Removing existing files in the output directory...";
+		QDir(output_dir).removeRecursively();
+		std::cout << " done." << std::endl;
+	}
+	QDir().mkpath(output_dir);
 
+	// open a file to save the parameter values
+	QFile file_params(output_dir + "/parameters.txt");
+	if (!file_params.open(QIODevice::WriteOnly)) {
+		std::cerr << "Cannot open file for writing: " << file_params.fileName().toUtf8().constData() << std::endl;
+		return;
+	}
+	QTextStream out_params(&file_params);
 
+	// write the header to the file
+	out_params << "No." << ",";
+	out_params << "avenueAvgSegmentLength" << ",";
+	out_params << "streetAvgSegmentLength" << ",";
+	out_params << "road_curvature" << ",";
+	out_params << "parksRatio" << ",";
+	out_params << "parcel_area_mean" << ",";
+	out_params << "parcel_setback_front" << ",";
+	out_params << "parcel_setback_rear" << ",";
+	out_params << "parcel_setback_sides" << ",";
+	out_params << "building_stories_mean" << "\n";
+
+	printf("Generating scenarios: ");
+	for (int iter = 0; iter < numScenarios; ++iter) {
+		printf("\rGenerating scenarios: %d", iter + 1);
+
+		// set the parameter values
+		G::global()["avenueAvgSegmentLength"] = Util::genRand(avenueSegmentLengthRange.first, avenueSegmentLengthRange.second);
+		G::global()["streetAvgSegmentLength"] = Util::genRand(streetSegmentLengthRange.first, streetSegmentLengthRange.second);
+		G::global()["road_curvature"] = Util::genRand(roadCurvatureRange.first, roadCurvatureRange.second);
+		G::global()["parksRatio"] = Util::genRand(parkRatioRange.first, parkRatioRange.second);
+		G::global()["parcel_area_mean"] = Util::genRand(parcelAreaRange.first, parcelAreaRange.second);
+		G::global()["parcel_setback_front"] = Util::genRand(setbackFrontRange.first, setbackFrontRange.second);
+		G::global()["parcel_setback_rear"] = Util::genRand(setbackRearRange.first, setbackRearRange.second);
+		G::global()["parcel_setback_sides"] = Util::genRand(setbackSideRange.first, setbackSideRange.second);
+		G::global()["building_stories_mean"] = Util::genRand(numStoriesRange.first, numStoriesRange.second);
+
+		// generate a city
+		generateAll();
+
+		// save roads
+		QString filename_roads = output_dir + QString("/roads_%1.shp").arg(iter + 1, 6, 10, QChar('0'));
+		saveRoads(filename_roads.toUtf8().constData());
+
+		// save parcels
+		QString filename_parcels = output_dir + QString("/parcels_%1.shp").arg(iter + 1, 6, 10, QChar('0'));
+		saveParcels(filename_parcels.toUtf8().constData());
+
+		// save building footprints
+		QString filename_buildings = output_dir + QString("/buildings_%1.shp").arg(iter + 1, 6, 10, QChar('0'));
+		saveBuildings(filename_buildings.toUtf8().constData());
+
+		// save the parameter values
+		out_params << iter + 1 << ",";
+		out_params << G::getFloat("avenueAvgSegmentLength") << ",";
+		out_params << G::getFloat("streetAvgSegmentLength") << ",";
+		out_params << G::getFloat("road_curvature") << ",";
+		out_params << G::getFloat("parksRatio") << ",";
+		out_params << G::getFloat("parcel_area_mean") << ",";
+		out_params << G::getFloat("parcel_setback_front") << ",";
+		out_params << G::getFloat("parcel_setback_rear") << ",";
+		out_params << G::getFloat("parcel_setback_sides") << ",";
+		out_params << G::getFloat("building_stories_mean") << "\n";
+	}
+
+	file_params.close();
+	printf("\n");
+	std::cout << "Generation has completed." << std::endl;
 }
 
 /**

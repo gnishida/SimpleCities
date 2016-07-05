@@ -15,10 +15,10 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 	//////////////////////////////////////////
 	// POLYLINES
 	{
-		float const maxSegmentLeng=5.0f;//5.0f
+		float const maxSegmentLeng = 5.0f;
 
 		RoadEdgeIter ei, eiEnd;
-		int numEdges=0;
+		int numEdges = 0;
 
 		std::vector<Vertex> vertROAD[2];
 		std::vector<Vertex> intersectCirclesV;
@@ -31,28 +31,24 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 			
 			int type;
 			switch (roads.graph[*ei]->type) {
-			case RoadEdge::TYPE_HIGHWAY:
-				type=1;//should have its texture!!! TODO
-				break;
-			case RoadEdge::TYPE_BOULEVARD:
 			case RoadEdge::TYPE_AVENUE:
-				type=1;
+				type = 1;
 				break;
 			case RoadEdge::TYPE_STREET:
-				type=0;
+				type = 0;
 				break;
 			default:
-				type=0;
+				type = 0;
 				break;
 			}
 			
-			float lengthMovedL=0;//road texture dX
-			float lengthMovedR=0;//road texture dX
+			float lengthMovedL = 0; // road texture dX
+			float lengthMovedR = 0; // road texture dX
 
 			QVector2D a0,a1,a2,a3;
 
 			for (int pL = 0; pL < edge->polyline.size() - 1; pL++) {
-				bool bigAngle=false;
+				bool bigAngle = false;
 				QVector2D p0 = edge->polyline[pL];
 				QVector2D p1 = edge->polyline[pL+1];
 				if ((p0 - p1).lengthSquared() <= 0.00001f) continue;
@@ -84,9 +80,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				float middLenghtR = length;
 				float middLenghtL = length;
 				float segmentLengR, segmentLengL;
-				int numSegments=ceil(length/5.0f);
+				int numSegments = ceil(length/5.0f);
 
-				float dW=7.5f;//tex size in m
+				float dW = 7.5f;//tex size in m
 
 				QVector3D b0, b3;
 				QVector3D b1 = a0;
@@ -95,8 +91,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				QVector3D vecL = a2 - a3;
 
 				for(int nS=0;nS<numSegments;nS++){
-					segmentLengR=std::min(maxSegmentLeng,middLenghtR);
-					segmentLengL=std::min(maxSegmentLeng,middLenghtL);
+					segmentLengR = std::min(maxSegmentLeng, middLenghtR);
+					segmentLengL = std::min(maxSegmentLeng, middLenghtL);
 
 					b0 = b1;
 					b3 = b2;
@@ -137,10 +133,10 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					vertSide.push_back(Vertex(b3, QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b2, QColor(64, 64, 64), per, QVector3D()));
 
-					lengthMovedR+=segmentLengR;
-					lengthMovedL+=segmentLengL;
-					middLenghtR-=segmentLengR;
-					middLenghtL-=segmentLengL;
+					lengthMovedR += segmentLengR;
+					lengthMovedL += segmentLengL;
+					middLenghtR -= segmentLengR;
+					middLenghtL -= segmentLengL;
 				}				
 
 				a3 = a2;
@@ -283,8 +279,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					// compute left side
 					QVector2D ed2DirL = (ed2p0L - ed2p1L).normalized();//ends in 0
 					QVector2D ed2PerL(ed2DirL.y(), -ed2DirL.x());
-					ed2p0L-=ed2PerL*ed2WL/2.0f;
-					ed2p1L-=ed2PerL*ed2WL/2.0f;
+					ed2p0L -= ed2PerL*ed2WL/2.0f;
+					ed2p1L -= ed2PerL*ed2WL/2.0f;
 
 					// c) ED2: last edge
 					int nextEdge = (eN + 1) % edgeAngleOut.size();
@@ -295,8 +291,8 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					// compute left side
 					QVector2D ed2DirR = (ed2p0R - ed2p1R).normalized();//ends in 0
 					QVector2D ed2PerR(ed2DirR.y(), -ed2DirR.x());
-					ed2p0R+=ed2PerR*ed2WR/2.0f;
-					ed2p1R+=ed2PerR*ed2WR/2.0f;
+					ed2p0R += ed2PerR*ed2WR/2.0f;
+					ed2p1R += ed2PerR*ed2WR/2.0f;
 
 					//////////////////////////////////////////
 					// d) Computer interior coordinates
@@ -335,9 +331,9 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 					if (outDegree >= 3 && roads.graph[edgeAngleOut[eN].second]->type == RoadEdge::TYPE_AVENUE && (ed1poly[0] - ed1poly.back()).length() > 10.0f && ed1poly.length() > 50.0f) {
 						// 横断歩道
-						interPedX.push_back(Vertex(intPoint1, QVector3D(0-0.07f, 0, 0)));
+						interPedX.push_back(Vertex(intPoint1, QVector3D(0 - 0.07f, 0, 0)));
 						interPedX.push_back(Vertex(intPoint2, QVector3D(ed1W / 7.5f + 0.07f, 0, 0)));
-						interPedX.push_back(Vertex(intPoint2 - ed1Dir * 3.5f, QVector3D(ed1W/7.5f + 0.07f, 1.0f, 0)));
+						interPedX.push_back(Vertex(intPoint2 - ed1Dir * 3.5f, QVector3D(ed1W / 7.5f + 0.07f, 1.0f, 0)));
 						interPedX.push_back(Vertex(intPoint1 - ed1Dir * 3.5f, QVector3D(0.0f - 0.07f, 1.0f, 0)));
 
 						// 停止線
@@ -351,7 +347,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}
 								
 				if (interPoints.size() > 2) {
-					rendManager.addStaticGeometry2("3d_roads", interPoints,0.0f, "../data/textures/roads/road_0lines.jpg", 2, QVector3D(1.0f/7.5f, 1.0f/7.5f, 1), QColor());
+					rendManager.addStaticGeometry2("3d_roads", interPoints,0.0f, "../data/textures/roads/road_0lines.jpg", 2, QVector3D(1.0f / 7.5f, 1.0f / 7.5f, 1), QColor());
 				}
 			}
 		}
@@ -425,23 +421,16 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 			float heightOffsetBg = 0.0f;
 
 			switch (roads.graph[*ei]->type) {
-			case RoadEdge::TYPE_HIGHWAY:
-				heightOffset = 0.8f;
-				heightOffsetBg = 0.3f;
-				color=QColor(0xfa,0x9e,0x25);
-				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
-				break;
-			case RoadEdge::TYPE_BOULEVARD:
 			case RoadEdge::TYPE_AVENUE:
 				heightOffset = 0.6f;
 				heightOffsetBg = 0.1f;
-				color=QColor(0xff,0xe1,0x68);
+				color = QColor(0xff,0xe1,0x68);
 				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
 				break;
 			case RoadEdge::TYPE_STREET:
 				heightOffset = 0.4f;
 				heightOffsetBg = 0.1f;
-				color=QColor(0xff,0xff,0xff);
+				color = QColor(0xff,0xff,0xff);
 				colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
 				break;
 			}
@@ -528,23 +517,16 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 				halfWidth = roads.graph[*oei]->getHalfWidth();
 
 				switch (roads.graph[*oei]->type) {
-				case RoadEdge::TYPE_HIGHWAY:
-					heightOffset = 0.6f;
-					heightOffsetBg = 0.3f;
-					color=QColor(0xfa,0x9e,0x25);
-					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
-					continue;
-				case RoadEdge::TYPE_BOULEVARD:
 				case RoadEdge::TYPE_AVENUE:
 					heightOffset = 0.5f;
 					heightOffsetBg = 0.2f;
-					color=QColor(0xff,0xe1,0x68);
+					color = QColor(0xff,0xe1,0x68);
 					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
 					continue;
 				case RoadEdge::TYPE_STREET:
 					heightOffset = 0.4f;
 					heightOffsetBg = 0.2f;
-					color=QColor(0xff,0xff,0xff);
+					color = QColor(0xff,0xff,0xff);
 					colorBg = QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
 					continue;
 				}

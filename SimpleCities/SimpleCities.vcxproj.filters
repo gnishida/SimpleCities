@@ -64,12 +64,6 @@
     <ClCompile Include="RoadVertex.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_PropertyWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_PropertyWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GLWidget3D.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
@@ -127,9 +121,6 @@
     <ClCompile Include="GLWidget3D_Shadows.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
-    <ClCompile Include="PropertyWidget.cpp">
-      <Filter>Form Files</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Main Files</Filter>
     </ClCompile>
@@ -162,9 +153,6 @@
     </ClCompile>
     <ClCompile Include="BlockMeshGenerator.cpp">
       <Filter>VBO</Filter>
-    </ClCompile>
-    <ClCompile Include="gisutils.cpp">
-      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="GShapefile.cpp">
       <Filter>Main Files</Filter>
@@ -202,6 +190,12 @@
     <ClCompile Include="PmVegetation.cpp">
       <Filter>PM</Filter>
     </ClCompile>
+    <ClCompile Include="ScenarioGenerationDialog.cpp">
+      <Filter>Form Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ScenarioGenerationDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -210,16 +204,10 @@
     <CustomBuild Include="MainWindow.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="PropertyWidget.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="TerrainSizeInputDialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ControlWidget.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PropertyWidget.h">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="MainWindow.h">
@@ -229,6 +217,12 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ControlWidget.h">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioGenerationDialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ScenarioGenerationDialog.h">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -244,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="RoadVertex.h">
       <Filter>Main Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_PropertyWidget.h">
-      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GLWidget3D.h">
       <Filter>Main Files</Filter>
@@ -332,9 +323,6 @@
     <ClInclude Include="BlockMeshGenerator.h">
       <Filter>VBO</Filter>
     </ClInclude>
-    <ClInclude Include="gisutils.h">
-      <Filter>Main Files</Filter>
-    </ClInclude>
     <ClInclude Include="GShapefile.h">
       <Filter>Main Files</Filter>
     </ClInclude>
@@ -376,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="PmVegetation.h">
       <Filter>PM</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ScenarioGenerationDialog.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@
 
 class RoadEdge {
 public:
-	static enum { TYPE_OTHERS = 0, TYPE_STREET = 1, TYPE_AVENUE = 2, TYPE_BOULEVARD = 4, TYPE_HIGHWAY = 8 };
+	static enum { TYPE_OTHERS = 0, TYPE_STREET = 1, TYPE_AVENUE = 2 };
 
 public:
 	int type;

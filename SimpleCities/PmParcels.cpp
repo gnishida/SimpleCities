@@ -1,9 +1,4 @@
-﻿/************************************************************************************************
- *		Procedural City Generation: Parcel
- *		@author igarciad
- ************************************************************************************************/
-
-#include "PmParcels.h"
+﻿#include "PmParcels.h"
 #include "qmatrix4x4.h"
 #include "global.h"
 #include "Util.h"

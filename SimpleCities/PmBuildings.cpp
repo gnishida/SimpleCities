@@ -1,9 +1,4 @@
-﻿/************************************************************************************************
-*		Procedural City Generation: Buildings
-*		@author igarciad
-************************************************************************************************/
-
-#include "PmBuildings.h"
+﻿#include "PmBuildings.h"
 #include "global.h"
 #include "Util.h"
 
