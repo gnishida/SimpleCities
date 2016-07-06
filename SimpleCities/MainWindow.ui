@@ -34,7 +34,6 @@
      <string>File</string>
     </property>
     <addaction name="actionLoadZone"/>
-    <addaction name="actionNewTerrain"/>
     <addaction name="actionOpenTerrain"/>
     <addaction name="actionSaveTerrain"/>
     <addaction name="separator"/>
@@ -77,8 +76,16 @@
     <addaction name="separator"/>
     <addaction name="actionGenerateScenarios"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionView2D"/>
+    <addaction name="actionView3D"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPM"/>
+   <addaction name="menuView"/>
    <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="fileToolBar">
@@ -245,6 +252,22 @@
   <action name="actionGenerateScenarios">
    <property name="text">
     <string>Generate Scenarios</string>
+   </property>
+  </action>
+  <action name="actionView2D">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>2D</string>
+   </property>
+  </action>
+  <action name="actionView3D">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>3D</string>
    </property>
   </action>
  </widget>

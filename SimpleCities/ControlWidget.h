@@ -6,23 +6,13 @@
 class MainWindow;
 
 class ControlWidget : public QDockWidget {
-Q_OBJECT
-
-private:
-	
-	MainWindow* mainWin;
+	Q_OBJECT
 
 public:
+	MainWindow* mainWin;
 	Ui::ControlWidget ui;
+
+public:
 	ControlWidget(MainWindow* mainWin);
-
-
-public slots:
-	void generateRoadsPM();
-	void clear();
-	void updateTerrainLabels(int newValue);
-	void updateTerrainEdit(const QString &text);
-	void changeTerrainShader(int);
-
 };
 

@@ -13,6 +13,6 @@ public:
 public:
 	Parcel();
 
-	float computeBuildableArea(float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &pgonInset);
+	static void computeBuildingFootprint(const Polygon3D& contour, float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &footprint);
 };
 

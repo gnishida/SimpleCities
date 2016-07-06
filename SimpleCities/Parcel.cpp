@@ -7,45 +7,36 @@ Parcel::Parcel() {
 /**
 * Compute Parcel Buildable Area
 **/
-float Parcel::computeBuildableArea(float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &pgonInset) {
-	pgonInset.clear();
+void Parcel::computeBuildingFootprint(const Polygon3D& contour, float frontSetback, float rearSetback, float sideSetback, const std::vector<int> &frontEdges, const std::vector<int> &rearEdges, const std::vector<int> &sideEdges, Loop3D &footprint) {
+	footprint.clear();
 
-	int contourSz = this->parcelContour.contour.size();
+	if (contour.size() < 3) return;
 
-	if(contourSz < 3) return 0.0f;
+	std::vector<float> offsetValues(contour.size());
 
-	//--- first, initialize values to side setback (most edges are sides)
-	std::vector<float> offsetValues(contourSz, sideSetback);
-
-	//--- then, append front ant back values
-	for(int i=0; i<frontEdges.size(); ++i){
-		if(frontEdges[i]<offsetValues.size()){
+	// set the offset values
+	for (int i = 0; i < frontEdges.size(); ++i) {
+		if (frontEdges[i] < offsetValues.size()) {
 			offsetValues[frontEdges[i]] = frontSetback;
 		}
 	}
-
-	for(int i=0; i<rearEdges.size(); ++i){
-		if(rearEdges[i]<offsetValues.size()){
+	for (int i = 0; i < rearEdges.size(); ++i) {
+		if (rearEdges[i] < offsetValues.size()) {
 			offsetValues[rearEdges[i]] = rearSetback;
 		}
 	}
-
-	for(int i=0; i<sideEdges.size(); ++i){
-		if(sideEdges[i]<offsetValues.size()){
+	for (int i = 0; i < sideEdges.size(); ++i) {
+		if (sideEdges[i] < offsetValues.size()) {
 			offsetValues[sideEdges[i]] = sideSetback;
 		}
 	}
 
-	// compute irregular offset and the inset area
+	// compute offset
 	std::vector<Loop3D> offsetPolygons;
-	parcelContour.offsetInside(offsetValues, offsetPolygons);
+	contour.offsetInside(offsetValues, offsetPolygons);
 
 	if (offsetPolygons.size() > 0) {
-		pgonInset = offsetPolygons[0];
+		// currently only one building per parcel is supported
+		footprint = offsetPolygons[0];
 	}
-	else {
-		pgonInset.clear();
-	}
-		
-	return pgonInset.area();
 }

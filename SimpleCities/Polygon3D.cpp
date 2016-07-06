@@ -886,6 +886,10 @@ float Polygon3D::area() const {
 	return contour.area();
 }
 
+void Polygon3D::simplify(float threshold) {
+	contour.simplify(threshold);
+}
+
 /**
  * GEN
  * このポリゴンが細すぎるかどうかチェックする。

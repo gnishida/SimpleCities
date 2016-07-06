@@ -52,8 +52,10 @@ public slots:
 	void onGenerateVegetation();
 	void onGenerateAll();
 
+	void onGenerateCity();
 	void onGenerateScenarios();
 
+	void onViewChanged();
 	void onShowControlWidget();
 };
 

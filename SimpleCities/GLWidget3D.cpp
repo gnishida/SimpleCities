@@ -94,6 +94,8 @@ void GLWidget3D::initializeGL() {
 	shadow.initShadow(vboRenderManager.program,this);
 	glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);//SHADOW: Disable
 	glUniform1i(glGetUniformLocation(vboRenderManager.program, "terrainMode"), 0);//FLAT
+
+	mainWin->urbanGeometry = new UrbanGeometry(mainWin);
 }
 
 void GLWidget3D::resizeGL(int width, int height) {

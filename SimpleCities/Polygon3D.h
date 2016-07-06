@@ -73,6 +73,7 @@ public:
 	bool isSelfIntersecting() const;
 	BBox envelope() const;
 	float area() const;
+	void simplify(float threshold);
 
 	//Only works for polygons with no holes in them
 	bool splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2);

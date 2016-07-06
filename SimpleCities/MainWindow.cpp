@@ -9,12 +9,14 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
 
+	QActionGroup* group = new QActionGroup(this);
+	group->addAction(ui.actionView2D);
+	group->addAction(ui.actionView3D);
+	ui.actionView2D->setChecked(true);
+	ui.actionView3D->setChecked(false);
+
 	// setup the docking widgets
 	controlWidget = new ControlWidget(this);
-
-	// setup the toolbar
-	ui.fileToolBar->addAction(ui.actionNewTerrain);
-	ui.fileToolBar->addAction(ui.actionOpenTerrain);
 
 	// register the menu's action handlers
 	connect(ui.actionLoadZone, SIGNAL(triggered()), this, SLOT(onLoadZone()));
@@ -45,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 	connect(ui.actionGenerateScenarios, SIGNAL(triggered()), this, SLOT(onGenerateScenarios()));
 
+	connect(ui.actionView2D, SIGNAL(triggered()), this, SLOT(onViewChanged()));
+	connect(ui.actionView3D, SIGNAL(triggered()), this, SLOT(onViewChanged()));
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
 
 	// setup the GL widget
@@ -54,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	controlWidget->show();
 	addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 
-	urbanGeometry = new UrbanGeometry(this);
+	//urbanGeometry = new UrbanGeometry(this);
 }
 
 MainWindow::~MainWindow() {
@@ -232,6 +236,29 @@ void MainWindow::onGenerateAll() {
 	glWidget->updateGL();
 }
 
+void MainWindow::onGenerateCity() {
+	std::cout << "Generating a city...";
+
+	urbanGeometry->clear();
+
+	// set the parameter values
+	G::global()["avenueAvgSegmentLength"] = controlWidget->ui.lineEditAvenueSegmentLength->text().toFloat();
+	G::global()["streetAvgSegmentLength"] = controlWidget->ui.lineEditStreetSegmentLength->text().toFloat();
+	G::global()["road_curvature"] = controlWidget->ui.lineEditRoadCurvature->text().toFloat();
+	G::global()["parksRatio"] = controlWidget->ui.lineEditParkRatio->text().toFloat();
+	G::global()["parcel_area_mean"] = controlWidget->ui.lineEditParcelArea->text().toFloat();
+	G::global()["parcel_setback_front"] = controlWidget->ui.lineEditSetbackFront->text().toFloat();
+	G::global()["parcel_setback_rear"] = controlWidget->ui.lineEditSetbackRear->text().toFloat();
+	G::global()["parcel_setback_sides"] = controlWidget->ui.lineEditSetbackSide->text().toFloat();
+	G::global()["building_stories_mean"] = Util::genRand(controlWidget->ui.lineEditNumStoriesMin->text().toInt(), controlWidget->ui.lineEditNumStoriesMax->text().toInt() + 1);
+
+	urbanGeometry->generateAll();
+	glWidget->shadow.makeShadowMap(glWidget);
+	glWidget->updateGL();
+
+	std::cout << " Done." << std::endl;
+}
+
 void MainWindow::onGenerateScenarios() {
 	ScenarioGenerationDialog dlg;
 	if (!dlg.exec()) return;
@@ -258,6 +285,23 @@ void MainWindow::onGenerateScenarios() {
 
 	// generate scenarios
 	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, streetSegmentLengthRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange);
+}
+
+void MainWindow::onViewChanged() {
+	G::global()["shader2D"] = ui.actionView2D->isChecked();
+
+	int terrainMode;
+	if (ui.actionView2D->isChecked()) {
+		terrainMode = 0;
+	}
+	else  {
+		terrainMode = 1;
+	}
+
+	glWidget->vboRenderManager.changeTerrainShader(terrainMode);
+	urbanGeometry->update(glWidget->vboRenderManager);
+	glWidget->shadow.makeShadowMap(glWidget);
+	glWidget->updateGL();
 }
 
 void MainWindow::onShowControlWidget() {

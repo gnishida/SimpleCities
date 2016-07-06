@@ -21,9 +21,15 @@
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
+
+	// load a default zone and terrain
+	loadZone("../3D/zone1.shp");
+	loadTerrain("../3D/dem1m_calb.tif");
 }
 
 void UrbanGeometry::generateRoads() {
+	clear();
+
 	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
 	generator.generateRoadNetwork();
 	update(mainWin->glWidget->vboRenderManager);
@@ -50,6 +56,8 @@ void UrbanGeometry::generateVegetation() {
 }
 
 void UrbanGeometry::generateAll() {
+	clear();
+
 	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
 	generator.generateRoadNetwork();
 	PmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);

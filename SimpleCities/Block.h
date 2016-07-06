@@ -18,6 +18,6 @@ public:
 	Block() : isPark(false) {}
 
 	void clear();
-	void findParcelFrontAndBackEdges(const Parcel& inParcel, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges);
+	void findParcelFrontAndBackEdges(const Polygon3D& parcelContour, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges);
 };
 

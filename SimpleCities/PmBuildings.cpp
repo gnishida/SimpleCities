@@ -28,11 +28,15 @@ bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, 
 	std::vector<int> rearEdges;
 	std::vector<int> sideEdges;
 
-	block.findParcelFrontAndBackEdges(parcel, frontEdges, rearEdges, sideEdges);
+	// simplify the contour in order to obtain a simple building footprint
+	Polygon3D contour = parcel.parcelContour;
+	contour.simplify(0.5);
 
-	// Compute buildable area polygon
+	block.findParcelFrontAndBackEdges(contour, frontEdges, rearEdges, sideEdges);
+
+	// Compute building footprint
 	Loop3D footprint;
-	parcel.computeBuildableArea(G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges, footprint);
+	Parcel::computeBuildingFootprint(contour, G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges, footprint);
 	if (footprint.size() == 0) return false;
 	if (footprint.isSelfIntersecting()) {
 		return false;

@@ -52,11 +52,14 @@ public:
     QAction *actionSaveParcels;
     QAction *actionSaveBuildings;
     QAction *actionGenerateScenarios;
+    QAction *actionView2D;
+    QAction *actionView3D;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuWindow;
     QMenu *menuPM;
+    QMenu *menuView;
     QToolBar *fileToolBar;
     QStatusBar *statusBar;
 
@@ -118,6 +121,12 @@ public:
         actionSaveBuildings->setObjectName(QStringLiteral("actionSaveBuildings"));
         actionGenerateScenarios = new QAction(MainWindow);
         actionGenerateScenarios->setObjectName(QStringLiteral("actionGenerateScenarios"));
+        actionView2D = new QAction(MainWindow);
+        actionView2D->setObjectName(QStringLiteral("actionView2D"));
+        actionView2D->setCheckable(true);
+        actionView3D = new QAction(MainWindow);
+        actionView3D->setObjectName(QStringLiteral("actionView3D"));
+        actionView3D->setCheckable(true);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -130,6 +139,8 @@ public:
         menuWindow->setObjectName(QStringLiteral("menuWindow"));
         menuPM = new QMenu(menuBar);
         menuPM->setObjectName(QStringLiteral("menuPM"));
+        menuView = new QMenu(menuBar);
+        menuView->setObjectName(QStringLiteral("menuView"));
         MainWindow->setMenuBar(menuBar);
         fileToolBar = new QToolBar(MainWindow);
         fileToolBar->setObjectName(QStringLiteral("fileToolBar"));
@@ -140,9 +151,9 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuPM->menuAction());
+        menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuWindow->menuAction());
         menuFile->addAction(actionLoadZone);
-        menuFile->addAction(actionNewTerrain);
         menuFile->addAction(actionOpenTerrain);
         menuFile->addAction(actionSaveTerrain);
         menuFile->addSeparator();
@@ -174,6 +185,8 @@ public:
         menuPM->addAction(actionGenerateAll);
         menuPM->addSeparator();
         menuPM->addAction(actionGenerateScenarios);
+        menuView->addAction(actionView2D);
+        menuView->addAction(actionView3D);
 
         retranslateUi(MainWindow);
 
@@ -218,9 +231,12 @@ public:
         actionSaveParcels->setText(QApplication::translate("MainWindow", "Save Parcels", 0));
         actionSaveBuildings->setText(QApplication::translate("MainWindow", "Save Buildings", 0));
         actionGenerateScenarios->setText(QApplication::translate("MainWindow", "Generate Scenarios", 0));
+        actionView2D->setText(QApplication::translate("MainWindow", "2D", 0));
+        actionView3D->setText(QApplication::translate("MainWindow", "3D", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0));
+        menuView->setTitle(QApplication::translate("MainWindow", "View", 0));
     } // retranslateUi
 
 };
