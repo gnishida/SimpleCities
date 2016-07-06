@@ -66,7 +66,7 @@ void UrbanGeometry::generateAll() {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& streetSegmentLengthRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<float, float>& numStoriesRange) {
+void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& streetSegmentLengthRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<int, int>& numStoriesRange) {
 	if (QDir(output_dir).exists()) {
 		std::cout << "Removing existing files in the output directory...";
 		QDir(output_dir).removeRecursively();
@@ -107,7 +107,7 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		G::global()["parcel_setback_front"] = Util::genRand(setbackFrontRange.first, setbackFrontRange.second);
 		G::global()["parcel_setback_rear"] = Util::genRand(setbackRearRange.first, setbackRearRange.second);
 		G::global()["parcel_setback_sides"] = Util::genRand(setbackSideRange.first, setbackSideRange.second);
-		G::global()["building_stories_mean"] = Util::genRand(numStoriesRange.first, numStoriesRange.second);
+		G::global()["building_stories_mean"] = (int)Util::genRand(numStoriesRange.first, numStoriesRange.second + 1);
 
 		// generate a city
 		generateAll();

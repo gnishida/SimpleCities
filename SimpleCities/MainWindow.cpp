@@ -275,7 +275,7 @@ void MainWindow::onGenerateScenarios() {
 	std::pair<float, float> setbackFrontRange = std::make_pair(dlg.ui.lineEditSetbackFrontMin->text().toFloat(), dlg.ui.lineEditSetbackFrontMax->text().toFloat());
 	std::pair<float, float> setbackRearRange = std::make_pair(dlg.ui.lineEditSetbackRearMin->text().toFloat(), dlg.ui.lineEditSetbackRearMax->text().toFloat());
 	std::pair<float, float> setbackSideRange = std::make_pair(dlg.ui.lineEditSetbackSideMin->text().toFloat(), dlg.ui.lineEditSetbackSideMax->text().toFloat());
-	std::pair<float, float> numStoriesRange = std::make_pair(dlg.ui.lineEditNumStoriesMin->text().toFloat(), dlg.ui.lineEditNumStoriesMax->text().toFloat());
+	std::pair<int, int> numStoriesRange = std::make_pair(dlg.ui.lineEditNumStoriesMin->text().toInt(), dlg.ui.lineEditNumStoriesMax->text().toInt());
 
 	// load zone
 	urbanGeometry->loadZone(zone_file.toUtf8().constData());
