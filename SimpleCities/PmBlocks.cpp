@@ -250,8 +250,6 @@ bool PmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph& roadGr
 	vertex_output_visitor v_vis;	
 	boost::planar_face_traversal(roadGraph.graph, &embedding[0], v_vis, pmEdgeIndex);
 
-	//printf("roads graph was traversed. %d blocks were extracted.\n", tmpBlocks.size());
-
 	// Remove invalid data
 	for (int i = 0; i < tmpBlocks.size();) {
 		if (tmpBlocks[i].sidewalkContour.size() != tmpBlocks[i].sidewalkContourRoadsWidths.size()) {
@@ -409,20 +407,20 @@ void PmBlocks::saveBlockImage(const RoadGraph& roads, const Polygon3D& contour, 
 
 		for (int pl = 0; pl < roads.graph[*ei]->polyline.size() - 1; ++pl) {
 			int x1 = roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x();
-			int y1 = img.rows - (roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y());
+			int y1 = roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y();
 			int x2 = roads.graph[*ei]->polyline[pl + 1].x() - bbox.minPt.x();
-			int y2 = img.rows - (roads.graph[*ei]->polyline[pl + 1].y() - bbox.minPt.y());
-			cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(224, 224, 224), 3);
+			int y2 = roads.graph[*ei]->polyline[pl + 1].y() - bbox.minPt.y();
+			cv::line(img, cv::Point(x1, img.rows - y1), cv::Point(x2, img.rows - y2), cv::Scalar(224, 224, 224), 3);
 		}
 	}
 
 	for (int i = 0; i < contour.size(); ++i) {
 		int next = (i + 1) % contour.size();
 		int x1 = contour.contour[i].x() - bbox.minPt.x();
-		int y1 = img.rows - (contour.contour[i].y() - bbox.minPt.y());
+		int y1 = contour.contour[i].y() - bbox.minPt.y();
 		int x2 = contour.contour[next].x() - bbox.minPt.x();
-		int y2 = img.rows - (contour.contour[next].y() - bbox.minPt.y());
-		cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(0, 0, 0), 3);
+		int y2 = contour.contour[next].y() - bbox.minPt.y();
+		cv::line(img, cv::Point(x1, img.rows - y1), cv::Point(x2, img.rows - y2), cv::Scalar(0, 0, 0), 3);
 	}
 
 	cv::imwrite(filename, img);
