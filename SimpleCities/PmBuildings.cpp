@@ -48,7 +48,7 @@ bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, 
 	QVector3D obbSize;
 	QMatrix4x4 obbMat;
 	parcel.building.buildingFootprint.getMyOBB(obbSize, obbMat);
-	if (obbSize.x() < 5 || obbSize.y() < 5) return false;
+	if (obbSize.x() < 3 || obbSize.y() < 3) return false;
 	if (obbSize.x() > obbSize.y() * 10 || obbSize.y() > obbSize.x() * 10) return false;
 
 	// set the elevation

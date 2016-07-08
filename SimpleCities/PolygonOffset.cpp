@@ -56,7 +56,7 @@ namespace polyoffset {
 				double theta1 = atan2(p0.y - cur.y, p0.x - cur.x);
 				double theta2 = atan2(p1.y - cur.y, p1.x - cur.x);
 				if (theta2 >= theta1) theta2 -= M_PI * 2.0f;
-				for (double theta = theta1 - 0.1f; theta > theta2; theta -= 0.1) {
+				for (double theta = theta1 - 0.2f; theta >= theta2 + 0.2; theta -= 0.2) {
 					glm::vec2 p = cur + glm::dvec2(cos(theta) * offset, sin(theta) * offset);
 					rawInterPolygon.push_back(p);
 				}
