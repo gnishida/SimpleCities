@@ -3,42 +3,36 @@
 #include "global.h"
 #include "Util.h"
 
-bool PmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
+bool PmParcels::generateParcels(VBORenderManager& rendManager, std::vector<Block>& blocks) {
 	srand(0);
-	for (int i = 0; i < blocks.size(); ++i) {
-		subdivideBlockIntoParcels(blocks[i]);
+	for (int bN = 0; bN < blocks.size(); ++bN) {
+		if (blocks[bN].isPark) continue;
+
+		for (int cN = 0; cN < blocks[bN].blockContours.size(); ++cN) {
+			std::vector<Parcel> parcels;
+			subdivideBlockIntoParcels(blocks[bN].blockContours[cN], parcels);
+
+			blocks[bN].parcels.insert(blocks[bN].parcels.end(), parcels.begin(), parcels.end());
+		}
 	}
 
 	return true;
 }
 
-void PmParcels::subdivideBlockIntoParcels(Block &block) {
-	//srand(block.randSeed);
-	std::vector<Parcel> tmpParcels;
-
-	block.parcels.clear();
-
+void PmParcels::subdivideBlockIntoParcels(const Polygon3D& contour, std::vector<Parcel>& parcels) {
 	// set the initial parcel be the block itself
-	Parcel tmpParcel;
-	tmpParcel.parcelContour = block.blockContour;
+	Parcel parcel;
+	parcel.parcelContour = contour;
 
-	if (block.isPark) {
-		tmpParcel.isPark = true;
-		tmpParcels.push_back(tmpParcel);
-	} else {
-		subdivideParcel(tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
-	}
+	subdivideParcel(parcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), parcels);
 
-	for (int i = 0; i < tmpParcels.size(); ++i) {
-		//add parcel to block
-		block.parcels.push_back(tmpParcels[i]);
-
-		if (block.parcels.back().parcelContour.isClockwise()) {
-			std::reverse(block.parcels.back().parcelContour.contour.begin(), block.parcels.back().parcelContour.contour.end());
+	for (int i = 0; i < parcels.size(); ++i) {
+		if (parcels[i].parcelContour.isClockwise()) {
+			std::reverse(parcels[i].parcelContour.contour.begin(), parcels[i].parcelContour.contour.end());
 		}
 
 		if (Util::genRand() < G::getFloat("parksRatio")) {
-			block.parcels.back().isPark = true;
+			parcels[i].isPark = true;
 		}
 	}
 }

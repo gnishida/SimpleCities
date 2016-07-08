@@ -2,7 +2,7 @@
 #include <QVector2D>
 
 void Block::clear() {
-	this->blockContour.contour.clear();
+	this->blockContours.clear();
 	this->sidewalkContour.clear();
 	this->sidewalkContourRoadsWidths.clear();
 	this->parcels.clear();
@@ -20,9 +20,9 @@ void Block::findParcelFrontAndBackEdges(const Polygon3D& parcelContour, std::vec
 
 		QVector3D midPt = (parcelContour[i] + parcelContour[next]) * 0.5f;
 
-		float distPtThis = blockContour.distanceXYToPoint(parcelContour[i]);
-		float distPtNext = blockContour.distanceXYToPoint(parcelContour[next]);
-		float distPtMid = blockContour.distanceXYToPoint(midPt);
+		float distPtThis = distanceXYToPoint(parcelContour[i]);
+		float distPtNext = distanceXYToPoint(parcelContour[next]);
+		float distPtMid = distanceXYToPoint(midPt);
 		int numPtsThatAreClose = (int)(distPtThis < kDistTol) + (int)(distPtMid < kDistTol) + (int)(distPtNext < kDistTol);
 
 		bool midPtIsClose = (distPtThis < kDistTol);
@@ -40,4 +40,14 @@ void Block::findParcelFrontAndBackEdges(const Polygon3D& parcelContour, std::vec
 			break;
 		}
 	}
+}
+
+float Block::distanceXYToPoint(const QVector3D& pt) {
+	float min_dist = std::numeric_limits<float>::max();
+	for (int i = 0; i < blockContours.size(); ++i) {
+		float dist = blockContours[i].distanceXYToPoint(pt);
+		if (dist < min_dist) min_dist = dist;
+	}
+
+	return min_dist;
 }

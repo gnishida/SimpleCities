@@ -73,21 +73,23 @@ bool PmVegetation::generateVegetation(VBORenderManager& rendManager, const std::
 	// generate trees in blocks (park)
 	for (int bN = 0; bN < blocks.size(); bN++) {
 		if (blocks[bN].isPark) {
-			BBox bbox = blocks[bN].blockContour.envelope();
-			int numTrees = blocks[bN].blockContour.area() * treesPerSqMeter;
+			for (int cN = 0; cN < blocks[bN].blockContours.size(); ++cN) {
+				BBox bbox = blocks[bN].blockContours[cN].envelope();
+				int numTrees = blocks[bN].blockContours[cN].area() * treesPerSqMeter;
 
-			for (int i = 0; i < numTrees; ++i) {
-				QVector3D pos;
-				while (true) {
-					pos.setX(Util::genRand(bbox.minPt.x(), bbox.maxPt.x()));
-					pos.setY(Util::genRand(bbox.minPt.y(), bbox.maxPt.y()));
-					pos.setZ(deltaZ);
-					if (blocks[bN].blockContour.contains(pos)) {
-						break;
+				for (int i = 0; i < numTrees; ++i) {
+					QVector3D pos;
+					while (true) {
+						pos.setX(Util::genRand(bbox.minPt.x(), bbox.maxPt.x()));
+						pos.setY(Util::genRand(bbox.minPt.y(), bbox.maxPt.y()));
+						pos.setZ(deltaZ);
+						if (blocks[bN].blockContours[cN].contains(pos)) {
+							break;
+						}
 					}
-				}
 
-				rendManager.addStreetElementModel("tree", addTree(pos));
+					rendManager.addStreetElementModel("tree", addTree(pos));
+				}
 			}
 		} else {			
 			for (int pN = 0; pN < blocks[bN].parcels.size(); ++pN) {
@@ -101,7 +103,7 @@ bool PmVegetation::generateVegetation(VBORenderManager& rendManager, const std::
 							pos.setX(Util::genRand(bbox.minPt.x(), bbox.maxPt.x()));
 							pos.setY(Util::genRand(bbox.minPt.y(), bbox.maxPt.y()));
 							pos.setZ(deltaZ);
-							if (blocks[bN].blockContour.contains(pos)) {
+							if (blocks[bN].parcels[pN].parcelContour.contains(pos)) {
 								break;
 							}
 						}
@@ -120,7 +122,7 @@ bool PmVegetation::generateVegetation(VBORenderManager& rendManager, const std::
 							pos.setX(Util::genRand(bbox.minPt.x(), bbox.maxPt.x()));
 							pos.setY(Util::genRand(bbox.minPt.y(), bbox.maxPt.y()));
 							pos.setZ(deltaZ);
-							if (blocks[bN].blockContour.contains(pos) && !blocks[bN].parcels[pN].building.buildingFootprint.contains(pos)) {
+							if (blocks[bN].parcels[pN].parcelContour.contains(pos) && !blocks[bN].parcels[pN].building.buildingFootprint.contains(pos)) {
 								break;
 							}
 						}

@@ -391,8 +391,11 @@ void PmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& block
 		std::vector<Loop3D> contours;
 		blocks[i].sidewalkContour.offsetInside(sidewalk_width, contours);
 
-		if (contours.size() > 0) {
-			blocks[i].blockContour.contour = contours[0];
+		blocks[i].blockContours.resize(contours.size());
+		for (int cN = 0; cN < contours.size(); ++cN) {
+			for (int k = 0; k < contours[cN].size(); ++k) {
+				blocks[i].blockContours[cN].push_back(contours[cN][k]);
+			}
 		}
 	}
 }

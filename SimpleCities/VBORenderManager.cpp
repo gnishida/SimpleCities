@@ -229,10 +229,10 @@ bool VBORenderManager::addStaticGeometry(const QString& geoName, const std::vect
 bool VBORenderManager::addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
 	if (pos.size() < 3) return false;
 
-	return addStaticGeometry2WithHole(geoName, pos, std::vector<QVector3D>(), zShift, textureName, shaderMode, texScale, color);
+	return addStaticGeometry2WithHole(geoName, pos, std::vector<std::vector<QVector3D>>(), zShift, textureName, shaderMode, texScale, color);
 }
 
-bool VBORenderManager::addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<QVector3D>& hole, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
+bool VBORenderManager::addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<std::vector<QVector3D>>& holes, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color){
 	if (pos.size() < 3) return false;
 
 	std::vector<pointP> vP;
@@ -259,17 +259,17 @@ bool VBORenderManager::addStaticGeometry2WithHole(const QString& geoName, const 
 	polygonP polygon;
 	boost::polygon::set_points(polygon, vP.begin(), vP.end());
 
-	if (hole.size() >= 3) {
-		// add hole
-		boost::polygon::polygon_with_holes_traits<polygonP>::hole_type hole_polys[1];
-		std::vector<pointP> hole_poly(hole.size());
-		for (int i = hole.size() - 1; i >= 0; --i) {
-			hole_poly[i] = boost::polygon::construct<pointP>(hole[i].x(), hole[i].y());
+	// add holes
+	std::vector<boost::polygon::polygon_with_holes_traits<polygonP>::hole_type> hole_polys(holes.size());
+	for (int i = 0; i < holes.size(); ++i) {
+		std::vector<pointP> hole_poly(holes[i].size());
+		for (int k = holes[i].size() - 1; k >= 0; --k) {
+			hole_poly[k] = boost::polygon::construct<pointP>(holes[i][k].x(), holes[i][k].y());
 		}
 		hole_poly.push_back(hole_poly[0]);
-		boost::polygon::set_points(hole_polys[0], hole_poly.begin(), hole_poly.end());
-		boost::polygon::set_holes(polygon, hole_polys, hole_polys + 1);
+		boost::polygon::set_points(hole_polys[i], hole_poly.begin(), hole_poly.end());
 	}
+	boost::polygon::set_holes(polygon, hole_polys.begin(), hole_polys.end());
 
 	std::vector<polygonP> polySet;
 	polySet.push_back(polygon);

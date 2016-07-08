@@ -8,7 +8,7 @@
 
 class Block {
 public:
-	Polygon3D blockContour;
+	std::vector<Polygon3D> blockContours;
 	Polygon3D sidewalkContour;
 	std::vector<float> sidewalkContourRoadsWidths;
 	bool isPark;
@@ -19,5 +19,6 @@ public:
 
 	void clear();
 	void findParcelFrontAndBackEdges(const Polygon3D& parcelContour, std::vector<int>& frontEdges, std::vector<int>& rearEdges, std::vector<int>& sideEdges);
+	float distanceXYToPoint(const QVector3D& pt);
 };
 

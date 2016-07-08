@@ -333,16 +333,17 @@ void UrbanGeometry::loadParcels(const std::string& filename) {
 	for (int i = 0; i < shape.shapeObjects.size(); ++i) {
 		for (int j = 0; j < shape.shapeObjects[i].parts.size(); ++j) {
 			Block block;
+			block.blockContours.resize(1);
 			for (int k = shape.shapeObjects[i].parts[j].points.size() - 1; k >= 1; --k) {
 				QVector3D pt;
 				pt.setX(shape.shapeObjects[i].parts[j].points[k].x - offset.x);
 				pt.setY(shape.shapeObjects[i].parts[j].points[k].y - offset.y);
 				pt.setZ(shape.shapeObjects[i].parts[j].points[k].z);
-				block.blockContour.push_back(pt);
+				block.blockContours[0].push_back(pt);
 			}
 			
 			Parcel parcel;
-			parcel.parcelContour = block.blockContour;
+			parcel.parcelContour = block.blockContours[0];
 			block.parcels.push_back(parcel);
 
 			blocks.blocks.push_back(block);

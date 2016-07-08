@@ -98,7 +98,7 @@ public:
 	//static
 	bool addStaticGeometry(const QString& geoName, const std::vector<Vertex>& vert, const QString& textureName, GLenum geometryType, int shaderMode);
 	bool addStaticGeometry2(const QString& geoName, const std::vector<QVector3D>& pos, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
-	bool addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<QVector3D>& hole, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
+	bool addStaticGeometry2WithHole(const QString& geoName, const std::vector<QVector3D>& pos, const std::vector<std::vector<QVector3D>>& holes, float zShift, const QString& textureName, int shaderMode, const QVector3D& texScale, const QColor& color);
 	bool removeStaticGeometry(const QString& geoName);
 	void renderStaticGeometry(const QString& geoName);
 
