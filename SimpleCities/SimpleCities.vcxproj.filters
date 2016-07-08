@@ -196,6 +196,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ScenarioGenerationDialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="PolygonOffset.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -367,6 +370,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_ScenarioGenerationDialog.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PolygonOffset.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

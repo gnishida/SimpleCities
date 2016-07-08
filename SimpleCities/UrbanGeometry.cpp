@@ -109,6 +109,16 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		G::global()["parcel_setback_sides"] = Util::genRand(setbackSideRange.first, setbackSideRange.second);
 		G::global()["building_stories_mean"] = (int)Util::genRand(numStoriesRange.first, numStoriesRange.second + 1);
 
+		std::cout << "avenueAvgSegmentLength: " << G::getFloat("avenueAvgSegmentLength") << std::endl;
+		std::cout << "streetAvgSegmentLength: " << G::getFloat("streetAvgSegmentLength") << std::endl;
+		std::cout << "road_curvature: " << G::getFloat("road_curvature") << std::endl;
+		std::cout << "parksRatio: " << G::getFloat("parksRatio") << std::endl;
+		std::cout << "parcel_area_mean: " << G::getFloat("parcel_area_mean") << std::endl;
+		std::cout << "parcel_setback_front: " << G::getFloat("parcel_setback_front") << std::endl;
+		std::cout << "parcel_setback_rear: " << G::getFloat("parcel_setback_rear") << std::endl;
+		std::cout << "parcel_setback_sides: " << G::getFloat("parcel_setback_sides") << std::endl;
+		std::cout << "building_stories_mean: " << G::getFloat("building_stories_mean") << std::endl;
+
 		// generate a city
 		generateAll();
 

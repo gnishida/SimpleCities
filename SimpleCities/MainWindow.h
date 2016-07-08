@@ -22,6 +22,8 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+	void setParameters();
+
 protected:
 	void keyPressEvent(QKeyEvent* e);
 	void keyReleaseEvent(QKeyEvent* e);

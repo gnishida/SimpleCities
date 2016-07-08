@@ -64,6 +64,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 MainWindow::~MainWindow() {
 }
 
+void MainWindow::setParameters() {
+	G::global()["avenueAvgSegmentLength"] = controlWidget->ui.lineEditAvenueSegmentLength->text().toFloat();
+	G::global()["streetAvgSegmentLength"] = controlWidget->ui.lineEditStreetSegmentLength->text().toFloat();
+	G::global()["road_curvature"] = controlWidget->ui.lineEditRoadCurvature->text().toFloat();
+	G::global()["parksRatio"] = controlWidget->ui.lineEditParkRatio->text().toFloat();
+	G::global()["parcel_area_mean"] = controlWidget->ui.lineEditParcelArea->text().toFloat();
+	G::global()["parcel_setback_front"] = controlWidget->ui.lineEditSetbackFront->text().toFloat();
+	G::global()["parcel_setback_rear"] = controlWidget->ui.lineEditSetbackRear->text().toFloat();
+	G::global()["parcel_setback_sides"] = controlWidget->ui.lineEditSetbackSide->text().toFloat();
+	G::global()["building_stories_mean"] = Util::genRand(controlWidget->ui.lineEditNumStoriesMin->text().toInt(), controlWidget->ui.lineEditNumStoriesMax->text().toInt() + 1);
+}
+
 void MainWindow::keyPressEvent(QKeyEvent* e) {
 	glWidget->keyPressEvent(e);
 }
@@ -201,36 +213,42 @@ void MainWindow::onResetCamera() {
 }
 
 void MainWindow::onGenerateRoads() {
+	setParameters();
 	urbanGeometry->generateRoads();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateBlocks() {
+	setParameters();
 	urbanGeometry->generateBlocks();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateParcels() {
+	setParameters();
 	urbanGeometry->generateParcels();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateBuildings() {
+	setParameters();
 	urbanGeometry->generateBuildings();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateVegetation() {
+	setParameters();
 	urbanGeometry->generateVegetation();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateAll() {
+	setParameters();
 	urbanGeometry->generateAll();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
@@ -242,15 +260,7 @@ void MainWindow::onGenerateCity() {
 	urbanGeometry->clear();
 
 	// set the parameter values
-	G::global()["avenueAvgSegmentLength"] = controlWidget->ui.lineEditAvenueSegmentLength->text().toFloat();
-	G::global()["streetAvgSegmentLength"] = controlWidget->ui.lineEditStreetSegmentLength->text().toFloat();
-	G::global()["road_curvature"] = controlWidget->ui.lineEditRoadCurvature->text().toFloat();
-	G::global()["parksRatio"] = controlWidget->ui.lineEditParkRatio->text().toFloat();
-	G::global()["parcel_area_mean"] = controlWidget->ui.lineEditParcelArea->text().toFloat();
-	G::global()["parcel_setback_front"] = controlWidget->ui.lineEditSetbackFront->text().toFloat();
-	G::global()["parcel_setback_rear"] = controlWidget->ui.lineEditSetbackRear->text().toFloat();
-	G::global()["parcel_setback_sides"] = controlWidget->ui.lineEditSetbackSide->text().toFloat();
-	G::global()["building_stories_mean"] = Util::genRand(controlWidget->ui.lineEditNumStoriesMin->text().toInt(), controlWidget->ui.lineEditNumStoriesMax->text().toInt() + 1);
+	setParameters();
 
 	urbanGeometry->generateAll();
 	glWidget->shadow.makeShadowMap(glWidget);

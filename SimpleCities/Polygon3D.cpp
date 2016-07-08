@@ -10,6 +10,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Partition_traits_2.h>
 #include <CGAL/partition_2.h>
+#include "PolygonOffset.h"
 
 bool Loop3D::contains(const QVector3D& pt) const {
 	if (size() < 3) return false;
@@ -217,213 +218,20 @@ void Polygon3D::offsetInside(float offsetDistance, std::vector<Loop3D>& pgonInse
 void Polygon3D::offsetInside(std::vector<float>& offsetDistances, std::vector<Loop3D>& pgonInsets) const {
 	pgonInsets.clear();
 
-	double tol = 0.01f;
-
-	//if offsets are zero, add a small epsilon just to avoid division by zero
-	for(size_t i=0; i<offsetDistances.size(); ++i){
-		if(fabs(offsetDistances[i]) < tol){
-			offsetDistances[i] = tol;
-		}
-	}
-
-	Loop3D pgonInset;
-	bool wrongDirection = false;
-	for (int cur = 0; cur < contour.size(); ++cur) {
-		int prev = (cur - 1 + contour.size()) % contour.size();
-		int next = (cur + 1) % contour.size();
-
-		if (Util::diffAngle(contour[prev] - contour[cur], contour[next] - contour[cur]) < 0.1f) {
-			QVector3D vec = contour[cur] - contour[prev];
-			QVector3D perp(-vec.y(), vec.x(), 0);
-
-			float angle = atan2f(perp.y(), perp.x());
-			for (int i = 0; i <= 10; ++i) {
-				float a = angle - (float)i * M_PI / 10.0f;
-				QVector3D intPt(contour[cur].x() + cosf(a) * offsetDistances[cur], contour[cur].y() + sinf(a) * offsetDistances[cur], contour[cur].z());
-				pgonInset.push_back(intPt);
-			}
-		}
-		else {
-			QVector3D intPt;
-			Util::getIrregularBisector(contour[prev], contour[cur], contour[next], offsetDistances[prev], offsetDistances[cur], intPt);
-
-			// 方向をチェック
-			if (pgonInset.size() > 0) {
-				if (QVector3D::dotProduct(contour[cur] - contour[prev], intPt - pgonInset.back()) < 0) {
-					wrongDirection = true;
-					break;
-				}
-			}
-
-			pgonInset.push_back(intPt);
-		}
-	}
-
-	// naive 方式が失敗したら、CGALを利用する。
-	if (wrongDirection) {
-		offsetInsideCGAL(offsetDistances[0], pgonInsets);
-	}
-	else {
-		pgonInsets.push_back(pgonInset);
-	}
-
-#if 0
-	if (offsetDistances[0] > 0) {	// 内側へのoffsetの計算（Block生成、footprint生成などに使用）
-		// ToDo: We should improve this logic to make it more stable.
-		pgonInset.clear();
-		for (int cur = 0; cur<cSz; ++cur){
-			//Some geometry and trigonometry
-
-			//point p1 is the point with index cur
-			prev = (cur - 1 + cSz) % cSz; //point p0
-			next = (cur + 1) % cSz;	  //point p2
-
-			if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
-				// For deanend edge
-				QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
-				QVector3D vec2(-vec.y(), vec.x(), 0);
-
-				float angle = atan2f(vec2.y(), vec2.x());
-				for (int i = 0; i <= 10; ++i) {
-					float a = angle - (float)i * M_PI / 10.0f;
-					intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
-					pgonInset.push_back(intPt);
-				}
-			}
-			else {
-				Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-				
-				// For acute angle
-				/*if (pgonInset.size() >= 2) {
-					if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
-						pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
-					}
-				}*/
-
-				pgonInset.push_back(intPt);
-			}
-		}
-	}
-	else {	// 外側へのoffsetの計算（ビルの屋根などで使用）
-		// ToDo: We should improve this logic to make it more stable.
-		pgonInset.clear();
-		for (int cur = 0; cur<cSz; ++cur){
-			//Some geometry and trigonometry
-
-			//point p1 is the point with index cur
-			prev = (cur - 1 + cSz) % cSz; //point p0
-			next = (cur + 1) % cSz;	  //point p2
-
-			if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
-				// For deanend edge
-				QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
-				QVector3D vec2(-vec.y(), vec.x(), 0);
-
-				float angle = atan2f(vec2.y(), vec2.x());
-				for (int i = 0; i <= 10; ++i) {
-					float a = angle - (float)i * M_PI / 10.0f;
-					intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
-					pgonInset.push_back(intPt);
-				}
-			}
-			else {
-				Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-				
-				// For acute angle
-				if (pgonInset.size() >= 2) {
-					if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
-						pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
-					}
-				}
-
-				pgonInset.push_back(intPt);
-			}
-		}
-	}
-	
-	if (pgonInset.size() > 0) {
-		boost::geometry::ring_type<Polygon3D>::type bg_contour;
-		boost::geometry::ring_type<Polygon3D>::type bg_contour_inset;
-
-		boost::geometry::assign(bg_contour_inset, pgonInset);
-		boost::geometry::correct(bg_contour_inset);
-
-		if (boost::geometry::intersects(bg_contour_inset)) {
-			computeInset2(offsetDistances[0], pgonInset);
-			return;
-		}
-		else {
-			// 内側へのinsetなのに、areaが大きくなった場合は、CGALを利用する。
-			if (offsetDistances[0] > 0) {
-				if (pgonInset.area() > contour.area()) {
-					computeInset2(offsetDistances[0], pgonInset);
-					return;
-				}
-			}
-
-			// 元のポリゴンと交差する場合は、CGALを利用する
-			bool intersected = false;
-			for (int i = 0; i < pgonInset.size() && !intersected; ++i) {
-				int next = (i + 1) % pgonInset.size();
-
-				for (int j = 0; j < contour.size(); ++j) {
-					int next2 = (j + 1) % contour.size();
-
-					float tab, tcd;
-					QVector3D intPoint;
-					if (Util::segmentSegmentIntersectXY3D(pgonInset[i], pgonInset[next], contour[j], contour[next2], &tab, &tcd, true, intPoint)) {
-						intersected = true;
-						break;
-					}
-				}
-			}
-
-			if (intersected) {
-				computeInset2(offsetDistances[0], pgonInset);
-				return;
-			}
-		}
-	}
-#endif
-}
-
-/**
-* @brief: Given a polygon, this function computes the polygon's inwards offset. The offset distance
-* is not assumed to be constant and must be specified in the vector offsetDistances. The size of this
-* vector must be equal to the number of vertices of the polygon.
-* Note that the i-th polygon segment is defined by vertices i and i+1.
-* The polygon vertices are assumed to be oriented clockwise
-* @param[in] offsetDistances: Perpendicular distance from offset segment i to polygon segment i.
-* @param[out] pgonInset: The vertices of the polygon inset
-* @return insetArea: Returns the area of the polygon inset
-**/
-void Polygon3D::offsetInsideCGAL(float offsetDistance, std::vector<Loop3D>& pgonInsets) const {
-	typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-	typedef CGAL::Partition_traits_2<K> Traits;
-	typedef Traits::Polygon_2 Polygon_2;
-	typedef boost::shared_ptr<Polygon_2> PolygonPtr;
-
-	pgonInsets.clear();
-
-	Polygon_2 poly;
-
+	std::vector<glm::vec2> polygon;
 	for (int i = 0; i < contour.size(); ++i) {
-		poly.push_back(K::Point_2(contour[i].x(), contour[i].y()));
+		polygon.push_back(glm::vec2(contour[i].x(), contour[i].y()));
 	}
-	poly.push_back(K::Point_2(contour[0].x(), contour[0].y()));
+	std::vector<std::vector<glm::vec2>> offsetPolygons;
+	polyoffset::polygonOffset(polygon, offsetDistances, offsetPolygons);
 
-	std::vector<PolygonPtr> offset_poly;
-
-	K::FT lOffset = offsetDistance;
-	offset_poly = CGAL::create_interior_skeleton_and_offset_polygons_2(lOffset, poly);
-
-	pgonInsets.resize(offset_poly.size());
-	for (int i = 0; i < offset_poly.size(); ++i) {
-		pgonInsets[i].clear();
-		for (auto it = offset_poly[i]->vertices_begin(); it != offset_poly[i]->vertices_end(); ++it) {
-			pgonInsets[i].push_back(QVector3D(it->x(), it->y(), 0));
+	pgonInsets.resize(offsetPolygons.size());
+	for (int i = 0; i < offsetPolygons.size(); ++i) {
+		for (int j = 0; j < offsetPolygons[i].size(); ++j) {
+			pgonInsets[i].push_back(QVector3D(offsetPolygons[i][j].x, offsetPolygons[i][j].y, 0));
 		}
 	}
+
 }
 
 void Polygon3D::transformLoop(const Loop3D& pin, Loop3D& pout, const QMatrix4x4& transformMat) {

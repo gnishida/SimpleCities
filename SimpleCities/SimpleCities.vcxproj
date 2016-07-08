@@ -143,6 +143,7 @@
     <ClCompile Include="nvModel\nvModelObj.cpp" />
     <ClCompile Include="nvModel\nvModelQuery.cpp" />
     <ClCompile Include="PMRoadGenerator.cpp" />
+    <ClCompile Include="PolygonOffset.cpp" />
     <ClCompile Include="Polyline2D.cpp" />
     <ClCompile Include="RoadMeshGenerator.cpp" />
     <ClCompile Include="ControlWidget.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="GeneratedFiles\ui_ScenarioGenerationDialog.h" />
     <ClInclude Include="GShapefile.h" />
     <ClInclude Include="PMRoadGenerator.h" />
+    <ClInclude Include="PolygonOffset.h" />
     <ClInclude Include="Polyline2D.h" />
     <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="nvModel\nvMath.h" />
