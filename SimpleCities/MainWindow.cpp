@@ -303,6 +303,9 @@ void MainWindow::onViewChanged() {
 	int terrainMode;
 	if (ui.actionView2D->isChecked()) {
 		terrainMode = 0;
+
+		// change to top view
+		glWidget->camera.resetCamera();
 	}
 	else  {
 		terrainMode = 1;
