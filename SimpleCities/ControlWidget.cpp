@@ -15,12 +15,14 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditRoadCurvature->setText("0.2");
 	ui.lineEditParkRatio->setText("0.1");
 	ui.lineEditParcelArea->setText("1000");
+	ui.lineEditParcelAreaDev->setText("200");
 	ui.lineEditSetbackFront->setText("5");
 	ui.lineEditSetbackRear->setText("5");
 	ui.lineEditSetbackSide->setText("5");
-	ui.lineEditNumStoriesMin->setText("5");
-	ui.lineEditNumStoriesMax->setText("5");
-	
+	ui.lineEditNumStories->setText("5");
+	ui.lineEditNumStoriesDev->setText("2");
+	ui.lineEditMinBuildingDim->setText("10.0");
+
 	connect(ui.pushButtonGenerateAll, SIGNAL(clicked()), mainWin, SLOT(onGenerateCity()));
 	
 	hide();	

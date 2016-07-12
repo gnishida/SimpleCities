@@ -24,7 +24,7 @@ void PmParcels::subdivideBlockIntoParcels(const Polygon3D& contour, std::vector<
 	Parcel parcel;
 	parcel.parcelContour = contour;
 
-	subdivideParcel(parcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), parcels);
+	subdivideParcel(parcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), parcels);
 
 	for (int i = 0; i < parcels.size(); ++i) {
 		if (parcels[i].parcelContour.isClockwise()) {
@@ -38,18 +38,17 @@ void PmParcels::subdivideBlockIntoParcels(const Polygon3D& contour, std::vector<
 }
 
 /**
-* Parcel subdivision
-* @desc: Recursive subdivision of a parcel using OBB technique
-* @return: true if parcel was successfully subdivided, false otherwise
-* @areaMean: mean target area of parcels after subdivision
-* @areaVar: variance of parcels area after subdivision (normalized in 0-1)
-* @splitIrregularity: A normalized value 0-1 indicating how far
-*					from the middle point the split line should be
-**/
-bool PmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, float areaStd, float splitIrregularity, std::vector<Parcel> &outParcels) {
-	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
+ * Recursively subdivision of a parcel using OBB technique
+ * @param parcel			parcel
+ * @param areaMean			mean parcel area
+ * @param areaStd			StdDev of parcel area
+ * @param splitIrregularity	A normalized value 0-1 indicating how far from the middle point the split line should be.
+ * @param outParcels		the resulting subdivision
+ **/
+bool PmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaStd, float splitIrregularity, std::vector<Parcel> &outParcels) {
+	float thresholdArea = std::max(0.0f, Util::genRandNormal(areaMean, areaStd));
 	
-	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {
+	if (parcel.parcelContour.area() <= thresholdArea * 1.5f) {
 		outParcels.push_back(parcel);
 		return true;
 	}
@@ -104,8 +103,8 @@ bool PmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, f
 		parcel2.parcelContour = pgon2;
 
 		// call recursive function for both parcels
-		subdivideParcel(parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
-		subdivideParcel(parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+		subdivideParcel(parcel1, areaMean, areaStd, splitIrregularity, outParcels);
+		subdivideParcel(parcel2, areaMean, areaStd, splitIrregularity, outParcels);
 	} else {
 		// If the simple splitting fails, try CGAL version which is slow
 		if (parcel.parcelContour.split(splitLine, pgons)) {
@@ -113,7 +112,7 @@ bool PmParcels::subdivideParcel(Parcel& parcel, float areaMean, float areaMin, f
 				Parcel parcel;
 				parcel.parcelContour = pgons[i];
 
-				subdivideParcel(parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+				subdivideParcel(parcel, areaMean, areaStd, splitIrregularity, outParcels);
 			}
 		} else {
 			parcel.isPark = true;

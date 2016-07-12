@@ -74,23 +74,31 @@ public:
     QLineEdit *lineEditSetbackSideMin;
     QLineEdit *lineEditSetbackSideMax;
     QLabel *label_22;
+    QLabel *label_38;
+    QLineEdit *lineEditParcelAreaDev;
     QGroupBox *groupBox_3;
     QLabel *label_33;
     QLineEdit *lineEditNumStoriesMin;
     QLineEdit *lineEditNumStoriesMax;
     QLabel *label_34;
+    QLineEdit *lineEditNumStoriesDev;
+    QLabel *label_35;
+    QLabel *label_36;
+    QLineEdit *lineEditMinBuildingDimMin;
+    QLineEdit *lineEditMinBuildingDimMax;
+    QLabel *label_37;
 
     void setupUi(QDialog *ScenarioGenerationDialog)
     {
         if (ScenarioGenerationDialog->objectName().isEmpty())
             ScenarioGenerationDialog->setObjectName(QStringLiteral("ScenarioGenerationDialog"));
-        ScenarioGenerationDialog->resize(544, 544);
+        ScenarioGenerationDialog->resize(544, 571);
         pushButtonOK = new QPushButton(ScenarioGenerationDialog);
         pushButtonOK->setObjectName(QStringLiteral("pushButtonOK"));
-        pushButtonOK->setGeometry(QRect(330, 500, 91, 31));
+        pushButtonOK->setGeometry(QRect(330, 530, 91, 31));
         pushButtonCancel = new QPushButton(ScenarioGenerationDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
-        pushButtonCancel->setGeometry(QRect(440, 500, 91, 31));
+        pushButtonCancel->setGeometry(QRect(440, 530, 91, 31));
         label = new QLabel(ScenarioGenerationDialog);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(20, 70, 61, 21));
@@ -232,9 +240,15 @@ public:
         label_22 = new QLabel(groupBox_2);
         label_22->setObjectName(QStringLiteral("label_22"));
         label_22->setGeometry(QRect(226, 140, 16, 21));
+        label_38 = new QLabel(groupBox_2);
+        label_38->setObjectName(QStringLiteral("label_38"));
+        label_38->setGeometry(QRect(370, 50, 51, 21));
+        lineEditParcelAreaDev = new QLineEdit(groupBox_2);
+        lineEditParcelAreaDev->setObjectName(QStringLiteral("lineEditParcelAreaDev"));
+        lineEditParcelAreaDev->setGeometry(QRect(430, 50, 71, 20));
         groupBox_3 = new QGroupBox(ScenarioGenerationDialog);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 430, 521, 51));
+        groupBox_3->setGeometry(QRect(10, 430, 521, 81));
         label_33 = new QLabel(groupBox_3);
         label_33->setObjectName(QStringLiteral("label_33"));
         label_33->setGeometry(QRect(20, 20, 121, 21));
@@ -247,6 +261,24 @@ public:
         label_34 = new QLabel(groupBox_3);
         label_34->setObjectName(QStringLiteral("label_34"));
         label_34->setGeometry(QRect(226, 20, 16, 21));
+        lineEditNumStoriesDev = new QLineEdit(groupBox_3);
+        lineEditNumStoriesDev->setObjectName(QStringLiteral("lineEditNumStoriesDev"));
+        lineEditNumStoriesDev->setGeometry(QRect(430, 20, 71, 20));
+        label_35 = new QLabel(groupBox_3);
+        label_35->setObjectName(QStringLiteral("label_35"));
+        label_35->setGeometry(QRect(370, 20, 51, 21));
+        label_36 = new QLabel(groupBox_3);
+        label_36->setObjectName(QStringLiteral("label_36"));
+        label_36->setGeometry(QRect(20, 50, 121, 21));
+        lineEditMinBuildingDimMin = new QLineEdit(groupBox_3);
+        lineEditMinBuildingDimMin->setObjectName(QStringLiteral("lineEditMinBuildingDimMin"));
+        lineEditMinBuildingDimMin->setGeometry(QRect(150, 50, 71, 20));
+        lineEditMinBuildingDimMax = new QLineEdit(groupBox_3);
+        lineEditMinBuildingDimMax->setObjectName(QStringLiteral("lineEditMinBuildingDimMax"));
+        lineEditMinBuildingDimMax->setGeometry(QRect(240, 50, 71, 20));
+        label_37 = new QLabel(groupBox_3);
+        label_37->setObjectName(QStringLiteral("label_37"));
+        label_37->setGeometry(QRect(226, 50, 16, 21));
 
         retranslateUi(ScenarioGenerationDialog);
 
@@ -285,9 +317,13 @@ public:
         label_20->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_21->setText(QApplication::translate("ScenarioGenerationDialog", "Setback side:", 0));
         label_22->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
+        label_38->setText(QApplication::translate("ScenarioGenerationDialog", "Std Dev:", 0));
         groupBox_3->setTitle(QApplication::translate("ScenarioGenerationDialog", "Buildings", 0));
-        label_33->setText(QApplication::translate("ScenarioGenerationDialog", "# Stories", 0));
+        label_33->setText(QApplication::translate("ScenarioGenerationDialog", "# Stories:", 0));
         label_34->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
+        label_35->setText(QApplication::translate("ScenarioGenerationDialog", "Std Dev:", 0));
+        label_36->setText(QApplication::translate("ScenarioGenerationDialog", "Min dimension:", 0));
+        label_37->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
     } // retranslateUi
 
 };

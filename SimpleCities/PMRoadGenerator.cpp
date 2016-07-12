@@ -41,7 +41,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 	//std::cout << "Avenue generation started." << std::endl;
 	{
 		int iter;
-		for (iter = 0; !seeds.empty() && iter < 100; ) {
+		for (iter = 0; !seeds.empty() && iter < 200; ) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
@@ -98,7 +98,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 		generateStreetSeeds(seeds);
 				
 		int iter;
-		for (iter = 0; !seeds.empty() && iter < 1000; ) {
+		for (iter = 0; !seeds.empty() && iter < 2000; ) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
@@ -155,7 +155,7 @@ void PMRoadGenerator::generateAvenueSeeds(std::list<RoadVertexDesc>& seeds) {
 
 	BBox bbox = targetArea.envelope();
 
-	int numSeeds = 1;// (targetArea.area() + 125000) / 250000;
+	int numSeeds = (targetArea.area() + 125000) / 250000;
 	for (int iter = 0; iter < numSeeds; ++iter) {
 		float x, y;
 		while (true) {
@@ -234,17 +234,6 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 
 		if (isRedundantEdge(roads, srcDesc, direction, roadAngleTolerance)) continue;
 
-		
-		//BBox bbox = targetArea.envelope();
-		//float D2 = bbox.area();
-
-		/*std::vector<float> sigma2;
-		sigma2.push_back(SQR(G::getDouble("interpolationSigma1")));
-		sigma2.push_back(SQR(G::getDouble("interpolationSigma2")));
-		for (int i = 2; i < features.size(); ++i) {
-			sigma2.push_back(sigma2[0]);
-		}*/
-
 		// ステップ数、長さ、曲率を決定する
 		float step = G::getFloat("avenueAvgSegmentLength");
 		int num_steps = 5;
@@ -256,7 +245,7 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
 		float z2 = vboRenderManager->getTerrainHeight(pt2.x(), pt2.y());
-		if (z2 - z > tanf(G::getFloat("slopeTolerance")) * 20.0f) return;
+		if (z2 - z > tanf(G::getFloat("slopeTolerance")) * 30.0f) return;
 
 		growRoadSegment(roadType, srcDesc, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
@@ -284,17 +273,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 		}
 
 		if (found) {
-			// もしスナップ先が、シードじゃないなら、エッジ生成をキャンセル
-			/*
-			if (std::find(seeds.begin(), seeds.end(), tgtDesc) == seeds.end()) {
-				//（要検討。50%の確率ぐらいにすべきか？)
-				if (Util::genRand(0, 1) < 0.5f) {
-					cancel = true;
-					break;
-				}
-			}
-			*/
-
 			// もしスナップ先の頂点が、redundantなエッジを持っているなら、エッジ生成をキャンセル
 			Polyline2D snapped_polyline;
 			snapped_polyline.push_back(QVector2D(0, 0));
@@ -314,7 +292,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 				cancel = true;
 				break;
 			}
-
+			
 			// エッジに沿って、水没チェック
 			if (roadType == RoadEdge::TYPE_STREET) {
 				if (submerged(vboRenderManager, new_edge->polyline, G::getFloat("sea_level"))) {

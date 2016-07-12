@@ -70,10 +70,13 @@ void MainWindow::setParameters() {
 	G::global()["road_curvature"] = controlWidget->ui.lineEditRoadCurvature->text().toFloat();
 	G::global()["parksRatio"] = controlWidget->ui.lineEditParkRatio->text().toFloat();
 	G::global()["parcel_area_mean"] = controlWidget->ui.lineEditParcelArea->text().toFloat();
+	G::global()["parcel_area_deviation"] = controlWidget->ui.lineEditParcelAreaDev->text().toFloat();
 	G::global()["parcel_setback_front"] = controlWidget->ui.lineEditSetbackFront->text().toFloat();
 	G::global()["parcel_setback_rear"] = controlWidget->ui.lineEditSetbackRear->text().toFloat();
 	G::global()["parcel_setback_sides"] = controlWidget->ui.lineEditSetbackSide->text().toFloat();
-	G::global()["building_stories_mean"] = Util::genRand(controlWidget->ui.lineEditNumStoriesMin->text().toInt(), controlWidget->ui.lineEditNumStoriesMax->text().toInt() + 1);
+	G::global()["building_stories_mean"] = controlWidget->ui.lineEditNumStories->text().toFloat();
+	G::global()["building_stories_deviation"] = controlWidget->ui.lineEditNumStoriesDev->text().toFloat();
+	G::global()["building_min_dimension"] = controlWidget->ui.lineEditMinBuildingDim->text().toFloat();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* e) {
@@ -282,10 +285,13 @@ void MainWindow::onGenerateScenarios() {
 	std::pair<float, float> roadCurvatureRange = std::make_pair(dlg.ui.lineEditRoadCurvatureMin->text().toFloat(), dlg.ui.lineEditRoadCurvatureMax->text().toFloat());
 	std::pair<float, float> parkRatioRange = std::make_pair(dlg.ui.lineEditParkRatioMin->text().toFloat(), dlg.ui.lineEditParkRatioMax->text().toFloat());
 	std::pair<float, float> pacelAreaRange = std::make_pair(dlg.ui.lineEditParcelAreaMin->text().toFloat(), dlg.ui.lineEditParcelAreaMax->text().toFloat());
+	float parcelAreaDev = dlg.ui.lineEditParcelAreaDev->text().toFloat();
 	std::pair<float, float> setbackFrontRange = std::make_pair(dlg.ui.lineEditSetbackFrontMin->text().toFloat(), dlg.ui.lineEditSetbackFrontMax->text().toFloat());
 	std::pair<float, float> setbackRearRange = std::make_pair(dlg.ui.lineEditSetbackRearMin->text().toFloat(), dlg.ui.lineEditSetbackRearMax->text().toFloat());
 	std::pair<float, float> setbackSideRange = std::make_pair(dlg.ui.lineEditSetbackSideMin->text().toFloat(), dlg.ui.lineEditSetbackSideMax->text().toFloat());
 	std::pair<int, int> numStoriesRange = std::make_pair(dlg.ui.lineEditNumStoriesMin->text().toInt(), dlg.ui.lineEditNumStoriesMax->text().toInt());
+	float numStoriesDev = dlg.ui.lineEditNumStoriesDev->text().toFloat();
+	std::pair<float, float> minBuildingDimRange = std::make_pair(dlg.ui.lineEditMinBuildingDimMin->text().toFloat(), dlg.ui.lineEditMinBuildingDimMax->text().toFloat());
 
 	// load zone
 	urbanGeometry->loadZone(zone_file.toUtf8().constData());
@@ -294,7 +300,7 @@ void MainWindow::onGenerateScenarios() {
 	urbanGeometry->loadTerrain(terrain_file.toUtf8().constData());
 
 	// generate scenarios
-	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, streetSegmentLengthRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange);
+	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, streetSegmentLengthRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, parcelAreaDev, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange, numStoriesDev, minBuildingDimRange);
 }
 
 void MainWindow::onViewChanged() {

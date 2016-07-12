@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>261</width>
-    <height>474</height>
+    <height>535</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -131,7 +131,7 @@
       <x>10</x>
       <y>130</y>
       <width>241</width>
-      <height>171</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="title">
@@ -177,7 +177,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
+       <y>170</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -190,7 +190,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>110</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -203,7 +203,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
+       <y>140</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -216,7 +216,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>110</y>
+       <y>140</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -236,7 +236,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>80</y>
+       <y>110</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -246,10 +246,33 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>140</y>
+       <y>170</y>
        <width>71</width>
        <height>20</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditParcelAreaDev">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>80</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deviation of parcel area:</string>
      </property>
     </widget>
    </widget>
@@ -257,15 +280,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>310</y>
+      <y>340</y>
       <width>241</width>
-      <height>81</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="title">
      <string>Buildings</string>
     </property>
-    <widget class="QLineEdit" name="lineEditNumStoriesMin">
+    <widget class="QLineEdit" name="lineEditNumStories">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -288,7 +311,7 @@
       <string># Stories</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEditNumStoriesMax">
+    <widget class="QLineEdit" name="lineEditNumStoriesDev">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -298,17 +321,40 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_34">
+    <widget class="QLabel" name="label_35">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>10</x>
        <y>50</y>
-       <width>16</width>
+       <width>121</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>~</string>
+      <string>Deviation of # Stories:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_34">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Min dimension:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditMinBuildingDim">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>80</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -316,7 +362,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>410</y>
+      <y>470</y>
       <width>201</width>
       <height>31</height>
      </rect>

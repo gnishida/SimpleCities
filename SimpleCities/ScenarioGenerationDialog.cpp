@@ -18,6 +18,7 @@ ScenarioGenerationDialog::ScenarioGenerationDialog(QWidget *parent) : QDialog(pa
 	ui.lineEditParkRatioMax->setText("0.1");
 	ui.lineEditParcelAreaMin->setText("1000");
 	ui.lineEditParcelAreaMax->setText("1000");
+	ui.lineEditParcelAreaDev->setText("200");
 	ui.lineEditSetbackFrontMin->setText("5.0");
 	ui.lineEditSetbackFrontMax->setText("5.0");
 	ui.lineEditSetbackRearMin->setText("5.0");
@@ -26,6 +27,9 @@ ScenarioGenerationDialog::ScenarioGenerationDialog(QWidget *parent) : QDialog(pa
 	ui.lineEditSetbackSideMax->setText("5.0");
 	ui.lineEditNumStoriesMin->setText("5");
 	ui.lineEditNumStoriesMax->setText("5");
+	ui.lineEditNumStoriesDev->setText("2");
+	ui.lineEditMinBuildingDimMin->setText("10.0");
+	ui.lineEditMinBuildingDimMax->setText("10.0");
 
 	connect(ui.pushButtonZone, SIGNAL(clicked()), this, SLOT(onZone()));
 	connect(ui.pushButtonTerrain, SIGNAL(clicked()), this, SLOT(onTerrain()));

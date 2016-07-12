@@ -44,12 +44,12 @@ bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, 
 
 	parcel.building.buildingFootprint.contour = footprint;
 
-	// もしfootprintの一辺の長さが短すぎたら、または、短い辺と長い辺の比が大きすぎたら、ビルの建設を中止する
+	// Cancel the building if the dimension is too small
 	QVector3D obbSize;
 	QMatrix4x4 obbMat;
 	parcel.building.buildingFootprint.getMyOBB(obbSize, obbMat);
-	if (obbSize.x() < 5 || obbSize.y() < 5) return false;
-	if (obbSize.x() > obbSize.y() * 10 || obbSize.y() > obbSize.x() * 10) return false;
+	if (obbSize.x() < G::getFloat("building_min_dimension") || obbSize.y() < G::getFloat("building_min_dimension")) return false;
+	//if (obbSize.x() > obbSize.y() * 10 || obbSize.y() > obbSize.x() * 10) return false;
 
 	// set the elevation
 	for (int i = 0; i < parcel.building.buildingFootprint.size(); ++i) {
@@ -57,7 +57,7 @@ bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, 
 	}
 
 	// Set building attributes
-	parcel.building.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation")));
+	parcel.building.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation"))) + 0.5f;
 	float c = rand() % 192;
 	parcel.building.color = QColor(c, c, c);
 	parcel.building.bldType = 1;
