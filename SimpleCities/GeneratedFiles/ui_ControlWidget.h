@@ -157,6 +157,18 @@ public:
         pushButtonGenerateAll->setObjectName(QStringLiteral("pushButtonGenerateAll"));
         pushButtonGenerateAll->setGeometry(QRect(30, 470, 201, 31));
         ControlWidget->setWidget(dockWidgetContents);
+        QWidget::setTabOrder(lineEditAvenueSegmentLength, lineEditStreetSegmentLength);
+        QWidget::setTabOrder(lineEditStreetSegmentLength, lineEditRoadCurvature);
+        QWidget::setTabOrder(lineEditRoadCurvature, lineEditParkRatio);
+        QWidget::setTabOrder(lineEditParkRatio, lineEditParcelArea);
+        QWidget::setTabOrder(lineEditParcelArea, lineEditParcelAreaDev);
+        QWidget::setTabOrder(lineEditParcelAreaDev, lineEditSetbackFront);
+        QWidget::setTabOrder(lineEditSetbackFront, lineEditSetbackRear);
+        QWidget::setTabOrder(lineEditSetbackRear, lineEditSetbackSide);
+        QWidget::setTabOrder(lineEditSetbackSide, lineEditNumStories);
+        QWidget::setTabOrder(lineEditNumStories, lineEditNumStoriesDev);
+        QWidget::setTabOrder(lineEditNumStoriesDev, lineEditMinBuildingDim);
+        QWidget::setTabOrder(lineEditMinBuildingDim, pushButtonGenerateAll);
 
         retranslateUi(ControlWidget);
 

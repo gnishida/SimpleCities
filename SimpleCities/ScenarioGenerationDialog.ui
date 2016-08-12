@@ -742,6 +742,39 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEditZone</tabstop>
+  <tabstop>pushButtonZone</tabstop>
+  <tabstop>lineEditTerrain</tabstop>
+  <tabstop>pushButtonTerrain</tabstop>
+  <tabstop>lineEditNumScenarios</tabstop>
+  <tabstop>lineEditOutputDirectory</tabstop>
+  <tabstop>pushButtonOutputDirectory</tabstop>
+  <tabstop>lineEditAvenueSegmentLengthMin</tabstop>
+  <tabstop>lineEditAvenueSegmentLengthMax</tabstop>
+  <tabstop>lineEditStreetSegmentLengthMin</tabstop>
+  <tabstop>lineEditStreetSegmentLengthMax</tabstop>
+  <tabstop>lineEditRoadCurvatureMin</tabstop>
+  <tabstop>lineEditRoadCurvatureMax</tabstop>
+  <tabstop>lineEditParkRatioMin</tabstop>
+  <tabstop>lineEditParkRatioMax</tabstop>
+  <tabstop>lineEditParcelAreaMin</tabstop>
+  <tabstop>lineEditParcelAreaMax</tabstop>
+  <tabstop>lineEditParcelAreaDev</tabstop>
+  <tabstop>lineEditSetbackFrontMin</tabstop>
+  <tabstop>lineEditSetbackFrontMax</tabstop>
+  <tabstop>lineEditSetbackRearMin</tabstop>
+  <tabstop>lineEditSetbackRearMax</tabstop>
+  <tabstop>lineEditSetbackSideMin</tabstop>
+  <tabstop>lineEditSetbackSideMax</tabstop>
+  <tabstop>lineEditNumStoriesMin</tabstop>
+  <tabstop>lineEditNumStoriesMax</tabstop>
+  <tabstop>lineEditNumStoriesDev</tabstop>
+  <tabstop>lineEditMinBuildingDimMin</tabstop>
+  <tabstop>lineEditMinBuildingDimMax</tabstop>
+  <tabstop>pushButtonOK</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

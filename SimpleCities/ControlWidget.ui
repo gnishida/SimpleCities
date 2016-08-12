@@ -373,6 +373,21 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEditAvenueSegmentLength</tabstop>
+  <tabstop>lineEditStreetSegmentLength</tabstop>
+  <tabstop>lineEditRoadCurvature</tabstop>
+  <tabstop>lineEditParkRatio</tabstop>
+  <tabstop>lineEditParcelArea</tabstop>
+  <tabstop>lineEditParcelAreaDev</tabstop>
+  <tabstop>lineEditSetbackFront</tabstop>
+  <tabstop>lineEditSetbackRear</tabstop>
+  <tabstop>lineEditSetbackSide</tabstop>
+  <tabstop>lineEditNumStories</tabstop>
+  <tabstop>lineEditNumStoriesDev</tabstop>
+  <tabstop>lineEditMinBuildingDim</tabstop>
+  <tabstop>pushButtonGenerateAll</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

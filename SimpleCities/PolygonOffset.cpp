@@ -77,7 +77,7 @@ namespace polyoffset {
 
 				double tab, tcd;
 				glm::dvec2 intPoint;
-				if (segmentSegmentIntersectXY(rawInterPolygon[i], rawInterPolygon[i2], rawInterPolygon[j], rawInterPolygon[j2], &tab, &tcd, true, intPoint)) {
+				if (segmentSegmentIntersect(rawInterPolygon[i], rawInterPolygon[i2], rawInterPolygon[j], rawInterPolygon[j2], &tab, &tcd, true, intPoint)) {
 					intersections.push_back(std::make_pair(tab, std::make_pair(j, intPoint)));
 					/*
 					intersected_ids.push_back(j);
@@ -136,7 +136,7 @@ namespace polyoffset {
 		}
 	}
 
-	bool segmentSegmentIntersectXY(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c, const glm::dvec2& d, double *tab, double *tcd, bool segmentOnly, glm::dvec2& intPoint) {
+	bool segmentSegmentIntersect(const glm::dvec2& a, const glm::dvec2& b, const glm::dvec2& c, const glm::dvec2& d, double *tab, double *tcd, bool segmentOnly, glm::dvec2& intPoint) {
 		glm::dvec2 u = b - a;
 		glm::dvec2 v = d - c;
 

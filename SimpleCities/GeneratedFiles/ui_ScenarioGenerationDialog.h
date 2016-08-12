@@ -279,6 +279,36 @@ public:
         label_37 = new QLabel(groupBox_3);
         label_37->setObjectName(QStringLiteral("label_37"));
         label_37->setGeometry(QRect(226, 50, 16, 21));
+        QWidget::setTabOrder(lineEditZone, pushButtonZone);
+        QWidget::setTabOrder(pushButtonZone, lineEditTerrain);
+        QWidget::setTabOrder(lineEditTerrain, pushButtonTerrain);
+        QWidget::setTabOrder(pushButtonTerrain, lineEditNumScenarios);
+        QWidget::setTabOrder(lineEditNumScenarios, lineEditOutputDirectory);
+        QWidget::setTabOrder(lineEditOutputDirectory, pushButtonOutputDirectory);
+        QWidget::setTabOrder(pushButtonOutputDirectory, lineEditAvenueSegmentLengthMin);
+        QWidget::setTabOrder(lineEditAvenueSegmentLengthMin, lineEditAvenueSegmentLengthMax);
+        QWidget::setTabOrder(lineEditAvenueSegmentLengthMax, lineEditStreetSegmentLengthMin);
+        QWidget::setTabOrder(lineEditStreetSegmentLengthMin, lineEditStreetSegmentLengthMax);
+        QWidget::setTabOrder(lineEditStreetSegmentLengthMax, lineEditRoadCurvatureMin);
+        QWidget::setTabOrder(lineEditRoadCurvatureMin, lineEditRoadCurvatureMax);
+        QWidget::setTabOrder(lineEditRoadCurvatureMax, lineEditParkRatioMin);
+        QWidget::setTabOrder(lineEditParkRatioMin, lineEditParkRatioMax);
+        QWidget::setTabOrder(lineEditParkRatioMax, lineEditParcelAreaMin);
+        QWidget::setTabOrder(lineEditParcelAreaMin, lineEditParcelAreaMax);
+        QWidget::setTabOrder(lineEditParcelAreaMax, lineEditParcelAreaDev);
+        QWidget::setTabOrder(lineEditParcelAreaDev, lineEditSetbackFrontMin);
+        QWidget::setTabOrder(lineEditSetbackFrontMin, lineEditSetbackFrontMax);
+        QWidget::setTabOrder(lineEditSetbackFrontMax, lineEditSetbackRearMin);
+        QWidget::setTabOrder(lineEditSetbackRearMin, lineEditSetbackRearMax);
+        QWidget::setTabOrder(lineEditSetbackRearMax, lineEditSetbackSideMin);
+        QWidget::setTabOrder(lineEditSetbackSideMin, lineEditSetbackSideMax);
+        QWidget::setTabOrder(lineEditSetbackSideMax, lineEditNumStoriesMin);
+        QWidget::setTabOrder(lineEditNumStoriesMin, lineEditNumStoriesMax);
+        QWidget::setTabOrder(lineEditNumStoriesMax, lineEditNumStoriesDev);
+        QWidget::setTabOrder(lineEditNumStoriesDev, lineEditMinBuildingDimMin);
+        QWidget::setTabOrder(lineEditMinBuildingDimMin, lineEditMinBuildingDimMax);
+        QWidget::setTabOrder(lineEditMinBuildingDimMax, pushButtonOK);
+        QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
 
         retranslateUi(ScenarioGenerationDialog);
 
