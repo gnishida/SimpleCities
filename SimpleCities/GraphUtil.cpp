@@ -1278,6 +1278,36 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const
 	return false;
 }
 
+bool GraphUtil::isIntersect(RoadGraph &roads, const QVector2D& pt1, const QVector2D& pt2, RoadEdgeDesc &nearestEdgeDesc, QVector2D &intPoint) {
+	float min_dist = std::numeric_limits<float>::max();
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; ++i) {
+			float tab, tcd;
+			QVector2D pt;
+			if (Util::segmentSegmentIntersectXY(roads.graph[*ei]->polyline[i], roads.graph[*ei]->polyline[i + 1], pt1, pt2, &tab, &tcd, true, pt)) {
+				float dist = (pt1 - pt).lengthSquared();
+				if (dist < min_dist) {
+					min_dist = dist;
+					nearestEdgeDesc = *ei;
+					intPoint = pt;
+				}
+			}
+
+		}
+	}
+
+	if (min_dist < std::numeric_limits<float>::max()) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 /**
  * Check if the poly line intersects with the existing road segments.
  * ただし、頂点srcDescに最も近い交点をintPointにセットして返却する。

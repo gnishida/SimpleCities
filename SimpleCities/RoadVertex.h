@@ -15,6 +15,7 @@ public:
 	bool fixed;
 	int type;
 	bool onBoundary;
+	int level;
 
 public:
 	RoadVertex();

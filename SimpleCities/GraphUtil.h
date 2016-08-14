@@ -72,6 +72,7 @@ public:
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadEdgeDesc ignoreEdge);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2, QVector2D &intPoint);
+	static bool isIntersect(RoadGraph &roads, const QVector2D& pt1, const QVector2D& pt2, RoadEdgeDesc &nearestEdgeDesc, QVector2D &intPoint);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, RoadEdgeDesc &nearestEdgeDesc, QVector2D &intPoint);
 	static std::vector<QVector2D> simplifyPolyLine(std::vector<QVector2D>& polyline, float threshold);
 	static void removeShortEdges(RoadGraph& roads, float threshold);

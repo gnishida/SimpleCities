@@ -9,28 +9,10 @@
 #include "Util.h"
 
 void PMRoadGenerator::generateRoadNetwork() {
-	srand(12345);
+	//srand(12345);
 
-	// mark all the existing vertices as fixed
-	{
-		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-			roads.graph[*vi]->fixed = true;
-		}
-	}
-
-	// remove all the local streets temporalily
-	QMap<RoadEdgeDesc, bool> originalLocalStreets;
-	{
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-			if (roads.graph[*ei]->type == RoadEdge::TYPE_STREET) {
-				originalLocalStreets[*ei] = true;
-				roads.graph[*ei]->valid = false;
-			}
-		}
-	}
+	// make roads along the boundary of the area
+	generateRoadsAtBoundary();
 
 	std::list<RoadVertexDesc> seeds;
 
@@ -45,29 +27,8 @@ void PMRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
-			float z = vboRenderManager->getMinTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
-			if (z < G::getFloat("sea_level")) {
-				// 水中の頂点は、degree=1のはず！！
-				/*assert(GraphUtil::getDegree(roads, desc) == 1);
-				if (!extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, G::getFloat("acrossRiverTolerance"))) {
-					removeEdge(roads, desc);
-				}*/
-				continue;
-			}
-
-			// エリアの外なら、スキップする
-			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				continue;
-			}
-
-			//std::cout << "attemptExpansion (avenue): " << iter << " (Seed: " << desc << ")" << std::endl;
-			attemptExpansion(RoadEdge::TYPE_AVENUE, desc, seeds);
-
-			if (false) {
-				char filename[255];
-				sprintf(filename, "road_images/avenues_%d.jpg", iter);
-				saveRoadImage(roads, seeds, filename);
+			if (roads.graph[desc]->level < 2) {
+				attemptExpansion(RoadEdge::TYPE_AVENUE, desc, seeds);
 			}
 
 			iter++;
@@ -76,6 +37,8 @@ void PMRoadGenerator::generateRoadNetwork() {
 	//std::cout << "Avenue generation completed." << std::endl;
 
 	seeds.clear();
+
+#if 0
 
 	// Avenueをクリーンナップ
 	/*
@@ -145,6 +108,31 @@ void PMRoadGenerator::generateRoadNetwork() {
 	*/
 
 	//GraphUtil::cleanEdges(roads);
+#endif
+}
+
+void PMRoadGenerator::generateRoadsAtBoundary() {
+	RoadVertexDesc cur_desc;
+	for (int i = 0; i < targetArea.size(); ++i) {
+		int next = (i + 1) % targetArea.size();
+
+		// create an intersection
+		if (i == 0) {
+			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(targetArea[i]));
+			cur_desc = GraphUtil::addVertex(roads, v);
+		}
+
+		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(targetArea[next]));
+		RoadVertexDesc next_desc = GraphUtil::addVertex(roads, v);
+
+		// add edge
+		RoadEdgePtr e = RoadEdgePtr(new RoadEdge(RoadEdge::TYPE_AVENUE, 1));
+		e->polyline.push_back(roads.graph[cur_desc]->pt);
+		e->polyline.push_back(roads.graph[next_desc]->pt);
+		GraphUtil::addEdge(roads, cur_desc, next_desc, e);
+
+		cur_desc = next_desc;
+	}
 }
 
 /**
@@ -155,31 +143,9 @@ void PMRoadGenerator::generateAvenueSeeds(std::list<RoadVertexDesc>& seeds) {
 
 	BBox bbox = targetArea.envelope();
 
-	int numSeeds = (targetArea.area() + 125000) / 250000;
-	for (int iter = 0; iter < numSeeds; ++iter) {
-		float x, y;
-		while (true) {
-			x = Util::genRand(bbox.minPt.x(), bbox.maxPt.x());
-			y = Util::genRand(bbox.minPt.y(), bbox.maxPt.y());
-			bool hoge = targetArea.contains(QVector2D(x, y));
-			float z = vboRenderManager->getMinTerrainHeight(x, y);
-			if (targetArea.contains(QVector2D(x, y)) && vboRenderManager->getMinTerrainHeight(x, y) > G::getFloat("sea_level")) break;
-		}
-
-		addAvenueSeed(QVector2D(x, y), seeds);
-	}
-}
-
-/**
- * Avenue用のシードを座標ptに追加する。
- *
- * @param pt			シード座標
- * @param seeds			追加されたシードは、seedsに追加される。
- */
-void PMRoadGenerator::addAvenueSeed(const QVector2D &pt, std::list<RoadVertexDesc>& seeds) {
-	// 頂点を追加し、シードとする
-	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(bbox.midPt()));
 	RoadVertexDesc desc = GraphUtil::addVertex(roads, v);
+	roads.graph[desc]->level = 0;
 	seeds.push_back(desc);
 }
 
@@ -215,15 +181,6 @@ void PMRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
  * このシードを使って、PM方式で道路生成する。
  */
 void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std::list<RoadVertexDesc> &seeds) {
-	// 要注意！！
-	// 既に標高はチェック済みなので、このチェックは不要のはず！！！
-	float z = vboRenderManager->getMinTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y());
-	if (z < G::getFloat("sea_level")) {
-		printf("ERROR! The current vertex should be above sea leve.\n");
-		assert(false);
-		return;
-	}
-
 	float roadAngleTolerance = G::getFloat("roadAngleTolerance");
 
 	// 当該頂点から出るエッジの方向を取得する
@@ -235,19 +192,25 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 		if (isRedundantEdge(roads, srcDesc, direction, roadAngleTolerance)) continue;
 
 		// ステップ数、長さ、曲率を決定する
-		float step = G::getFloat("avenueAvgSegmentLength");
+		float length;
+		if (roadType == RoadEdge::TYPE_AVENUE) {
+			length = G::getFloat("avenueAvgSegmentLength");
+		}
+		else {
+			length = G::getFloat("streetAvgSegmentLength");
+		}
 		int num_steps = 5;
 		float curvature = G::getFloat("road_curvature");
-		if (roadType == RoadEdge::TYPE_STREET) {
-			step = G::getFloat("streetAvgSegmentLength");
-		}
-			
-		// 坂が急なら、キャンセル
-		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
-		float z2 = vboRenderManager->getTerrainHeight(pt2.x(), pt2.y());
-		if (z2 - z > tanf(G::getFloat("slopeTolerance")) * 30.0f) return;
 
-		growRoadSegment(roadType, srcDesc, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
+		growRoads(roadType, srcDesc, roads.graph[srcDesc]->level + 1, length, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
+	}
+}
+
+void PMRoadGenerator::growRoads(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+	while (true) {
+		RoadVertexDesc tgtDesc;
+		if (!growRoadSegment(roadType, srcDesc, level, length, num_steps, angle, curvature, lanes, angleTolerance, tgtDesc, seeds)) break;
+		srcDesc = tgtDesc;
 	}
 }
 
@@ -255,188 +218,77 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
  * 指定されたpolylineに従って、srcDesc頂点からエッジを伸ばす。
  * エッジの端点が、srcDescとは違うセルに入る場合は、falseを返却する。
  */
-bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
-	const int num_sub_steps = 5;
-	float sub_step = step / num_sub_steps;
+bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float& angle, float curvature, int lanes, float angleTolerance, RoadVertexDesc& tgtDesc, std::list<RoadVertexDesc> &seeds) {
+	float sub_length = length / num_steps;
+	int dir = Util::genRand() > 0.5 ? 1 : -1;
 	
-	RoadVertexDesc curDesc = srcDesc;
 	QVector2D curPt = roads.graph[srcDesc]->pt;
-	RoadVertexDesc tgtDesc;
-	bool cancel = false;
+
+	RoadEdgePtr new_edge = RoadEdgePtr(new RoadEdge(roadType, lanes));
+	new_edge->polyline.push_back(curPt);
+
 	for (int iter = 0; iter < num_steps; ++iter) {
-		RoadEdgePtr new_edge = RoadEdgePtr(new RoadEdge(roadType, lanes));
-		new_edge->polyline.push_back(roads.graph[curDesc]->pt);
+		QVector2D nextPt = curPt + QVector2D(sub_length * cosf(angle), sub_length * sinf(angle));
+
 
 		bool found = false;
-		if (getVertexForSnapping(*vboRenderManager, roads, curDesc, step * 2.0f, G::getFloat("sea_level"), angle, 0.3f, tgtDesc)) {
+		if (getVertexForSnapping(*vboRenderManager, roads, srcDesc, sub_length * 2.0f, G::getFloat("sea_level"), angle, 0.1f, tgtDesc)) {
 			found = true;
 		}
 
 		if (found) {
-			// もしスナップ先の頂点が、redundantなエッジを持っているなら、エッジ生成をキャンセル
-			Polyline2D snapped_polyline;
-			snapped_polyline.push_back(QVector2D(0, 0));
-			snapped_polyline.push_back(QVector2D(new_edge->polyline.back() - roads.graph[tgtDesc]->pt));
-			if (isRedundantEdge(roads, tgtDesc, snapped_polyline, angleTolerance)) {
-				//（とりあえず、ものすごい鋭角の場合は、必ずキャンセル)
-				cancel = true;
-				break;
-			}
-
-			// もし他のエッジに交差するなら、エッジ生成をキャンセル
-			// （キャンセルせずに、交差させるべき？）
-			QVector2D intPoint;
-			RoadEdgeDesc closestEdge;
-			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
-			if (GraphUtil::isIntersect(roads, new_edge->polyline, curDesc, closestEdge, intPoint)) {
-				cancel = true;
-				break;
-			}
-			
-			// エッジに沿って、水没チェック
-			if (roadType == RoadEdge::TYPE_STREET) {
-				if (submerged(vboRenderManager, new_edge->polyline, G::getFloat("sea_level"))) {
-					cancel = true;
-					break;
-				}
-			}
-
 			// エッジを生成
-			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
+			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
+			GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
 
-			return true;
-		}
-
-		// snap先がなければ、polylineを１歩伸ばす
-		for (int sub_iter = 0; sub_iter < num_sub_steps; ++sub_iter) {
-			QVector2D pt = new_edge->polyline.back();
-			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
-			QVector2D pt2 = pt + QVector2D(cosf(angle), sinf(angle)) * sub_step;
-			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
-
-			if (fabs(z - z2) > 2.5f) {
-				curvature = 0.3f;
-			}
-
-			{
-				float angle1 =  angle + curvature / (float)num_sub_steps;
-				QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
-				float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
-
-				float angle2 =  angle - curvature / (float)num_sub_steps;
-				QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
-				float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
-
-				if (fabs(z - z1) < fabs(z - z2)) {
-					new_edge->polyline.push_back(pt1);
-					angle = angle1;
-				} else {
-					new_edge->polyline.push_back(pt2);
-					angle = angle2;
-				}
-			}
+			return false;
 		}
 
 		// もし、新規エッジが、既存グラフと交差するなら、エッジ生成をキャンセル
 		QVector2D intPoint;
 		RoadEdgeDesc closestEdge;
-		if (GraphUtil::isIntersect(roads, new_edge->polyline, curDesc, closestEdge, intPoint)) {
-			// 水面下なら終了
-			float z = vboRenderManager->getMinTerrainHeight(intPoint.x(), intPoint.y());
-			if (z < G::getFloat("sea_level")) {
-				cancel = true;
-				break;
-			}
-
-			// 60%の確率でキャンセル？
-			if (Util::genRand(0, 1) < 0.6f) {
-				cancel = true;
-				break;
-			}
-
-			// 交差する箇所で中断させる
-			new_edge->polyline.clear();
-			new_edge->polyline.push_back(curPt);
+		if (GraphUtil::isIntersect(roads, curPt, nextPt, closestEdge, intPoint)) {
 			new_edge->polyline.push_back(intPoint);
 
 			// 他のエッジにスナップ
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
 
 			// エッジを生成
-			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
+			GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
 
-			return true;
+			// stop the road growth if the next point is outside the target area
+			if (!targetArea.contains(nextPt)) return false;
+
+			// continue the road growth from the intersection
+			srcDesc = tgtDesc;
+			new_edge = RoadEdgePtr(new RoadEdge(roadType, lanes));
+			new_edge->polyline.push_back(intPoint);
 		}
 
-		// streetの場合、水面下ならキャンセル
-		if (roadType == RoadEdge::TYPE_STREET) {
-			float z = vboRenderManager->getMinTerrainHeight(new_edge->polyline.back().x(), new_edge->polyline.back().y());
-			if (z < G::getFloat("sea_level")) {
-				cancel = true;
-				break;
-			}
-		}
-
-		if (!found) {
-			// 頂点を追加
-			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.back()));
-			tgtDesc = GraphUtil::addVertex(roads, v);
-
-			// エリア外なら、onBoundaryフラグをセット
-			if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
-				roads.graph[tgtDesc]->onBoundary = true;
-			}
-
-			// エッジを作成
-			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
-
-			curDesc = tgtDesc;
-			curPt = new_edge->polyline.back();
-		}
-
-		// エリア外なら、ここでストップ
-		if (!targetArea.contains(roads.graph[tgtDesc]->pt)) break;
-
-		// Avenueの場合、水面下ならここでストップ
-		if (roadType == RoadEdge::TYPE_AVENUE) {
-			float z = vboRenderManager->getMinTerrainHeight(new_edge->polyline.back().x(), new_edge->polyline.back().y());
-			if (z < G::getFloat("sea_level")) {
-				if (!extendRoadAcrossRiver(roads, vboRenderManager, targetArea, roadType, curDesc, seeds, 0.3f, G::getFloat("acrossRiverTolerance"), tgtDesc)) {
-					//removeEdge(roads, curDesc);
-					cancel = true;
-					break;
-				}
-
-				curDesc = tgtDesc;
-				curPt = roads.graph[curDesc]->pt;
-
-				//break;
-			}
-		}
-
+		/*
 		// 遠くにある、近接頂点に向かうよう、方向を変える
-		if (getVertexForSnapping(*vboRenderManager, roads, curDesc, step * (num_steps - iter) * 2.0f, G::getFloat("sea_level"), angle, 0.3f, tgtDesc)) {
+		if (getVertexForSnapping(*vboRenderManager, roads, curDesc, sub_length * (num_steps - iter) * 2.0f, G::getFloat("sea_level"), angle, 0.15f, tgtDesc)) {
 			QVector2D dir = roads.graph[tgtDesc]->pt - curPt;
 			float a = atan2f(dir.y(), dir.x());
 			angle += Util::diffAngle(a, angle, false) * 0.5f;
 		}
+		else {
+		*/
+			angle = angle + curvature * dir;
+		//}
+
+		new_edge->polyline.push_back(nextPt);
+		curPt = nextPt;
 	}
 
-	if (cancel) {
-		while (curDesc != srcDesc) {
-			roads.graph[curDesc]->valid = false;
-			RoadOutEdgeIter ei, eend;
-			boost::tie(ei, eend) = boost::out_edges(curDesc, roads.graph);
-			roads.graph[*ei]->valid = false;
+	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(curPt));
+	tgtDesc = GraphUtil::addVertex(roads, v);
+	roads.graph[tgtDesc]->level = level;
+	seeds.push_back(tgtDesc);
 
-			RoadVertexDesc nextDesc = boost::target(*ei, roads.graph);
-			curDesc = nextDesc;
-		}
-		return false;
-	} else {
-		seeds.push_back(tgtDesc);
-		return true;
-	}
+	GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
+
+	return true;
 }
 
 float PMRoadGenerator::getFirstEdgeAngle(RoadGraph& roads, RoadVertexDesc srcDesc) {

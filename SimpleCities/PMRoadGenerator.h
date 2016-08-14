@@ -19,13 +19,14 @@ public:
 	void generateRoadNetwork();
 
 private:
+	void generateRoadsAtBoundary();
 	void generateAvenueSeeds(std::list<RoadVertexDesc>& seeds);
-	void addAvenueSeed(const QVector2D &pt, std::list<RoadVertexDesc>& seeds);
 	void generateStreetSeeds(std::list<RoadVertexDesc> &seeds);
 	void generateStreetSeeds2(std::list<RoadVertexDesc> &seeds);
 
 	void attemptExpansion(int roadType, RoadVertexDesc srcDesc, std::list<RoadVertexDesc> &seeds);
-	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
+	void growRoads(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
+	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float& angle, float curvature, int lanes, float angleTolerance, RoadVertexDesc& tgtDesc, std::list<RoadVertexDesc> &seeds);
 	float getFirstEdgeAngle(RoadGraph& roads, RoadVertexDesc srcDesc);
 	bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
 	bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, float angle, float angleTolerance);
