@@ -9,13 +9,14 @@
 
 class RoadVertex {
 public:
+	static enum { EIGEN_TYPE_NONE = 0, EIGEN_TYPE_MAJOR = 1, EIGEN_TYPE_MINOR = 2, EIGEN_TYPE_BOTH = 3 };
+
+public:
 	QVector2D pt;
 	QVector3D pt3D;
 	bool valid;
-	bool fixed;
-	int type;
-	bool onBoundary;
-	int level;
+	int eigenType;
+	bool new_vertx;
 
 public:
 	RoadVertex();

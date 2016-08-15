@@ -20,23 +20,12 @@ public:
 
 private:
 	void generateRoadsAtBoundary();
-	void generateAvenueSeeds(std::list<RoadVertexDesc>& seeds);
-	void generateStreetSeeds(std::list<RoadVertexDesc> &seeds);
-	void generateStreetSeeds2(std::list<RoadVertexDesc> &seeds);
-
-	void attemptExpansion(int roadType, RoadVertexDesc srcDesc, std::list<RoadVertexDesc> &seeds);
-	void growRoads(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
-	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, int level, float length, int num_steps, float& angle, float curvature, int lanes, float angleTolerance, RoadVertexDesc& tgtDesc, std::list<RoadVertexDesc> &seeds);
-	float getFirstEdgeAngle(RoadGraph& roads, RoadVertexDesc srcDesc);
-	bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
-	bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, float angle, float angleTolerance);
-	bool getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc);
-	bool submerged(int roadType, RoadGraph &roads, VBORenderManager *vboRenderManager);
-	bool submerged(int roadType, const Polyline2D &polyline, VBORenderManager *vboRenderManager);
-	bool submerged(VBORenderManager* vboRenderManager, Polyline2D& polyline, float seaLevel);
-	bool extendRoadAcrossRiver(RoadGraph& roads, VBORenderManager* vboRenderManager, Polygon2D& targetArea, int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float angle_threshold, float max_length, RoadVertexDesc& tgtDesc);
-	void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc);
-	void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc);
-	void saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename);
+	void growRoads(float angle, RoadVertexDesc srcDesc, float curvature, float segment_length, int type, std::vector<std::pair<QVector2D, float>>& regular_elements, std::list<RoadVertexDesc>& seeds);
+	void setupTensor(const Polygon2D& targetArea, const std::vector<std::pair<QVector2D, float>>& regular_elements, cv::Mat& tensor);
+	void generateRoadsByTensor(const cv::Mat& tensor, float segment_length, float near_threshold, std::list<RoadVertexDesc>& seeds);
+	void generateRoadByTensor(const cv::Mat& tensor, float segment_length, float near_threshold, RoadVertexDesc srcDesc, int type, std::list<RoadVertexDesc>& seeds);
+	int generateRoadSegmentByTensor(const cv::Mat& tensor, float segment_length, float near_threshold, RoadVertexDesc srcDesc, RoadVertexDesc& tgtDesc, int type);
+	void removeDanglingEdges();
+	void saveTensorImage(const cv::Mat& tensor, const std::string& filename);
 };
 

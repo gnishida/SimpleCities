@@ -544,6 +544,7 @@ bool GraphUtil::tshape(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc edge) {
 /**
  * classify the vertices into avenues and local streets.
  */
+/*
 void GraphUtil::setVertexType(RoadGraph &roads) {
 	RoadVertexIter vi, vend;
 	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
@@ -560,9 +561,10 @@ void GraphUtil::setVertexType(RoadGraph &roads) {
 			}
 		}
 
-		roads.graph[*vi]->type = type;
+		//roads.graph[*vi]->type = type;
 	}
 }
+*/
 
 /**
  * Return the index-th edge.
@@ -973,7 +975,6 @@ bool GraphUtil::isSimilarPolyline(const Polyline2D &polyline1, const Polyline2D 
 
 /**
  * Remove all the dead-end edges.
- * ただし、"fixed"フラグがtrueの頂点は、削除しない。
  */
 bool GraphUtil::removeDeadEnd(RoadGraph& roads) {
 	bool removed = false;
@@ -984,7 +985,6 @@ bool GraphUtil::removeDeadEnd(RoadGraph& roads) {
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
 			if (!roads.graph[*vi]->valid) continue;
-			if (roads.graph[*vi]->fixed) continue;
 
 			if (getDegree(roads, *vi) == 1) {
 				// invalidate all the outing edges.
@@ -1711,7 +1711,7 @@ void GraphUtil::loadRoads(RoadGraph& roads, const QString& filename, int roadTyp
 		fread(&onBoundary, sizeof(unsigned int), 1, fp);
 
 		RoadVertexPtr vertex = RoadVertexPtr(new RoadVertex(QVector2D(x, y)));
-		vertex->onBoundary = onBoundary == 1;
+		//vertex->onBoundary = onBoundary == 1;
 
 		RoadVertexDesc desc = boost::add_vertex(roads.graph);
 		roads.graph[desc] = vertex;
@@ -1795,8 +1795,8 @@ void GraphUtil::saveRoads(RoadGraph& roads, const QString& filename) {
 		fwrite(&y, sizeof(float), 1, fp);
 
 		// onBoundary? (1/0)
-		unsigned int onBoundary = v->onBoundary ? 1 : 0;
-		fwrite(&onBoundary, sizeof(unsigned int), 1, fp);
+		//unsigned int onBoundary = v->onBoundary ? 1 : 0;
+		//fwrite(&onBoundary, sizeof(unsigned int), 1, fp);
 
 		conv[desc] = cnt;
 		cnt++;
@@ -2106,7 +2106,7 @@ void GraphUtil::extractRoads2(RoadGraph& roads, const Polygon2D& area, int roadT
 		// Add a vertex on the border
 		RoadEdgeDesc e1, e2;
 		RoadVertexDesc v = splitEdge(roads, edges[e_id], intPt, e1, e2);
-		roads.graph[v]->onBoundary = true;
+		//roads.graph[v]->onBoundary = true;
 
 		if ((polyline[0] - roads.graph[src]->pt).lengthSquared() <= (polyline[0] - roads.graph[tgt]->pt).lengthSquared()) {
 			if (area.contains(roads.graph[src]->pt)) {
@@ -2172,7 +2172,7 @@ void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
 				}
 			}
 			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], src, intPt);
-			roads.graph[v]->onBoundary = true;
+			//roads.graph[v]->onBoundary = true;
 
 			{
 				Polyline2D polyline = orderPolyLine(roads, edges[e_id], tgt);
@@ -2185,7 +2185,7 @@ void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
 				}
 			}
 			v = cutoffEdge(roads, edges[e_id], tgt, intPt);
-			roads.graph[v]->onBoundary = true;
+			//roads.graph[v]->onBoundary = true;
 		} else if (area.contains(roads.graph[src]->pt)) {
 			QVector2D intPt;
 			{
@@ -2199,7 +2199,7 @@ void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
 				}
 			}
 			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], src, intPt);
-			roads.graph[v]->onBoundary = true;
+			//roads.graph[v]->onBoundary = true;
 			roads.graph[tgt]->valid = false;
 		} else {
 			QVector2D intPt;
@@ -2214,7 +2214,7 @@ void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
 				}
 			}
 			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], tgt, intPt);
-			roads.graph[v]->onBoundary = true;
+			//roads.graph[v]->onBoundary = true;
 			roads.graph[src]->valid = false;
 		}
 	}
@@ -2340,7 +2340,7 @@ void GraphUtil::perturb(RoadGraph &roads, const Polygon2D &area, float factor) {
  * 交差しているエッジを探し、あればレベルが低い方を削除する。
  */
 void GraphUtil::removeSelfIntersectingRoads(RoadGraph &roads) {
-	setVertexType(roads);
+	//setVertexType(roads);
 
 	float ta, tb;
 	QVector2D intPt;

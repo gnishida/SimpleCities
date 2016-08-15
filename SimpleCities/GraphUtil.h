@@ -38,7 +38,7 @@ public:
 	static float getDensity(RoadGraph& roads, const QVector2D& pos, float radius);
 	static bool hasRedundantEdge(RoadGraph& roads, RoadVertexDesc desc, const Polyline2D &polyline, float threshold);
 	static bool tshape(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc edge);
-	static void setVertexType(RoadGraph &roads);
+	//static void setVertexType(RoadGraph &roads);
 
 	// Edge related functions
 	static RoadEdgeDesc getEdge(RoadGraph& roads, int index, bool onlyValidEdge = true);
