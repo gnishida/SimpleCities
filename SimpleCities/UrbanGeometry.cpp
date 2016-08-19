@@ -23,8 +23,10 @@ UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
 
 	// load a default zone and terrain
-	loadZone("../3D/zone1.shp");
-	loadTerrain("../3D/dem1m_calb.tif");
+	//loadZone("../3D/zone1.shp");
+	//loadTerrain("../3D/dem1m_calb.tif");
+	loadZone("../3D/new_zone.shp");
+	mainWin->glWidget->vboRenderManager.vboTerrain.init(&mainWin->glWidget->vboRenderManager, glm::vec2(1000, 1000));
 }
 
 void UrbanGeometry::generateRoads() {
