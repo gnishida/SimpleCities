@@ -7,7 +7,7 @@
 #include "Polyline2D.h"
 
 class Util {
-	static const float MTC_FLOAT_TOL;
+	static const double MTC_FLOAT_TOL;
 
 protected:
 	Util();
@@ -17,8 +17,8 @@ public:
 	static QVector2D projLatLonToMeter(const QVector2D &latLon, const QVector2D &centerLatLon);
 	static QVector2D projLatLonToMeter(double longitude, double latitude, const QVector2D &centerLatLon);
 
-	static bool segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, const QVector2D& d, float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint);
-	static bool segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, float *tab, float *tcd, bool segmentOnly, QVector3D &intPoint);
+	static bool segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, const QVector2D& d, double *tab, double *tcd, bool segmentOnly, QVector2D &intPoint);
+	static bool segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, double *tab, double *tcd, bool segmentOnly, QVector3D &intPoint);
 	static float pointSegmentDistanceXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, QVector2D& closestPtInAB);
 
 	// angle computatiopn

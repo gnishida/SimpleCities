@@ -7,6 +7,7 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 	this->oneWay = oneWay;
 	this->link = link;
 	this->roundabout = roundabout;
+	this->eigenType = EIGEN_TYPE_NONE;
 	this->valid = true;
 }
 

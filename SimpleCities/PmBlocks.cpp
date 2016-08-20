@@ -354,6 +354,9 @@ void PmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks)
 			continue;
 		}
 
+		i++;
+
+		/*
 		// If the block is below sea level, or on a steep terain, make it invalid or park.
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
@@ -374,9 +377,9 @@ void PmBlocks::checkValidness(VBORenderManager* renderManager, BlockSet& blocks)
 			if (max_z - min_z > 20.0f) {
 				blocks[i].isPark = true;
 			}
-
 			i++;
 		}
+		*/
 	}
 }
 

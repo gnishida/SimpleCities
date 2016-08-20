@@ -27,5 +27,6 @@ private:
 	int generateRoadSegmentByTensor(const cv::Mat& tensor, float segment_length, float near_threshold, RoadVertexDesc srcDesc, RoadVertexDesc& tgtDesc, int type);
 	void removeDanglingEdges();
 	void saveTensorImage(const cv::Mat& tensor, const std::string& filename);
+	void saveRoadImage(RoadGraph& roads, const std::string& filename);
 };
 

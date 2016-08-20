@@ -269,7 +269,7 @@ bool Polygon3D::splitMeWithPolyline(const std::vector<QVector3D> &pline, Loop3D 
 			int jNext = (j + 1) % contourSz;
 
 			QVector2D tmpIntPt;
-			float tPline, tPgon;
+			double tPline, tPgon;
 			if (Util::segmentSegmentIntersectXY(QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(contour[j]), QVector2D(contour[jNext]), &tPline, &tPgon, true, tmpIntPt)) {
 				polylineIntersectsPolygon = true;
 

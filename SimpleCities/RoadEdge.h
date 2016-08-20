@@ -12,6 +12,8 @@
 class RoadEdge {
 public:
 	static enum { TYPE_OTHERS = 0, TYPE_STREET = 1, TYPE_AVENUE = 2 };
+	static enum { EIGEN_TYPE_NONE = 0, EIGEN_TYPE_MAJOR = 1, EIGEN_TYPE_MINOR = 2, EIGEN_TYPE_BOTH = 3 };
+
 
 public:
 	int type;
@@ -23,6 +25,7 @@ public:
 	Polyline3D polyline3D;
 
 	bool valid;			// if this edge is valid
+	int eigenType;
 
 public:
 	RoadEdge(unsigned int type, unsigned int lanes, bool oneWay = false, bool link = false, bool roundabout = false);

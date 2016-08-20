@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 	G::global()["slopeTolerance"] = 0.3f;
 	G::global()["acrossRiverTolerance"] = 200.0f;
 	G::global()["avenueAvgSegmentLength"] = 100.0f;
-	G::global()["streetAvgSegmentLength"] = 20.0f;
+	G::global()["road_base_orientation"] = 0.0f;
 	G::global()["road_curvature"] = 0.2f;
 	G::global()["parksRatio"] = 0.05f;
 	G::global()["parcel_area_mean"] = 1000.0f;

@@ -299,7 +299,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					// d.1 computer intersection left
 					QVector2D intPt1(FLT_MAX,0);
 					if (fabs(QVector2D::dotProduct(ed1Dir, ed2DirL)) < 0.95f) { // ２つの隣接道路が平行じゃないなら、
-						float tab,tcd;
+						double tab,tcd;
 						Util::segmentSegmentIntersectXY(ed1p0R, ed1p1R, ed2p0L, ed2p1L, &tab, &tcd, false, intPt1);
 					} else { // ２つの隣接道路が平行なら、
 						intPt1 = (ed1p0R + ed2p0L) * 0.5f;
@@ -307,7 +307,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					// d.2 computer intersecion right
 					QVector2D intPt2(FLT_MAX,0);
 					if (fabs(QVector2D::dotProduct(ed1Dir, ed2DirR)) < 0.95f) {
-						float tab,tcd;
+						double tab, tcd;
 						Util::segmentSegmentIntersectXY(ed1p0L, ed1p1L, ed2p0R, ed2p1R, &tab, &tcd, false, intPt2);
 					} else {
 						intPt2 = (ed1p0L + ed2p0R) * 0.5f;
@@ -376,7 +376,7 @@ std::vector<QVector3D> RoadMeshGenerator::generateCurvePoints(const QVector3D& i
 	QVector3D d2 = p2 - intPoint;
 	QVector3D per2 = QVector3D(-d2.y(), d2.x(), 0);
 
-	float tab, tcd;
+	double tab, tcd;
 	QVector3D center;
 	if (!Util::segmentSegmentIntersectXY3D(p1, p1 + per1 * 100, p2, p2 + per2 * 100, &tab, &tcd, false, center)) return points;
 

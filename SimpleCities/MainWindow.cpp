@@ -66,7 +66,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::setParameters() {
 	G::global()["avenueAvgSegmentLength"] = controlWidget->ui.lineEditAvenueSegmentLength->text().toFloat();
-	G::global()["streetAvgSegmentLength"] = controlWidget->ui.lineEditStreetSegmentLength->text().toFloat();
+	G::global()["road_base_orientation"] = controlWidget->ui.lineEditRoadBaseOrientation->text().toFloat();
 	G::global()["road_curvature"] = controlWidget->ui.lineEditRoadCurvature->text().toFloat();
 	G::global()["parksRatio"] = controlWidget->ui.lineEditParkRatio->text().toFloat();
 	G::global()["parcel_area_mean"] = controlWidget->ui.lineEditParcelArea->text().toFloat();
@@ -281,7 +281,7 @@ void MainWindow::onGenerateScenarios() {
 	int numScenarios = dlg.ui.lineEditNumScenarios->text().toInt();
 	QString output_dir = dlg.ui.lineEditOutputDirectory->text();
 	std::pair<float, float> avenueSegmentLengthRange = std::make_pair(dlg.ui.lineEditAvenueSegmentLengthMin->text().toFloat(), dlg.ui.lineEditAvenueSegmentLengthMax->text().toFloat());
-	std::pair<float, float> streetSegmentLengthRange = std::make_pair(dlg.ui.lineEditStreetSegmentLengthMin->text().toFloat(), dlg.ui.lineEditStreetSegmentLengthMax->text().toFloat());
+	std::pair<float, float> roadBaseOrientationRange = std::make_pair(dlg.ui.lineEditRoadBaseOrientationMin->text().toFloat(), dlg.ui.lineEditRoadBaseOrientationMax->text().toFloat());
 	std::pair<float, float> roadCurvatureRange = std::make_pair(dlg.ui.lineEditRoadCurvatureMin->text().toFloat(), dlg.ui.lineEditRoadCurvatureMax->text().toFloat());
 	std::pair<float, float> parkRatioRange = std::make_pair(dlg.ui.lineEditParkRatioMin->text().toFloat(), dlg.ui.lineEditParkRatioMax->text().toFloat());
 	std::pair<float, float> pacelAreaRange = std::make_pair(dlg.ui.lineEditParcelAreaMin->text().toFloat(), dlg.ui.lineEditParcelAreaMax->text().toFloat());
@@ -297,10 +297,10 @@ void MainWindow::onGenerateScenarios() {
 	urbanGeometry->loadZone(zone_file.toUtf8().constData());
 
 	// load terrain
-	urbanGeometry->loadTerrain(terrain_file.toUtf8().constData());
+	//urbanGeometry->loadTerrain(terrain_file.toUtf8().constData());
 
 	// generate scenarios
-	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, streetSegmentLengthRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, parcelAreaDev, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange, numStoriesDev, minBuildingDimRange);
+	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, roadBaseOrientationRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, parcelAreaDev, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange, numStoriesDev, minBuildingDimRange);
 }
 
 void MainWindow::onViewChanged() {

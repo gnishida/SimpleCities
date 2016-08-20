@@ -42,12 +42,12 @@ public:
     QLabel *label_9;
     QLineEdit *lineEditAvenueSegmentLengthMin;
     QLineEdit *lineEditRoadCurvatureMin;
-    QLineEdit *lineEditStreetSegmentLengthMax;
+    QLineEdit *lineEditRoadBaseOrientationMax;
     QLabel *label_6;
     QLineEdit *lineEditRoadCurvatureMax;
     QLabel *label_3;
     QLineEdit *lineEditAvenueSegmentLengthMax;
-    QLineEdit *lineEditStreetSegmentLengthMin;
+    QLineEdit *lineEditRoadBaseOrientationMin;
     QLabel *label_4;
     QLabel *label_7;
     QLabel *label_10;
@@ -76,6 +76,10 @@ public:
     QLabel *label_22;
     QLabel *label_38;
     QLineEdit *lineEditParcelAreaDev;
+    QLabel *label_23;
+    QLabel *label_24;
+    QLabel *label_25;
+    QLabel *label_26;
     QGroupBox *groupBox_3;
     QLabel *label_33;
     QLineEdit *lineEditNumStoriesMin;
@@ -87,6 +91,7 @@ public:
     QLineEdit *lineEditMinBuildingDimMin;
     QLineEdit *lineEditMinBuildingDimMax;
     QLabel *label_37;
+    QLabel *label_27;
 
     void setupUi(QDialog *ScenarioGenerationDialog)
     {
@@ -144,9 +149,9 @@ public:
         lineEditRoadCurvatureMin = new QLineEdit(groupBox);
         lineEditRoadCurvatureMin->setObjectName(QStringLiteral("lineEditRoadCurvatureMin"));
         lineEditRoadCurvatureMin->setGeometry(QRect(150, 80, 71, 20));
-        lineEditStreetSegmentLengthMax = new QLineEdit(groupBox);
-        lineEditStreetSegmentLengthMax->setObjectName(QStringLiteral("lineEditStreetSegmentLengthMax"));
-        lineEditStreetSegmentLengthMax->setGeometry(QRect(240, 50, 71, 20));
+        lineEditRoadBaseOrientationMax = new QLineEdit(groupBox);
+        lineEditRoadBaseOrientationMax->setObjectName(QStringLiteral("lineEditRoadBaseOrientationMax"));
+        lineEditRoadBaseOrientationMax->setGeometry(QRect(240, 50, 71, 20));
         label_6 = new QLabel(groupBox);
         label_6->setObjectName(QStringLiteral("label_6"));
         label_6->setGeometry(QRect(20, 50, 121, 21));
@@ -159,9 +164,9 @@ public:
         lineEditAvenueSegmentLengthMax = new QLineEdit(groupBox);
         lineEditAvenueSegmentLengthMax->setObjectName(QStringLiteral("lineEditAvenueSegmentLengthMax"));
         lineEditAvenueSegmentLengthMax->setGeometry(QRect(240, 20, 71, 20));
-        lineEditStreetSegmentLengthMin = new QLineEdit(groupBox);
-        lineEditStreetSegmentLengthMin->setObjectName(QStringLiteral("lineEditStreetSegmentLengthMin"));
-        lineEditStreetSegmentLengthMin->setGeometry(QRect(150, 50, 71, 20));
+        lineEditRoadBaseOrientationMin = new QLineEdit(groupBox);
+        lineEditRoadBaseOrientationMin->setObjectName(QStringLiteral("lineEditRoadBaseOrientationMin"));
+        lineEditRoadBaseOrientationMin->setGeometry(QRect(150, 50, 71, 20));
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QStringLiteral("label_4"));
         label_4->setGeometry(QRect(226, 20, 16, 21));
@@ -176,7 +181,7 @@ public:
         label_5->setGeometry(QRect(320, 20, 16, 21));
         label_8 = new QLabel(groupBox);
         label_8->setObjectName(QStringLiteral("label_8"));
-        label_8->setGeometry(QRect(320, 50, 16, 21));
+        label_8->setGeometry(QRect(320, 50, 31, 21));
         groupBox_2 = new QGroupBox(ScenarioGenerationDialog);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
         groupBox_2->setGeometry(QRect(10, 250, 521, 171));
@@ -246,6 +251,18 @@ public:
         lineEditParcelAreaDev = new QLineEdit(groupBox_2);
         lineEditParcelAreaDev->setObjectName(QStringLiteral("lineEditParcelAreaDev"));
         lineEditParcelAreaDev->setGeometry(QRect(430, 50, 71, 20));
+        label_23 = new QLabel(groupBox_2);
+        label_23->setObjectName(QStringLiteral("label_23"));
+        label_23->setGeometry(QRect(320, 80, 16, 21));
+        label_24 = new QLabel(groupBox_2);
+        label_24->setObjectName(QStringLiteral("label_24"));
+        label_24->setGeometry(QRect(320, 110, 16, 21));
+        label_25 = new QLabel(groupBox_2);
+        label_25->setObjectName(QStringLiteral("label_25"));
+        label_25->setGeometry(QRect(320, 140, 16, 21));
+        label_26 = new QLabel(groupBox_2);
+        label_26->setObjectName(QStringLiteral("label_26"));
+        label_26->setGeometry(QRect(320, 50, 31, 21));
         groupBox_3 = new QGroupBox(ScenarioGenerationDialog);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
         groupBox_3->setGeometry(QRect(10, 430, 521, 81));
@@ -279,6 +296,9 @@ public:
         label_37 = new QLabel(groupBox_3);
         label_37->setObjectName(QStringLiteral("label_37"));
         label_37->setGeometry(QRect(226, 50, 16, 21));
+        label_27 = new QLabel(groupBox_3);
+        label_27->setObjectName(QStringLiteral("label_27"));
+        label_27->setGeometry(QRect(320, 50, 16, 21));
         QWidget::setTabOrder(lineEditZone, pushButtonZone);
         QWidget::setTabOrder(pushButtonZone, lineEditTerrain);
         QWidget::setTabOrder(lineEditTerrain, pushButtonTerrain);
@@ -287,9 +307,9 @@ public:
         QWidget::setTabOrder(lineEditOutputDirectory, pushButtonOutputDirectory);
         QWidget::setTabOrder(pushButtonOutputDirectory, lineEditAvenueSegmentLengthMin);
         QWidget::setTabOrder(lineEditAvenueSegmentLengthMin, lineEditAvenueSegmentLengthMax);
-        QWidget::setTabOrder(lineEditAvenueSegmentLengthMax, lineEditStreetSegmentLengthMin);
-        QWidget::setTabOrder(lineEditStreetSegmentLengthMin, lineEditStreetSegmentLengthMax);
-        QWidget::setTabOrder(lineEditStreetSegmentLengthMax, lineEditRoadCurvatureMin);
+        QWidget::setTabOrder(lineEditAvenueSegmentLengthMax, lineEditRoadBaseOrientationMin);
+        QWidget::setTabOrder(lineEditRoadBaseOrientationMin, lineEditRoadBaseOrientationMax);
+        QWidget::setTabOrder(lineEditRoadBaseOrientationMax, lineEditRoadCurvatureMin);
         QWidget::setTabOrder(lineEditRoadCurvatureMin, lineEditRoadCurvatureMax);
         QWidget::setTabOrder(lineEditRoadCurvatureMax, lineEditParkRatioMin);
         QWidget::setTabOrder(lineEditParkRatioMin, lineEditParkRatioMax);
@@ -329,13 +349,13 @@ public:
         pushButtonTerrain->setText(QApplication::translate("ScenarioGenerationDialog", "...", 0));
         groupBox->setTitle(QApplication::translate("ScenarioGenerationDialog", "Roads", 0));
         label_9->setText(QApplication::translate("ScenarioGenerationDialog", "Road curvature:", 0));
-        label_6->setText(QApplication::translate("ScenarioGenerationDialog", "Street segment length:", 0));
+        label_6->setText(QApplication::translate("ScenarioGenerationDialog", "Road base orientation:", 0));
         label_3->setText(QApplication::translate("ScenarioGenerationDialog", "Avenue segment length:", 0));
         label_4->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_7->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_10->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_5->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
-        label_8->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
+        label_8->setText(QApplication::translate("ScenarioGenerationDialog", "[deg]", 0));
         groupBox_2->setTitle(QApplication::translate("ScenarioGenerationDialog", "Parcels", 0));
         label_11->setText(QApplication::translate("ScenarioGenerationDialog", "Park ratio:", 0));
         label_12->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
@@ -348,12 +368,17 @@ public:
         label_21->setText(QApplication::translate("ScenarioGenerationDialog", "Setback side:", 0));
         label_22->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_38->setText(QApplication::translate("ScenarioGenerationDialog", "Std Dev:", 0));
+        label_23->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
+        label_24->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
+        label_25->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
+        label_26->setText(QApplication::translate("ScenarioGenerationDialog", "[m^2]", 0));
         groupBox_3->setTitle(QApplication::translate("ScenarioGenerationDialog", "Buildings", 0));
         label_33->setText(QApplication::translate("ScenarioGenerationDialog", "# Stories:", 0));
         label_34->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_35->setText(QApplication::translate("ScenarioGenerationDialog", "Std Dev:", 0));
         label_36->setText(QApplication::translate("ScenarioGenerationDialog", "Min dimension:", 0));
         label_37->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
+        label_27->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
     } // retranslateUi
 
 };

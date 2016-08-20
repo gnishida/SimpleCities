@@ -4,14 +4,15 @@
 ScenarioGenerationDialog::ScenarioGenerationDialog(QWidget *parent) : QDialog(parent) {
 	ui.setupUi(this);
 
-	ui.lineEditZone->setText("../3D/zone1.shp");
+	//ui.lineEditZone->setText("../3D/zone1.shp");
+	ui.lineEditZone->setText("../3D/new_zone.shp");
 	ui.lineEditTerrain->setText("../3D/dem1m_calb.tif");
 	ui.lineEditNumScenarios->setText("10");
 	ui.lineEditOutputDirectory->setText("scenarios");
 	ui.lineEditAvenueSegmentLengthMin->setText("50");
 	ui.lineEditAvenueSegmentLengthMax->setText("200");
-	ui.lineEditStreetSegmentLengthMin->setText("10");
-	ui.lineEditStreetSegmentLengthMax->setText("50");
+	ui.lineEditRoadBaseOrientationMin->setText("0");
+	ui.lineEditRoadBaseOrientationMax->setText("180");
 	ui.lineEditRoadCurvatureMin->setText("0.0");
 	ui.lineEditRoadCurvatureMax->setText("0.5");
 	ui.lineEditParkRatioMin->setText("0.1");

@@ -47,7 +47,7 @@
       <rect>
        <x>140</x>
        <y>20</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -55,7 +55,7 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>210</x>
        <y>20</y>
        <width>16</width>
        <height>21</height>
@@ -75,7 +75,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Street segment length:</string>
+      <string>Road base orientation:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_9">
@@ -91,12 +91,12 @@
       <string>Road curvature:</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEditStreetSegmentLength">
+    <widget class="QLineEdit" name="lineEditRoadBaseOrientation">
      <property name="geometry">
       <rect>
        <x>140</x>
        <y>50</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -106,7 +106,7 @@
       <rect>
        <x>140</x>
        <y>80</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -114,14 +114,14 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>210</x>
        <y>50</y>
-       <width>16</width>
+       <width>31</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>[m]</string>
+      <string>[deg]</string>
      </property>
     </widget>
    </widget>
@@ -155,7 +155,7 @@
       <rect>
        <x>140</x>
        <y>20</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -217,7 +217,7 @@
       <rect>
        <x>140</x>
        <y>140</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -227,7 +227,7 @@
       <rect>
        <x>140</x>
        <y>50</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -237,7 +237,7 @@
       <rect>
        <x>140</x>
        <y>110</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -247,7 +247,7 @@
       <rect>
        <x>140</x>
        <y>170</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -257,7 +257,7 @@
       <rect>
        <x>140</x>
        <y>80</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -273,6 +273,71 @@
      </property>
      <property name="text">
       <string>Deviation of parcel area:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>110</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m]</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>140</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m]</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>170</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m]</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>50</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m^2]</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>80</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m^2]</string>
      </property>
     </widget>
    </widget>
@@ -293,7 +358,7 @@
       <rect>
        <x>140</x>
        <y>20</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -316,7 +381,7 @@
       <rect>
        <x>140</x>
        <y>50</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
      </property>
@@ -352,9 +417,22 @@
       <rect>
        <x>140</x>
        <y>80</y>
-       <width>71</width>
+       <width>61</width>
        <height>20</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>80</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[m]</string>
      </property>
     </widget>
    </widget>
@@ -375,7 +453,7 @@
  </widget>
  <tabstops>
   <tabstop>lineEditAvenueSegmentLength</tabstop>
-  <tabstop>lineEditStreetSegmentLength</tabstop>
+  <tabstop>lineEditRoadBaseOrientation</tabstop>
   <tabstop>lineEditRoadCurvature</tabstop>
   <tabstop>lineEditParkRatio</tabstop>
   <tabstop>lineEditParcelArea</tabstop>

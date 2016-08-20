@@ -68,7 +68,7 @@ void UrbanGeometry::generateAll() {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& streetSegmentLengthRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, float parcelAreaDev, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<int, int>& numStoriesRange, float numStoriesDev, const std::pair<int, int>& minBuildingDimRange) {
+void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& roadBaseOrientationRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, float parcelAreaDev, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<int, int>& numStoriesRange, float numStoriesDev, const std::pair<int, int>& minBuildingDimRange) {
 	if (QDir(output_dir).exists()) {
 		std::cout << "Removing existing files in the output directory...";
 		QDir(output_dir).removeRecursively();
@@ -87,7 +87,7 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 	// write the header to the file
 	out_params << "No." << ",";
 	out_params << "avenueAvgSegmentLength" << ",";
-	out_params << "streetAvgSegmentLength" << ",";
+	out_params << "road_base_orientation" << ",";
 	out_params << "road_curvature" << ",";
 	out_params << "parksRatio" << ",";
 	out_params << "parcel_area_mean" << ",";
@@ -99,13 +99,12 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 	out_params << "building_stories_deviation" << ",";
 	out_params << "building_min_dimension" << "\n";
 
-	printf("Generating scenarios: ");
 	for (int iter = 0; iter < numScenarios; ++iter) {
-		printf("\rGenerating scenarios: %d", iter + 1);
+		std::cout << "Generating scenarios: " << iter + 1 << std::endl;
 
 		// set the parameter values
 		G::global()["avenueAvgSegmentLength"] = Util::genRand(avenueSegmentLengthRange.first, avenueSegmentLengthRange.second);
-		G::global()["streetAvgSegmentLength"] = Util::genRand(streetSegmentLengthRange.first, streetSegmentLengthRange.second);
+		G::global()["road_base_orientation"] = Util::genRand(roadBaseOrientationRange.first, roadBaseOrientationRange.second);
 		G::global()["road_curvature"] = Util::genRand(roadCurvatureRange.first, roadCurvatureRange.second);
 		G::global()["parksRatio"] = Util::genRand(parkRatioRange.first, parkRatioRange.second);
 		G::global()["parcel_area_mean"] = Util::genRand(parcelAreaRange.first, parcelAreaRange.second);
@@ -117,18 +116,19 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		G::global()["building_stories_deviation"] = numStoriesDev;
 		G::global()["building_min_dimension"] = Util::genRand(minBuildingDimRange.first, minBuildingDimRange.second);
 
-		std::cout << "avenueAvgSegmentLength: " << G::getFloat("avenueAvgSegmentLength") << std::endl;
-		std::cout << "streetAvgSegmentLength: " << G::getFloat("streetAvgSegmentLength") << std::endl;
-		std::cout << "road_curvature: " << G::getFloat("road_curvature") << std::endl;
-		std::cout << "parksRatio: " << G::getFloat("parksRatio") << std::endl;
-		std::cout << "parcel_area_mean: " << G::getFloat("parcel_area_mean") << std::endl;
-		std::cout << "parcel_area_deviation: " << G::getFloat("parcel_area_deviation") << std::endl;
-		std::cout << "parcel_setback_front: " << G::getFloat("parcel_setback_front") << std::endl;
-		std::cout << "parcel_setback_rear: " << G::getFloat("parcel_setback_rear") << std::endl;
-		std::cout << "parcel_setback_sides: " << G::getFloat("parcel_setback_sides") << std::endl;
-		std::cout << "building_stories_mean: " << G::getFloat("building_stories_mean") << std::endl;
-		std::cout << "building_stories_deviation: " << G::getFloat("building_stories_deviation") << std::endl;
-		std::cout << "building_min_dimension: " << G::getFloat("building_min_dimension") << std::endl;
+		std::cout << "  avenueAvgSegmentLength: " << G::getFloat("avenueAvgSegmentLength") << std::endl;
+		std::cout << "  road_base_orientation: " << G::getFloat("road_base_orientation") << std::endl;
+		std::cout << "  road_curvature: " << G::getFloat("road_curvature") << std::endl;
+		std::cout << "  parksRatio: " << G::getFloat("parksRatio") << std::endl;
+		std::cout << "  parcel_area_mean: " << G::getFloat("parcel_area_mean") << std::endl;
+		std::cout << "  parcel_area_deviation: " << G::getFloat("parcel_area_deviation") << std::endl;
+		std::cout << "  parcel_setback_front: " << G::getFloat("parcel_setback_front") << std::endl;
+		std::cout << "  parcel_setback_rear: " << G::getFloat("parcel_setback_rear") << std::endl;
+		std::cout << "  parcel_setback_sides: " << G::getFloat("parcel_setback_sides") << std::endl;
+		std::cout << "  building_stories_mean: " << G::getFloat("building_stories_mean") << std::endl;
+		std::cout << "  building_stories_deviation: " << G::getFloat("building_stories_deviation") << std::endl;
+		std::cout << "  building_min_dimension: " << G::getFloat("building_min_dimension") << std::endl;
+		std::cout << std::endl;
 
 		// generate a city
 		generateAll();
@@ -148,7 +148,7 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		// save the parameter values
 		out_params << iter + 1 << ",";
 		out_params << G::getFloat("avenueAvgSegmentLength") << ",";
-		out_params << G::getFloat("streetAvgSegmentLength") << ",";
+		out_params << G::getFloat("road_base_orientation") << ",";
 		out_params << G::getFloat("road_curvature") << ",";
 		out_params << G::getFloat("parksRatio") << ",";
 		out_params << G::getFloat("parcel_area_mean") << ",";
@@ -162,7 +162,7 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 	}
 
 	file_params.close();
-	printf("\n");
+	
 	std::cout << "Generation has completed." << std::endl;
 }
 

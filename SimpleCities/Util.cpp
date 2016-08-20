@@ -5,7 +5,7 @@
 
 static std::default_random_engine generator;
 
-const float Util::MTC_FLOAT_TOL = 1e-6f;
+const double Util::MTC_FLOAT_TOL = 1e-10;
 
 /**
  * Return the distance from segment ab to point c.
@@ -76,7 +76,7 @@ QVector2D Util::projLatLonToMeter(const QVector2D &latLon, const QVector2D &cent
 	return  result; 
 }
 
-bool Util::segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, float *tab, float *tcd, bool segmentOnly, QVector3D& intPoint) {
+bool Util::segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, double *tab, double *tcd, bool segmentOnly, QVector3D& intPoint) {
 	QVector2D interPoint;
 	bool res=segmentSegmentIntersectXY(QVector2D(a.x(),a.y()),QVector2D(b.x(),b.y()),QVector2D(c.x(),c.y()),QVector2D(d.x(),d.y()),tab,tcd,segmentOnly,interPoint);
 	intPoint=interPoint.toVector3D();
@@ -97,7 +97,7 @@ bool Util::segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, c
  * @param intPoint	the intersection
  * @return true if two lines intersect / false otherwise
  **/
-bool Util::segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, const QVector2D& d, float *tab, float *tcd, bool segmentOnly, QVector2D& intPoint) {
+bool Util::segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, const QVector2D& d, double *tab, double *tcd, bool segmentOnly, QVector2D& intPoint) {
 	QVector2D u = b - a;
 	QVector2D v = d - c;
 
@@ -105,30 +105,31 @@ bool Util::segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, con
 		return false;
 	}
 
-	float numer = v.x()*(c.y()-a.y()) + v.y()*(a.x()-c.x());
-	float denom = u.y()*v.x() - u.x()*v.y();
+	double numer = v.x()*(c.y()-a.y()) + v.y()*(a.x()-c.x());
+	double denom = u.y()*v.x() - u.x()*v.y();
 
-	if (denom == 0.0f)  {
+	if (denom == 0.0)  {
 		// they are parallel
-		*tab = 0.0f;
-		*tcd = 0.0f;
+		*tab = 0.0;
+		*tcd = 0.0;
 		return false;
 	}
 
-	float t0 = numer / denom;
+	double t0 = numer / denom;
 
 	QVector2D ipt = a + t0*u;
 	QVector2D tmp = ipt - c;
-	float t1;
-	if (QVector2D::dotProduct(tmp, v) > 0.0f){
+	double t1;
+	if (QVector2D::dotProduct(tmp, v) > 0.0){
 		t1 = tmp.length() / v.length();
 	}
 	else {
-		t1 = -1.0f * tmp.length() / v.length();
+		t1 = -1.0 * tmp.length() / v.length();
 	}
 
 	//Check if intersection is within segments
-	if(segmentOnly && !( (t0 >= MTC_FLOAT_TOL) && (t0 <= 1.0f-MTC_FLOAT_TOL) && (t1 >= MTC_FLOAT_TOL) && (t1 <= 1.0f-MTC_FLOAT_TOL) ) ){
+	//if(segmentOnly && !( (t0 >= MTC_FLOAT_TOL) && (t0 <= 1.0-MTC_FLOAT_TOL) && (t1 >= MTC_FLOAT_TOL) && (t1 <= 1.0-MTC_FLOAT_TOL) ) ){
+	if (segmentOnly && !((t0 >= MTC_FLOAT_TOL) && (t0 <= 1.0 - MTC_FLOAT_TOL) && (t1 >= MTC_FLOAT_TOL) && (t1 <= 1.0 - MTC_FLOAT_TOL))){
 		return false;
 	}
 

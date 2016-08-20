@@ -9,7 +9,8 @@
 #include "Util.h"
 
 void PMRoadGenerator::generateRoadNetwork() {
-	srand(12);
+	//srand(12);
+	srand(clock());
 
 	// make roads along the boundary of the area
 	generateRoadsAtBoundary();
@@ -23,14 +24,15 @@ void PMRoadGenerator::generateRoadNetwork() {
 	roads.graph[v0_desc]->eigenType = RoadVertex::EIGEN_TYPE_MAJOR;
 	seeds.push_back(v0_desc);
 	float segment_length = G::getFloat("avenueAvgSegmentLength");
+	float base_orientation = G::getFloat("road_base_orientation") / 180.0 * M_PI;
 	float curvature = G::getFloat("road_curvature");
-	growRoads(0.0, v0_desc, curvature, segment_length, RoadVertex::EIGEN_TYPE_MAJOR, regular_elements, seeds);
-	growRoads(0.0, v0_desc, curvature, -segment_length, RoadVertex::EIGEN_TYPE_MAJOR, regular_elements, seeds);
+	growRoads(base_orientation, v0_desc, curvature, segment_length, RoadVertex::EIGEN_TYPE_MAJOR, regular_elements, seeds);
+	growRoads(base_orientation, v0_desc, curvature, -segment_length, RoadVertex::EIGEN_TYPE_MAJOR, regular_elements, seeds);
 	
 	// setup the tensor field
 	cv::Mat tensor;
 	setupTensor(targetArea, regular_elements, tensor);
-	//saveTensorImage(tensor, "tensor.png");
+	saveTensorImage(tensor, "tensor.png");
 
 	// generate roads
 	generateRoadsByTensor(tensor, segment_length, segment_length * 0.7, seeds);
@@ -75,7 +77,7 @@ void PMRoadGenerator::generateRoadsAtBoundary() {
  * 座標pt、角度angleから開始して１本の道路を生成する。
  *
  * @param size						ターゲットエリアの一辺の長さ
- * @param angle						角度
+ * @param angle						角度 [rad]
  * @param pt						開始位置
  * @param curvature					曲率
  * @param segment_length			segment length
@@ -110,7 +112,7 @@ void PMRoadGenerator::growRoads(float angle, RoadVertexDesc srcDesc, float curva
 			if (!targetArea.contains(pt)) return;
 
 			angle += rotates[i] * rotate_dir;
-			QVector2D pt2 = pt + QVector2D(cosf(angle), sinf(angle)) * segment_length;
+			QVector2D pt2 = pt + QVector2D(cosf(angle), sinf(angle)) * (segment_length + Util::genRand(-1.0, 1.0));
 
 			RoadEdgeDesc closestEdge;
 			QVector2D intPt;
@@ -123,6 +125,7 @@ void PMRoadGenerator::growRoads(float angle, RoadVertexDesc srcDesc, float curva
 				RoadEdgePtr new_edge = RoadEdgePtr(new RoadEdge(RoadEdge::TYPE_AVENUE, 1));
 				new_edge->addPoint(pt);
 				new_edge->addPoint(intPt);
+				new_edge->eigenType = type;
 				GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
 
 				return;
@@ -228,15 +231,20 @@ void PMRoadGenerator::generateRoadsByTensor(const cv::Mat& tensor, float segment
 			}
 		}
 
-		std::cout << count << ": (" << roads.graph[desc]->pt.x() << ", " << roads.graph[desc]->pt.y() << ") " << type << (foundNearVertex ? " canceled" : "") << std::endl;
+		//std::cout << count << ": (" << roads.graph[desc]->pt.x() << ", " << roads.graph[desc]->pt.y() << ") " << type << (foundNearVertex ? " canceled" : "") << std::endl;
 
 		if (!foundNearVertex) {
 			generateRoadByTensor(tensor, segment_length, near_threshold, desc, type, seeds);
 			generateRoadByTensor(tensor, -segment_length, near_threshold, desc, type, seeds);
 		}
 
+		/*
+		QString name = QString("road_images/road_%1.png").arg(count);
+		saveRoadImage(roads, name.toUtf8().constData());
+		*/
+
 		count++;
-		if (count > 500) break;
+		if (count > 1000) break;
 	}
 }
 
@@ -305,14 +313,14 @@ void PMRoadGenerator::generateRoadByTensor(const cv::Mat& tensor, float segment_
 * @param tensor				tensor field
 * @param segment_length		segment length
 * @param near_threshold		near threshold
-* @param pt [OUT]			この座標から道路セグメント生成を開始する。また、最終地点の座標が格納される。
+* @param srcDesc			src vertex desc
+* @param tgtDesc [OUT]		tgt vertex desc
 * @param type				1 -- major eigen vector / 2 -- minor eigen vector
-* @param new_vertices [OUT]	既存セグメントとの交差点をこのリストに追加する
 * @return					0 -- 正常終了 / 1 -- ターゲットエリア外に出て終了 / 2 -- 既存交差点の近くで交差して終了
 */
 int PMRoadGenerator::generateRoadSegmentByTensor(const cv::Mat& tensor, float segment_length, float near_threshold, RoadVertexDesc srcDesc, RoadVertexDesc& tgtDesc, int type) {
 	int num_step = 5;
-	float step_length = segment_length / num_step;
+	float step_length = (segment_length + Util::genRand(-1.0, 1.0)) / num_step;
 
 	BBox bbox = targetArea.envelope();
 
@@ -373,14 +381,19 @@ int PMRoadGenerator::generateRoadSegmentByTensor(const cv::Mat& tensor, float se
 		RoadEdgeDesc nearestEdgeDesc;
 		QVector2D intPt;
 		if (GraphUtil::isIntersect(roads, pt, next_pt, nearestEdgeDesc, intPt)) {
+			int edgeEigenType = roads.graph[nearestEdgeDesc]->eigenType;
+
 			// 他のエッジにスナップ
 			tgtDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPt);
+			intPt = roads.graph[tgtDesc]->pt;
 			roads.graph[tgtDesc]->eigenType |= type;
+			roads.graph[tgtDesc]->eigenType |= edgeEigenType;
 			roads.graph[tgtDesc]->new_vertx = true;
 
 			new_edge->addPoint(intPt);
 
 			// エッジを生成
+			new_edge->eigenType = type;
 			GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
 
 			// エッジを交差点から再開させる
@@ -422,33 +435,46 @@ int PMRoadGenerator::generateRoadSegmentByTensor(const cv::Mat& tensor, float se
 		pt = next_pt;
 	}
 
-	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
-	tgtDesc = GraphUtil::addVertex(roads, v);
-	roads.graph[tgtDesc]->eigenType = type;
-	roads.graph[tgtDesc]->new_vertx = true;
+	if (new_edge->getLength() >= 1.0f) {
+		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+		tgtDesc = GraphUtil::addVertex(roads, v);
+		roads.graph[tgtDesc]->eigenType = type;
+		roads.graph[tgtDesc]->new_vertx = true;
 
-	// add edge
-	GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
+		// add edge
+		new_edge->eigenType = type;
+		GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
+	}
+	else {
+		tgtDesc = srcDesc;
+	}
 	
 	return 0;
 }
 
 void PMRoadGenerator::removeDanglingEdges() {
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		int count = 0;
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
-			if (roads.graph[*ei]->valid) count++;
-		}
+	while (true) {
+		bool updated = false;
 
-		if (count == 1) {
-			roads.graph[*vi]->valid = false;
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+			int count = 0;
 			RoadOutEdgeIter ei, eend;
 			for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
-				roads.graph[*ei]->valid = false;
+				if (roads.graph[*ei]->valid) count++;
+			}
+
+			if (count == 1) {
+				roads.graph[*vi]->valid = false;
+				RoadOutEdgeIter ei, eend;
+				for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+					roads.graph[*ei]->valid = false;
+				}
+				updated = true;
 			}
 		}
+
+		if (!updated) break;
 	}
 }
 
@@ -466,5 +492,52 @@ void PMRoadGenerator::saveTensorImage(const cv::Mat& tensor, const std::string& 
 	}
 
 	cv::flip(result, result, 0);
+	cv::imwrite(filename.c_str(), result);
+}
+
+void PMRoadGenerator::saveRoadImage(RoadGraph& roads, const std::string& filename) {
+	BBox bbox;
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		bbox.addPoint(roads.graph[*vi]->pt);
+	}
+
+	cv::Mat result((int)(bbox.dy() + 1), (int)(bbox.dx() + 1), CV_8UC3, cv::Scalar(255, 255, 255));
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		for (int k = 0; k < roads.graph[*ei]->polyline.size() - 1; ++k) {
+			int x1 = roads.graph[*ei]->polyline[k].x() - bbox.minPt.x();
+			int y1 = roads.graph[*ei]->polyline[k].y() - bbox.minPt.y();
+			int x2 = roads.graph[*ei]->polyline[k + 1].x() - bbox.minPt.x();
+			int y2 = roads.graph[*ei]->polyline[k + 1].y() - bbox.minPt.y();
+
+			cv::line(result, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+		}
+	}
+
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		int count = 0;
+		RoadOutEdgeIter oi, oend;
+		for (boost::tie(oi, oend) = boost::out_edges(*vi, roads.graph); oi != oend; ++oi) {
+			if (roads.graph[*oi]->valid) count++;
+		}
+
+		if (count == 2) continue;
+
+		int x = roads.graph[*vi]->pt.x() - bbox.minPt.x();
+		int y = roads.graph[*vi]->pt.y() - bbox.minPt.x();
+		cv::circle(result, cv::Point(x, y), 5, cv::Scalar(255, 0, 0), 1, cv::LINE_AA);
+
+		QString text = QString::number(count);
+		cv::putText(result, text.toUtf8().constData(), cv::Point(x, y), cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+	}
+
 	cv::imwrite(filename.c_str(), result);
 }

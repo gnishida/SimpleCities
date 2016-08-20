@@ -215,7 +215,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditStreetSegmentLengthMax">
+   <widget class="QLineEdit" name="lineEditRoadBaseOrientationMax">
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -235,7 +235,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Street segment length:</string>
+     <string>Road base orientation:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEditRoadCurvatureMax">
@@ -271,7 +271,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEditStreetSegmentLengthMin">
+   <widget class="QLineEdit" name="lineEditRoadBaseOrientationMin">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -338,12 +338,12 @@
      <rect>
       <x>320</x>
       <y>50</y>
-      <width>16</width>
+      <width>31</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>[m]</string>
+     <string>[deg]</string>
     </property>
    </widget>
   </widget>
@@ -612,6 +612,58 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="label_23">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>80</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[m]</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_24">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>110</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[m]</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_25">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>140</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[m]</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>50</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[m^2]</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
@@ -740,6 +792,19 @@
      <string>~</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_27">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>50</y>
+      <width>16</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[m]</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <tabstops>
@@ -752,8 +817,8 @@
   <tabstop>pushButtonOutputDirectory</tabstop>
   <tabstop>lineEditAvenueSegmentLengthMin</tabstop>
   <tabstop>lineEditAvenueSegmentLengthMax</tabstop>
-  <tabstop>lineEditStreetSegmentLengthMin</tabstop>
-  <tabstop>lineEditStreetSegmentLengthMax</tabstop>
+  <tabstop>lineEditRoadBaseOrientationMin</tabstop>
+  <tabstop>lineEditRoadBaseOrientationMax</tabstop>
   <tabstop>lineEditRoadCurvatureMin</tabstop>
   <tabstop>lineEditRoadCurvatureMax</tabstop>
   <tabstop>lineEditParkRatioMin</tabstop>

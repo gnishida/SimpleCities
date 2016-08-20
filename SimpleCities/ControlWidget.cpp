@@ -11,7 +11,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.setupUi(this);
 
 	ui.lineEditAvenueSegmentLength->setText("100");
-	ui.lineEditStreetSegmentLength->setText("20");
+	ui.lineEditRoadBaseOrientation->setText("0");
 	ui.lineEditRoadCurvature->setText("0.2");
 	ui.lineEditParkRatio->setText("0.1");
 	ui.lineEditParcelArea->setText("1000");

@@ -1249,7 +1249,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D& polyline1, const
 
 	for (int i = 0; i < polyline1.size() - 1; i++) {
 		for (int j = 0; j < polyline2.size() - 1; j++) {
-			float tab, tcd;
+			double tab, tcd;
 			QVector2D intPoint;
 			if (Util::segmentSegmentIntersectXY(polyline1[i], polyline1[i + 1], polyline2[j], polyline2[j + 1], &tab, &tcd, true, intPoint)) {
 				return true;
@@ -1268,7 +1268,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const
 
 	for (int i = 0; i < polyline1.size() - 1; i++) {
 		for (int j = 0; j < polyline2.size() - 1; j++) {
-			float tab, tcd;
+			double tab, tcd;
 			if (Util::segmentSegmentIntersectXY(polyline1[i], polyline1[i + 1], polyline2[j], polyline2[j + 1], &tab, &tcd, true, intPoint)) {
 				return true;
 			}
@@ -1286,7 +1286,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const QVector2D& pt1, const QVecto
 		if (!roads.graph[*ei]->valid) continue;
 
 		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; ++i) {
-			float tab, tcd;
+			double tab, tcd;
 			QVector2D pt;
 			if (Util::segmentSegmentIntersectXY(roads.graph[*ei]->polyline[i], roads.graph[*ei]->polyline[i + 1], pt1, pt2, &tab, &tcd, true, pt)) {
 				float dist = (pt1 - pt).lengthSquared();
@@ -2342,7 +2342,7 @@ void GraphUtil::perturb(RoadGraph &roads, const Polygon2D &area, float factor) {
 void GraphUtil::removeSelfIntersectingRoads(RoadGraph &roads) {
 	//setVertexType(roads);
 
-	float ta, tb;
+	double ta, tb;
 	QVector2D intPt;
 	RoadEdgeIter ei, eend;
 	RoadEdgeIter ei2, eend2;
@@ -3028,7 +3028,7 @@ bool GraphUtil::planarifyOne(RoadGraph& roads) {
 
 			for (int i = 0; i < e->polyline.size() - 1; i++) {
 				for (int j = 0; j < e2->polyline.size() - 1; j++) {
-					float tab, tcd;
+					double tab, tcd;
 					QVector2D intPt;
 					if (Util::segmentSegmentIntersectXY(e->polyline[i], e->polyline[i+1], e2->polyline[j], e2->polyline[j+1], &tab, &tcd, true, intPt)) {
 						// エッジの端、ぎりぎりで、交差する場合は、交差させない
