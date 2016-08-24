@@ -10,7 +10,6 @@
 
 void PMRoadGenerator::generateRoadNetwork() {
 	//srand(12);
-	srand(clock());
 
 	// make roads along the boundary of the area
 	generateRoadsAtBoundary();

@@ -4,7 +4,6 @@
 #include "Util.h"
 
 bool PmParcels::generateParcels(VBORenderManager& rendManager, std::vector<Block>& blocks) {
-	srand(0);
 	for (int bN = 0; bN < blocks.size(); ++bN) {
 		if (blocks[bN].isPark) continue;
 

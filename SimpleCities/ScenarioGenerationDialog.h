@@ -14,6 +14,8 @@ public slots:
 	void onZone();
 	void onTerrain();
 	void onOutputDirectory();
+	void onUseSimulator();
+	void onSimulatorDirectory();
 	void onOK();
 	void onCancel();
 

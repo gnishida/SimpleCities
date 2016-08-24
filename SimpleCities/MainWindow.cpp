@@ -280,6 +280,8 @@ void MainWindow::onGenerateScenarios() {
 	QString terrain_file = dlg.ui.lineEditTerrain->text();
 	int numScenarios = dlg.ui.lineEditNumScenarios->text().toInt();
 	QString output_dir = dlg.ui.lineEditOutputDirectory->text();
+	bool use_flood_simulator = dlg.ui.checkBoxUseSimulator->isChecked();
+	QString flood_simulator_dir = dlg.ui.lineEditSimulatorDirectory->text();
 	std::pair<float, float> avenueSegmentLengthRange = std::make_pair(dlg.ui.lineEditAvenueSegmentLengthMin->text().toFloat(), dlg.ui.lineEditAvenueSegmentLengthMax->text().toFloat());
 	std::pair<float, float> roadBaseOrientationRange = std::make_pair(dlg.ui.lineEditRoadBaseOrientationMin->text().toFloat(), dlg.ui.lineEditRoadBaseOrientationMax->text().toFloat());
 	std::pair<float, float> roadCurvatureRange = std::make_pair(dlg.ui.lineEditRoadCurvatureMin->text().toFloat(), dlg.ui.lineEditRoadCurvatureMax->text().toFloat());
@@ -290,7 +292,6 @@ void MainWindow::onGenerateScenarios() {
 	std::pair<float, float> setbackRearRange = std::make_pair(dlg.ui.lineEditSetbackRearMin->text().toFloat(), dlg.ui.lineEditSetbackRearMax->text().toFloat());
 	std::pair<float, float> setbackSideRange = std::make_pair(dlg.ui.lineEditSetbackSideMin->text().toFloat(), dlg.ui.lineEditSetbackSideMax->text().toFloat());
 	std::pair<int, int> numStoriesRange = std::make_pair(dlg.ui.lineEditNumStoriesMin->text().toInt(), dlg.ui.lineEditNumStoriesMax->text().toInt());
-	float numStoriesDev = dlg.ui.lineEditNumStoriesDev->text().toFloat();
 	std::pair<float, float> minBuildingDimRange = std::make_pair(dlg.ui.lineEditMinBuildingDimMin->text().toFloat(), dlg.ui.lineEditMinBuildingDimMax->text().toFloat());
 
 	// load zone
@@ -300,7 +301,7 @@ void MainWindow::onGenerateScenarios() {
 	//urbanGeometry->loadTerrain(terrain_file.toUtf8().constData());
 
 	// generate scenarios
-	urbanGeometry->generateScenarios(numScenarios, output_dir, avenueSegmentLengthRange, roadBaseOrientationRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, parcelAreaDev, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange, numStoriesDev, minBuildingDimRange);
+	urbanGeometry->generateScenarios(numScenarios, output_dir, use_flood_simulator, flood_simulator_dir, avenueSegmentLengthRange, roadBaseOrientationRange, roadCurvatureRange, parkRatioRange, pacelAreaRange, parcelAreaDev, setbackFrontRange, setbackRearRange, setbackSideRange, numStoriesRange, minBuildingDimRange);
 }
 
 void MainWindow::onViewChanged() {

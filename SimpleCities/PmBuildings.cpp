@@ -57,7 +57,8 @@ bool PmBuildings::generateBuilding(VBORenderManager& rendManager, Block& block, 
 	}
 
 	// Set building attributes
-	parcel.building.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation"))) + 0.5f;
+	parcel.building.numStories = Util::genRand(G::getInt("building_stories_min"), G::getInt("building_stories_max") + 1);
+	//parcel.building.numStories = std::max(1.0f, Util::genRandNormal(G::getInt("building_stories_mean"), G::getFloat("building_stories_deviation"))) + 0.5f;
 	float c = rand() % 192;
 	parcel.building.color = QColor(c, c, c);
 	parcel.building.bldType = 1;

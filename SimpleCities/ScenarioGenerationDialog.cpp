@@ -9,6 +9,8 @@ ScenarioGenerationDialog::ScenarioGenerationDialog(QWidget *parent) : QDialog(pa
 	ui.lineEditTerrain->setText("../3D/dem1m_calb.tif");
 	ui.lineEditNumScenarios->setText("10");
 	ui.lineEditOutputDirectory->setText("scenarios");
+	ui.checkBoxUseSimulator->setChecked(true);
+	ui.lineEditSimulatorDirectory->setText("C:/Hydro_model/Folder");
 	ui.lineEditAvenueSegmentLengthMin->setText("50");
 	ui.lineEditAvenueSegmentLengthMax->setText("200");
 	ui.lineEditRoadBaseOrientationMin->setText("0");
@@ -26,15 +28,16 @@ ScenarioGenerationDialog::ScenarioGenerationDialog(QWidget *parent) : QDialog(pa
 	ui.lineEditSetbackRearMax->setText("5.0");
 	ui.lineEditSetbackSideMin->setText("5.0");
 	ui.lineEditSetbackSideMax->setText("5.0");
-	ui.lineEditNumStoriesMin->setText("5");
-	ui.lineEditNumStoriesMax->setText("5");
-	ui.lineEditNumStoriesDev->setText("2");
+	ui.lineEditNumStoriesMin->setText("2");
+	ui.lineEditNumStoriesMax->setText("8");
 	ui.lineEditMinBuildingDimMin->setText("10.0");
 	ui.lineEditMinBuildingDimMax->setText("10.0");
 
 	connect(ui.pushButtonZone, SIGNAL(clicked()), this, SLOT(onZone()));
 	connect(ui.pushButtonTerrain, SIGNAL(clicked()), this, SLOT(onTerrain()));
 	connect(ui.pushButtonOutputDirectory, SIGNAL(clicked()), this, SLOT(onOutputDirectory()));
+	connect(ui.checkBoxUseSimulator, SIGNAL(clicked()), this, SLOT(onUseSimulator()));
+	connect(ui.pushButtonSimulatorDirectory, SIGNAL(clicked()), this, SLOT(onSimulatorDirectory()));
 	connect(ui.pushButtonOK, SIGNAL(clicked()), this, SLOT(onOK()));
 	connect(ui.pushButtonCancel, SIGNAL(clicked()), this, SLOT(onCancel()));
 }
@@ -57,6 +60,17 @@ void ScenarioGenerationDialog::onOutputDirectory() {
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), ui.lineEditOutputDirectory->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (!dir.isEmpty()) {
 		ui.lineEditOutputDirectory->setText(dir);
+	}
+}
+
+void ScenarioGenerationDialog::onUseSimulator() {
+	ui.lineEditSimulatorDirectory->setEnabled(ui.checkBoxUseSimulator->isChecked());
+}
+
+void ScenarioGenerationDialog::onSimulatorDirectory() {
+	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), ui.lineEditSimulatorDirectory->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	if (!dir.isEmpty()) {
+		ui.lineEditSimulatorDirectory->setText(dir);
 	}
 }
 

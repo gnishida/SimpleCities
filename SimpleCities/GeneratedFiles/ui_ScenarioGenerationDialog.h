@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -85,25 +86,27 @@ public:
     QLineEdit *lineEditNumStoriesMin;
     QLineEdit *lineEditNumStoriesMax;
     QLabel *label_34;
-    QLineEdit *lineEditNumStoriesDev;
-    QLabel *label_35;
     QLabel *label_36;
     QLineEdit *lineEditMinBuildingDimMin;
     QLineEdit *lineEditMinBuildingDimMax;
     QLabel *label_37;
     QLabel *label_27;
+    QLineEdit *lineEditSimulatorDirectory;
+    QLabel *label_28;
+    QPushButton *pushButtonSimulatorDirectory;
+    QCheckBox *checkBoxUseSimulator;
 
     void setupUi(QDialog *ScenarioGenerationDialog)
     {
         if (ScenarioGenerationDialog->objectName().isEmpty())
             ScenarioGenerationDialog->setObjectName(QStringLiteral("ScenarioGenerationDialog"));
-        ScenarioGenerationDialog->resize(544, 571);
+        ScenarioGenerationDialog->resize(544, 634);
         pushButtonOK = new QPushButton(ScenarioGenerationDialog);
         pushButtonOK->setObjectName(QStringLiteral("pushButtonOK"));
-        pushButtonOK->setGeometry(QRect(330, 530, 91, 31));
+        pushButtonOK->setGeometry(QRect(330, 590, 91, 31));
         pushButtonCancel = new QPushButton(ScenarioGenerationDialog);
         pushButtonCancel->setObjectName(QStringLiteral("pushButtonCancel"));
-        pushButtonCancel->setGeometry(QRect(440, 530, 91, 31));
+        pushButtonCancel->setGeometry(QRect(440, 590, 91, 31));
         label = new QLabel(ScenarioGenerationDialog);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(20, 70, 61, 21));
@@ -139,7 +142,7 @@ public:
         pushButtonTerrain->setGeometry(QRect(500, 40, 31, 23));
         groupBox = new QGroupBox(ScenarioGenerationDialog);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(10, 130, 521, 111));
+        groupBox->setGeometry(QRect(10, 200, 521, 111));
         label_9 = new QLabel(groupBox);
         label_9->setObjectName(QStringLiteral("label_9"));
         label_9->setGeometry(QRect(20, 80, 121, 21));
@@ -184,7 +187,7 @@ public:
         label_8->setGeometry(QRect(320, 50, 31, 21));
         groupBox_2 = new QGroupBox(ScenarioGenerationDialog);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 250, 521, 171));
+        groupBox_2->setGeometry(QRect(10, 320, 521, 171));
         label_11 = new QLabel(groupBox_2);
         label_11->setObjectName(QStringLiteral("label_11"));
         label_11->setGeometry(QRect(20, 20, 121, 21));
@@ -265,7 +268,7 @@ public:
         label_26->setGeometry(QRect(320, 50, 31, 21));
         groupBox_3 = new QGroupBox(ScenarioGenerationDialog);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 430, 521, 81));
+        groupBox_3->setGeometry(QRect(10, 500, 521, 81));
         label_33 = new QLabel(groupBox_3);
         label_33->setObjectName(QStringLiteral("label_33"));
         label_33->setGeometry(QRect(20, 20, 121, 21));
@@ -278,12 +281,6 @@ public:
         label_34 = new QLabel(groupBox_3);
         label_34->setObjectName(QStringLiteral("label_34"));
         label_34->setGeometry(QRect(226, 20, 16, 21));
-        lineEditNumStoriesDev = new QLineEdit(groupBox_3);
-        lineEditNumStoriesDev->setObjectName(QStringLiteral("lineEditNumStoriesDev"));
-        lineEditNumStoriesDev->setGeometry(QRect(430, 20, 71, 20));
-        label_35 = new QLabel(groupBox_3);
-        label_35->setObjectName(QStringLiteral("label_35"));
-        label_35->setGeometry(QRect(370, 20, 51, 21));
         label_36 = new QLabel(groupBox_3);
         label_36->setObjectName(QStringLiteral("label_36"));
         label_36->setGeometry(QRect(20, 50, 121, 21));
@@ -299,6 +296,18 @@ public:
         label_27 = new QLabel(groupBox_3);
         label_27->setObjectName(QStringLiteral("label_27"));
         label_27->setGeometry(QRect(320, 50, 16, 21));
+        lineEditSimulatorDirectory = new QLineEdit(ScenarioGenerationDialog);
+        lineEditSimulatorDirectory->setObjectName(QStringLiteral("lineEditSimulatorDirectory"));
+        lineEditSimulatorDirectory->setGeometry(QRect(130, 160, 361, 20));
+        label_28 = new QLabel(ScenarioGenerationDialog);
+        label_28->setObjectName(QStringLiteral("label_28"));
+        label_28->setGeometry(QRect(20, 160, 101, 21));
+        pushButtonSimulatorDirectory = new QPushButton(ScenarioGenerationDialog);
+        pushButtonSimulatorDirectory->setObjectName(QStringLiteral("pushButtonSimulatorDirectory"));
+        pushButtonSimulatorDirectory->setGeometry(QRect(500, 160, 31, 23));
+        checkBoxUseSimulator = new QCheckBox(ScenarioGenerationDialog);
+        checkBoxUseSimulator->setObjectName(QStringLiteral("checkBoxUseSimulator"));
+        checkBoxUseSimulator->setGeometry(QRect(20, 140, 101, 17));
         QWidget::setTabOrder(lineEditZone, pushButtonZone);
         QWidget::setTabOrder(pushButtonZone, lineEditTerrain);
         QWidget::setTabOrder(lineEditTerrain, pushButtonTerrain);
@@ -324,8 +333,7 @@ public:
         QWidget::setTabOrder(lineEditSetbackSideMin, lineEditSetbackSideMax);
         QWidget::setTabOrder(lineEditSetbackSideMax, lineEditNumStoriesMin);
         QWidget::setTabOrder(lineEditNumStoriesMin, lineEditNumStoriesMax);
-        QWidget::setTabOrder(lineEditNumStoriesMax, lineEditNumStoriesDev);
-        QWidget::setTabOrder(lineEditNumStoriesDev, lineEditMinBuildingDimMin);
+        QWidget::setTabOrder(lineEditNumStoriesMax, lineEditMinBuildingDimMin);
         QWidget::setTabOrder(lineEditMinBuildingDimMin, lineEditMinBuildingDimMax);
         QWidget::setTabOrder(lineEditMinBuildingDimMax, pushButtonOK);
         QWidget::setTabOrder(pushButtonOK, pushButtonCancel);
@@ -375,10 +383,12 @@ public:
         groupBox_3->setTitle(QApplication::translate("ScenarioGenerationDialog", "Buildings", 0));
         label_33->setText(QApplication::translate("ScenarioGenerationDialog", "# Stories:", 0));
         label_34->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
-        label_35->setText(QApplication::translate("ScenarioGenerationDialog", "Std Dev:", 0));
         label_36->setText(QApplication::translate("ScenarioGenerationDialog", "Min dimension:", 0));
         label_37->setText(QApplication::translate("ScenarioGenerationDialog", "~", 0));
         label_27->setText(QApplication::translate("ScenarioGenerationDialog", "[m]", 0));
+        label_28->setText(QApplication::translate("ScenarioGenerationDialog", "Simulator directory:", 0));
+        pushButtonSimulatorDirectory->setText(QApplication::translate("ScenarioGenerationDialog", "...", 0));
+        checkBoxUseSimulator->setText(QApplication::translate("ScenarioGenerationDialog", "Use simulator", 0));
     } // retranslateUi
 
 };

@@ -18,6 +18,8 @@
 #include "GraphUtil.h"
 #include "PMRoadGenerator.h"
 #include <QDir>
+#include <QProcess>
+#include <QTest>
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -57,7 +59,7 @@ void UrbanGeometry::generateVegetation() {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::generateAll() {
+float UrbanGeometry::generateAll() {
 	clear();
 
 	PMRoadGenerator generator(mainWin, roads, &mainWin->glWidget->vboRenderManager, zone);
@@ -65,10 +67,22 @@ void UrbanGeometry::generateAll() {
 	PmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	PmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	PmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
+
+	// compute the building coverage
+	float buildingCoverageRatio = 0.0f;
+	for (int i = 0; i < blocks.size(); ++i) {
+		for (int j = 0; j < blocks[i].parcels.size(); ++j) {
+			buildingCoverageRatio += blocks[i].parcels[j].building.buildingFootprint.area();
+		}
+	}
+	buildingCoverageRatio /= zone.area();
+
 	update(mainWin->glWidget->vboRenderManager);
+
+	return buildingCoverageRatio;
 }
 
-void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& roadBaseOrientationRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, float parcelAreaDev, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<int, int>& numStoriesRange, float numStoriesDev, const std::pair<int, int>& minBuildingDimRange) {
+void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_dir, bool useSimulator, const QString& flood_simulator_dir, const std::pair<float, float>& avenueSegmentLengthRange, const std::pair<float, float>& roadBaseOrientationRange, const std::pair<float, float>& roadCurvatureRange, const std::pair<float, float>& parkRatioRange, const std::pair<float, float>& parcelAreaRange, float parcelAreaDev, const std::pair<float, float>& setbackFrontRange, const std::pair<float, float>& setbackRearRange, const std::pair<float, float>& setbackSideRange, const std::pair<int, int>& numStoriesRange, const std::pair<int, int>& minBuildingDimRange) {
 	if (QDir(output_dir).exists()) {
 		std::cout << "Removing existing files in the output directory...";
 		QDir(output_dir).removeRecursively();
@@ -84,6 +98,17 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 	}
 	QTextStream out_params(&file_params);
 
+	QFile file_indicators(output_dir + "/indicators.txt");
+	QTextStream out_indicators;
+	if (useSimulator) {
+		if (!file_indicators.open(QIODevice::WriteOnly)) {
+			std::cerr << "Cannot open file for writing: " << file_indicators.fileName().toUtf8().constData() << std::endl;
+			return;
+		}
+		out_indicators.setDevice(&file_indicators);
+		out_indicators.setRealNumberPrecision(10);
+	}
+
 	// write the header to the file
 	out_params << "No." << ",";
 	out_params << "avenueAvgSegmentLength" << ",";
@@ -95,9 +120,10 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 	out_params << "parcel_setback_front" << ",";
 	out_params << "parcel_setback_rear" << ",";
 	out_params << "parcel_setback_sides" << ",";
-	out_params << "building_stories_mean" << ",";
-	out_params << "building_stories_deviation" << ",";
-	out_params << "building_min_dimension" << "\n";
+	out_params << "building_stories_min" << ",";
+	out_params << "building_stories_max" << ",";
+	out_params << "building_min_dimension" << ",";
+	out_params << "building_coverage" << "\n";
 
 	for (int iter = 0; iter < numScenarios; ++iter) {
 		std::cout << "Generating scenarios: " << iter + 1 << std::endl;
@@ -112,9 +138,12 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		G::global()["parcel_setback_front"] = Util::genRand(setbackFrontRange.first, setbackFrontRange.second);
 		G::global()["parcel_setback_rear"] = Util::genRand(setbackRearRange.first, setbackRearRange.second);
 		G::global()["parcel_setback_sides"] = Util::genRand(setbackSideRange.first, setbackSideRange.second);
-		G::global()["building_stories_mean"] = (int)Util::genRand(numStoriesRange.first, numStoriesRange.second + 1);
-		G::global()["building_stories_deviation"] = numStoriesDev;
+		G::global()["building_stories_min"] = numStoriesRange.first;
+		G::global()["building_stories_max"] = numStoriesRange.second;
 		G::global()["building_min_dimension"] = Util::genRand(minBuildingDimRange.first, minBuildingDimRange.second);
+
+		// generate a city
+		float buildingCoverageRatio = generateAll();
 
 		std::cout << "  avenueAvgSegmentLength: " << G::getFloat("avenueAvgSegmentLength") << std::endl;
 		std::cout << "  road_base_orientation: " << G::getFloat("road_base_orientation") << std::endl;
@@ -125,13 +154,11 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		std::cout << "  parcel_setback_front: " << G::getFloat("parcel_setback_front") << std::endl;
 		std::cout << "  parcel_setback_rear: " << G::getFloat("parcel_setback_rear") << std::endl;
 		std::cout << "  parcel_setback_sides: " << G::getFloat("parcel_setback_sides") << std::endl;
-		std::cout << "  building_stories_mean: " << G::getFloat("building_stories_mean") << std::endl;
-		std::cout << "  building_stories_deviation: " << G::getFloat("building_stories_deviation") << std::endl;
+		std::cout << "  building_stories_min: " << G::getInt("building_stories_min") << std::endl;
+		std::cout << "  building_stories_max: " << G::getInt("building_stories_max") << std::endl;
 		std::cout << "  building_min_dimension: " << G::getFloat("building_min_dimension") << std::endl;
+		std::cout << "  building_coverage: " << buildingCoverageRatio << std::endl;
 		std::cout << std::endl;
-
-		// generate a city
-		generateAll();
 
 		// save roads
 		QString filename_roads = output_dir + QString("/roads_%1.shp").arg(iter + 1, 6, 10, QChar('0'));
@@ -144,6 +171,9 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		// save building footprints
 		QString filename_buildings = output_dir + QString("/buildings_%1.shp").arg(iter + 1, 6, 10, QChar('0'));
 		saveBuildings(filename_buildings.toUtf8().constData());
+		if (useSimulator) {
+			saveBuildings((flood_simulator_dir + "/Bu1.shp").toUtf8().constData());
+		}
 
 		// save the parameter values
 		out_params << iter + 1 << ",";
@@ -156,12 +186,59 @@ void UrbanGeometry::generateScenarios(int numScenarios, const QString& output_di
 		out_params << G::getFloat("parcel_setback_front") << ",";
 		out_params << G::getFloat("parcel_setback_rear") << ",";
 		out_params << G::getFloat("parcel_setback_sides") << ",";
-		out_params << G::getFloat("building_stories_mean") << ",";
-		out_params << G::getFloat("building_stories_deviation") << ",";
-		out_params << G::getFloat("building_min_dimension") << "\n";
+		out_params << G::getFloat("building_stories_min") << ",";
+		out_params << G::getFloat("building_stories_max") << ",";
+		out_params << G::getFloat("building_min_dimension") << ",";
+		out_params << buildingCoverageRatio << "\n";
+
+		if (useSimulator) {
+			QFile file_ind(flood_simulator_dir + "/indicators");
+			if (file_ind.exists()) file_ind.remove();
+
+			QProcess process(mainWin);
+			process.start("cmd " + flood_simulator_dir + "/Urbannetwork.exe");
+			if (process.waitForStarted(-1)) {
+				std::cout << "Running simulator..." << std::endl;
+
+				if (process.waitForFinished(-1)) {
+					QString output(process.readAllStandardOutput());
+					std::cout << output.toUtf8().constData() << std::endl;
+
+					while (!file_ind.exists()) {
+						QTest::qSleep(1000);
+					}
+
+					std::cout << "Done." << std::endl;
+					std::cout << process.exitStatus() << std::endl;
+
+					QFile file_ind(flood_simulator_dir + "/indicators");
+					if (file_ind.open(QIODevice::ReadOnly)) {
+						QTextStream in(&file_ind);
+						int cnt = 0;
+						while (!in.atEnd()) {
+							double value = in.readLine().toDouble();
+							if (cnt > 0) out_indicators << ",";
+							out_indicators << value;
+							cnt++;
+						}
+						out_indicators << "\n";
+						file_ind.close();
+					}
+				}
+				else {
+					std::cout << "Stopped with errors." << std::endl;
+				}
+			}
+			else {
+				std::cout << "The simulator could not start." << std::endl;
+			}
+		}
 	}
 
 	file_params.close();
+	if (useSimulator) {
+		file_indicators.close();
+	}
 	
 	std::cout << "Generation has completed." << std::endl;
 }
